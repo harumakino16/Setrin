@@ -3,13 +3,27 @@ import { AuthContext } from '@/context/AuthContext';
 import { db } from '../../firebaseConfig';
 import { updateDoc, doc } from 'firebase/firestore';
 import { Sidebar } from "@/components/Sidebar";
-import { Keys, authUrl } from '../../KEYS';
+import { useRouter } from 'next/router';
 
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
+    const router = useRouter();
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&scope=${process.env.SCOPE}&response_type=code&prompt=consent&access_type=offline`;
+
+
+    useEffect(() => {
+        const { code } = router.query;
+        if (code) {
+            console.log('取得したcode:', code);
+            exchangeCodeForTokens(code);
+            // URLからcodeパラメータをクリアする
+            router.replace(router.pathname, undefined, { shallow: true });
+        }
+    }, [router]);
 
     if (loading) {
         return <div>ローディング中...</div>;
@@ -28,47 +42,49 @@ function Settings() {
         }
     }, [currentUser]);
 
-    useEffect(() => {
-        const handleHashChange = () => {
-            const hash = window.location.hash;
-            extractAccessTokenFromHash(hash);
-        };
 
-        window.addEventListener('hashchange', handleHashChange);
-        handleHashChange(); // 初期ロード時にも実行
+    // codeを渡してリフレッシュトークンを取得
+    async function exchangeCodeForTokens(code) {
+        try {
+            const response = await fetch('/api/getTokensFromCode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code })
+            });
 
-        return () => {
-            window.removeEventListener('hashchange', handleHashChange);
-        };
-    }, []);
-
-
-
-    function extractAccessTokenFromHash(hash) {
-        const params = new URLSearchParams(hash.substring(1)); // 先頭の '#' を取り除く
-        const tempAccessToken = params.get('access_token');
-        if (tempAccessToken) {
-            console.log(tempAccessToken);
-            // window.location.hash = ''; // アクセストークンを取得した後にハッシュをクリア
-            updateAccessTokenInFirestore(tempAccessToken); // Firestoreに直接保存
-        }
-    }
-
-    async function updateAccessTokenInFirestore(accessToken) {
-        if (currentUser) {
-            const userRef = doc(db, 'users', currentUser.uid);
-            try {
-                await updateDoc(userRef, {
-                    youtubeAccessToken: accessToken
-                });
-                console.log('アクセストークンがFirestoreに保存されました。');
-            } catch (error) {
-                console.error('アクセストークンの保存に失敗しました:', error);
+            if (!response.ok) {
+                throw new Error(`An error has occurred: ${response.status}`);
             }
-        }else{
-            console.log("ユーザーがいません");
+
+            const data = await response.json();
+            // 直接Promiseを解決して、その結果を渡します。
+            saveRefreshTokenInFirestore(data.refreshToken);
+        } catch (error) {
+            console.error('トークンの取得に失敗しました:', error);
         }
     }
+
+    // リフレッシュトークンをデータベースに保存
+    async function saveRefreshTokenInFirestore(refreshToken) {
+        if (!currentUser) {
+            console.log("ユーザーがいません");
+            return;
+        }
+
+        const userRef = doc(db, 'users', currentUser.uid);
+        try {
+            // refreshTokenが正しくPromiseから解決された値として扱われるようにします。
+            await updateDoc(userRef, {
+                youtubeRefreshToken: refreshToken
+            });
+            console.log('リフレッシュトークンがFirestoreに保存されました。');
+        } catch (error) {
+            console.error('リフレッシュトークンの保存に失敗しました:', error);
+        }
+    }
+
 
     const handleUpdateProfile = async () => {
         if (!currentUser) {
@@ -90,7 +106,8 @@ function Settings() {
     };
 
     console.count("レンダリングされました");
-    
+
+
     return (
         <div className="flex">
             <Sidebar />
@@ -104,7 +121,7 @@ function Settings() {
                     <label className="block mb-2">表示名:</label>
                     <input type="text" className="border p-2 rounded w-full" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                 </div>
-                {currentUser.youtubeAccessToken ? (
+                {currentUser.youtubeRefreshToken ? (
                     <div className="mt-4 text-green-500 font-bold">
                         YouTubeとリンク済み
                     </div>
@@ -117,9 +134,7 @@ function Settings() {
                     更新
                 </button>
 
-                <button onClick={() => createPlaylist()} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    プレイリストを作成
-                </button>
+
             </div>
         </div>
     );

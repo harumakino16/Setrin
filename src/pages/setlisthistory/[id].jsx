@@ -35,20 +35,36 @@ const SetlistDetail = () => {
         fetchSetlistDetail();
     }, [currentUser, id]);
 
-    async function createPlaylist(songs) {
-        const token = currentUser.youtubeAccessToken; // OAuth 2.0 で取得したアクセストークン
-        const videoUrls = songs.map(song => song.youtubeUrl);
-        console.log(token);
+    async function createPlaylist(songs, playlistName) {
         try {
+            const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken: currentUser.youtubeRefreshToken }),
+            });
+            console.log(refreshTokenResponse);
+            console.log(currentUser.youtubeRefreshToken);
+
+            if (!refreshTokenResponse.ok) {
+                throw new Error('Failed to refresh access token');
+            }
+
+            const { accessToken } = await refreshTokenResponse.json();
+            console.log(accessToken);
+
+            const videoUrls = songs.map(song => song.youtubeUrl);
             const response = await fetch('/api/createPlaylist', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token, videoUrls, playlistName }), // プレイリスト名も送信
+                body: JSON.stringify({ token: accessToken, videoUrls, playlistName: playlistName || '無名のプレイリスト' }),
             });
 
             if (!response.ok) {
+                console.log('Failed to create playlist');
                 throw new Error('Failed to create playlist');
             }
 
@@ -56,10 +72,24 @@ const SetlistDetail = () => {
             console.log('Playlist created:', data);
         } catch (error) {
             console.error('Error creating playlist:', error);
-
         }
 
+
     }
+    // const getAccessToken = async () => {
+    //     const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({ refreshToken: currentUser.youtubeRefreshToken }),
+    //     });
+    //     console.log(currentUser.youtubeRefreshToken);
+    //     console.log(refreshTokenResponse);
+    //     return refreshTokenResponse.json().then(data => {
+    //         setAccessToken(data.accessToken);
+    //     });
+    // }
 
     return (
         <div className="flex">
@@ -85,6 +115,8 @@ const SetlistDetail = () => {
                         </div>
                     </div>
                 )}
+                {/* <button onClick={() => getAccessToken()}>アクセストークンを取得</button>
+                <div>アクセストークン：{accessToken}</div> */}
             </div>
         </div>
     );
