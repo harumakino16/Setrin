@@ -35,6 +35,10 @@ const SetlistDetail = () => {
         fetchSetlistDetail();
     }, [currentUser, id]);
 
+    useEffect(() => {
+        console.log(playlistName);
+    }, [playlistName]);
+
     async function createPlaylist(songs, playlistName) {
         try {
             const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
@@ -60,7 +64,7 @@ const SetlistDetail = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: accessToken, videoUrls, playlistName: playlistName || '無名のプレイリスト' }),
+                body: JSON.stringify({ token: accessToken, videoUrls, playlistName }),
             });
 
             if (!response.ok) {
@@ -111,7 +115,7 @@ const SetlistDetail = () => {
                                 onChange={(e) => setPlaylistName(e.target.value)}
                                 className="border p-2 rounded w-full mb-4"
                             />
-                            <button onClick={() => createPlaylist(songs)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">YouTubeの再生リストに追加</button>
+                            <button onClick={() => createPlaylist(songs, playlistName ? playlistName : "無名のプレイリスト")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">YouTubeの再生リストに追加</button>
                         </div>
                     </div>
                 )}
