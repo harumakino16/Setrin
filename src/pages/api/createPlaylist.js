@@ -3,10 +3,14 @@ import { google } from 'googleapis';
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         try {
-            const { token } = req.body;
+            const { token, videoUrls, playlistName } = req.body;
 
             if (!token) {
                 return res.status(400).json({ message: 'Access token is required' });
+            }
+
+            if (!videoUrls || !Array.isArray(videoUrls) || videoUrls.length === 0) {
+                return res.status(400).json({ message: 'Video URLs are required and must be an array' });
             }
 
             const oauth2Client = new google.auth.OAuth2();
@@ -18,11 +22,11 @@ export default async function handler(req, res) {
             });
 
             try {
-                const response = await youtube.playlists.insert({
+                const playlistResponse = await youtube.playlists.insert({
                     part: ['snippet,status'],
                     requestBody: {
                         snippet: {
-                            title: '新しいプレイリスト',
+                            title: playlistName,
                             description: 'APIを通じて作成されたプレイリスト',
                             defaultLanguage: 'ja',
                         },
@@ -31,7 +35,30 @@ export default async function handler(req, res) {
                         },
                     },
                 });
-                res.status(200).json(response.data);
+
+                const playlistId = playlistResponse.data.id;
+
+                const videoIds = videoUrls.map(url => {
+                    const urlObj = new URL(url);
+                    return urlObj.searchParams.get('v');
+                });
+
+                for (const videoId of videoIds) {
+                    await youtube.playlistItems.insert({
+                        part: ['snippet'],
+                        requestBody: {
+                            snippet: {
+                                playlistId: playlistId,
+                                resourceId: {
+                                    kind: 'youtube#video',
+                                    videoId: videoId,
+                                },
+                            },
+                        },
+                    });
+                }
+
+                res.status(200).json({ playlistId: playlistId });
             } catch (apiError) {
                 if (apiError.code === 401 && apiError.errors[0].reason === 'youtubeSignupRequired') {
                     res.status(401).json({ message: 'YouTubeチャンネルが必要です。チャンネルを作成してください。' });

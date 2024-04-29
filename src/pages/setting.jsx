@@ -49,7 +49,7 @@ function Settings() {
         const tempAccessToken = params.get('access_token');
         if (tempAccessToken) {
             console.log(tempAccessToken);
-            window.location.hash = ''; // アクセストークンを取得した後にハッシュをクリア
+            // window.location.hash = ''; // アクセストークンを取得した後にハッシュをクリア
             updateAccessTokenInFirestore(tempAccessToken); // Firestoreに直接保存
         }
     }

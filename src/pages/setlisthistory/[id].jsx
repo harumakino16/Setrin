@@ -8,10 +8,9 @@ import SongTable from '@/components/SongTable'; // SongTable コンポーネン�
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 
 const SetlistDetail = () => {
-    console.log("再生リストを作り始めるよ");
-    console.log("再生リストを作り始めるよ2");
     const [setlist, setSetlist] = useState(null);
     const [songs, setSongs] = useState([]);
+    const [playlistName, setPlaylistName] = useState(''); // プレイリスト名のための状態
     const { currentUser } = useContext(AuthContext);
     const router = useRouter();
     const { id } = router.query;
@@ -36,8 +35,9 @@ const SetlistDetail = () => {
         fetchSetlistDetail();
     }, [currentUser, id]);
 
-    async function createPlaylist() {
+    async function createPlaylist(songs) {
         const token = currentUser.youtubeAccessToken; // OAuth 2.0 で取得したアクセストークン
+        const videoUrls = songs.map(song => song.youtubeUrl);
         console.log(token);
         try {
             const response = await fetch('/api/createPlaylist', {
@@ -45,7 +45,7 @@ const SetlistDetail = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token }),
+                body: JSON.stringify({ token, videoUrls, playlistName }), // プレイリスト名も送信
             });
 
             if (!response.ok) {
@@ -74,7 +74,14 @@ const SetlistDetail = () => {
                         <div className="mt-4">
                             <h2 className="text-xl font-bold">曲リスト</h2>
                             <SongTable songs={songs} pageName="setlisthistory/[id]" />
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">YouTubeの再生リストに追加</button>
+                            <input
+                                type="text"
+                                placeholder="プレイリスト名を入力"
+                                value={playlistName}
+                                onChange={(e) => setPlaylistName(e.target.value)}
+                                className="border p-2 rounded w-full mb-4"
+                            />
+                            <button onClick={() => createPlaylist(songs)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">YouTubeの再生リストに追加</button>
                         </div>
                     </div>
                 )}

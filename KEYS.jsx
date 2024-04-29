@@ -9,6 +9,6 @@ export const Keys = {
     
 } 
 
-export const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${Keys.CLIENT_ID}&redirect_uri=${Keys.REDIRECT_URI}&scope=${Keys.SCOPE}&response_type=token&prompt=consent`;
+export const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${Keys.CLIENT_ID}&redirect_uri=${Keys.REDIRECT_URI}&scope=${Keys.SCOPE}&response_type=code&prompt=consent&access_type=offline`;
 
 
