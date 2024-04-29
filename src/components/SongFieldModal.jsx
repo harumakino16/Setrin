@@ -1,0 +1,75 @@
+import { useState, useContext } from 'react';
+import { db } from '../../firebaseConfig';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { AuthContext } from '../context/AuthContext';
+
+function SongModal({ onClose, onSongUpdated, song }) {
+  const isNewSong = !song;
+  const [title, setTitle] = useState(isNewSong ? '' : song.title);
+  const [artist, setArtist] = useState(isNewSong ? '' : song.artist);
+  const [tags, setTags] = useState(isNewSong ? '' : song.tags.join(', '));
+  const [genres, setGenres] = useState(isNewSong ? '' : song.genres.join(', '));
+  const [youtubeUrl, setYoutubeUrl] = useState(isNewSong ? '' : song.youtubeUrl);
+  const [monetized, setMonetized] = useState(isNewSong ? 'NG' : (song.monetized ? 'OK' : 'NG'));
+  const [timesSung, setTimesSung] = useState(isNewSong ? 0 : song.timesSung);
+  const authContext = useContext(AuthContext);
+  const { currentUser } = authContext || {};
+
+  const handleSaveSong = async () => {
+    const songData = {
+      title,
+      artist,
+      tags: tags.split(',').map(tag => tag.trim()),
+      genres: genres.split(',').map(genre => genre.trim()),
+      youtubeUrl,
+      timesSung: parseInt(timesSung, 10),
+      monetized: monetized === 'OK'
+    };
+
+    if (!currentUser) {
+      alert('ログインしてください');
+      return;
+    }
+
+    try {
+      if (isNewSong) {
+        const userSongsCollection = collection(db, 'users', currentUser.uid, 'Songs');
+        await addDoc(userSongsCollection, songData);
+      } else {
+        const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', song.id);
+        await updateDoc(songDocRef, songData);
+      }
+      onClose();
+      onSongUpdated();
+    } catch (error) {
+      console.error(isNewSong ? '曲の追加に失敗しました:' : '曲の更新に失敗しました:', error);
+      alert(isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-90 flex justify-center items-center">
+      <div className="modal bg-white p-20 rounded-lg shadow-lg">
+        <span className="close text-3xl cursor-pointer" onClick={onClose}>&times;</span>
+        <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
+        <div className="flex flex-col space-y-3">
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
+          <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="アーティスト" className="input bg-gray-100 p-3 rounded" />
+          <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="タグ (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
+          <input type="text" value={genres} onChange={(e) => setGenres(e.target.value)} placeholder="ジャンル (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
+          <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="カラオケ音源のYoutube URL" className="input bg-gray-100 p-3 rounded" />
+          { !isNewSong && (
+            <input type="number" value={timesSung} onChange={(e) => setTimesSung(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
+          )}
+          <select value={monetized} onChange={(e) => setMonetized(e.target.value)} className="input bg-gray-100 p-3 rounded">
+            <option value="OK">OK</option>
+            <option value="NG">NG</option>
+          </select>
+        </div>
+        <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
+      </div>
+    </div>
+  );
+}
+
+export default SongModal;

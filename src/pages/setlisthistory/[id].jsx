@@ -1,0 +1,84 @@
+import { useEffect, useState, useContext } from 'react';
+import { useRouter } from 'next/router';
+import { db } from '../../../firebaseConfig';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { AuthContext } from '@/context/AuthContext';
+import Link from 'next/link';
+import SongTable from '@/components/SongTable'; // SongTable コンポーネントをインポート
+import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
+
+const SetlistDetail = () => {
+    const [setlist, setSetlist] = useState(null);
+    const [songs, setSongs] = useState([]);
+    const { currentUser } = useContext(AuthContext);
+    const router = useRouter();
+    const { id } = router.query;
+
+    useEffect(() => {
+        const fetchSetlistDetail = async () => {
+            if (currentUser && id) {
+                const setlistDocRef = doc(db, 'users', currentUser.uid, 'Setlists', id);
+                const setlistDoc = await getDoc(setlistDocRef);
+                if (setlistDoc.exists()) {
+                    setSetlist({ id: setlistDoc.id, ...setlistDoc.data() });
+                    const songsRef = collection(db, 'users', currentUser.uid, 'Setlists', id, 'Songs');
+                    const songsSnapshot = await getDocs(songsRef);
+                    const songsData = songsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setSongs(songsData);
+                } else {
+                    console.log('セットリストが見つかりません');
+                }
+            }
+        };
+
+        fetchSetlistDetail();
+    }, [currentUser, id]);
+
+    async function createPlaylist() {
+        const token = currentUser.youtubeAccessToken; // OAuth 2.0 で取得したアクセストークン
+        console.log(token);
+        try {
+            const response = await fetch('/api/createPlaylist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create playlist');
+            }
+
+            const data = await response.json();
+            console.log('Playlist created:', data);
+        } catch (error) {
+            console.error('Error creating playlist:', error);
+
+        }
+
+    }
+
+    return (
+        <div className="flex">
+            <Sidebar /> {/* サイドバーを表示 */}
+            <div className="flex-grow">
+                <Link href="/setlisthistory" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
+                <h1 className="text-2xl font-bold mb-4">セットリスト詳細</h1>
+                {setlist && (
+                    <div>
+                        <p>作成日: {setlist.createdAt.toDate().toLocaleDateString()}</p>
+                        <p>曲数: {songs.length}</p>
+                        <div className="mt-4">
+                            <h2 className="text-xl font-bold">曲リスト</h2>
+                            <SongTable songs={songs} pageName="setlisthistory/[id]" />
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">YouTubeの再生リストに追加</button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default SetlistDetail;
