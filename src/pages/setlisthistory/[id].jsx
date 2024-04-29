@@ -9,6 +9,7 @@ import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポ�
 
 const SetlistDetail = () => {
     console.log("再生リストを作り始めるよ");
+    console.log("再生リストを作り始めるよ2");
     const [setlist, setSetlist] = useState(null);
     const [songs, setSongs] = useState([]);
     const { currentUser } = useContext(AuthContext);
