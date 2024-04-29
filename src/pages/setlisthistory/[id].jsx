@@ -8,6 +8,7 @@ import SongTable from '@/components/SongTable'; // SongTable コンポーネン�
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 
 const SetlistDetail = () => {
+    console.log("再生リストを作り始めるよ");
     const [setlist, setSetlist] = useState(null);
     const [songs, setSongs] = useState([]);
     const { currentUser } = useContext(AuthContext);
