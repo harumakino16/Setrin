@@ -61,8 +61,8 @@ const ImportModal = ({ onClose, onSongsUpdated }) => {
                 tags: song['タグ'].split(',').map(tag => tag.trim()),
                 genres: song['ジャンル'].split(',').map(genre => genre.trim()),
                 monetized: song['収益化'] === 'はい', // monetizedをbool型で保存
-                timesSung: parseInt(song['歌った回数']), // timesSungをint型で保存
-                skillLevel: parseInt(song['熟練度']) // skillLevelをint型で保存
+                timesSung: song['歌った回数'] ? parseInt(song['歌った回数']) : 0, // timesSungをint型で保存
+                skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0 // skillLevelをint型で保存
             };
             batch.set(docRef, songData);
         });

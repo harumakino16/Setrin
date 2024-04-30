@@ -12,6 +12,7 @@ function SongModal({ onClose, onSongUpdated, song }) {
   const [youtubeUrl, setYoutubeUrl] = useState(isNewSong ? '' : song.youtubeUrl);
   const [monetized, setMonetized] = useState(isNewSong ? 'NG' : (song.monetized ? 'OK' : 'NG'));
   const [timesSung, setTimesSung] = useState(isNewSong ? 0 : song.timesSung);
+  const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel); // 熟練度の状態を追加
   const authContext = useContext(AuthContext);
   const { currentUser } = authContext || {};
 
@@ -23,7 +24,8 @@ function SongModal({ onClose, onSongUpdated, song }) {
       genres: genres.split(',').map(genre => genre.trim()),
       youtubeUrl,
       timesSung: parseInt(timesSung, 10),
-      monetized: monetized === 'OK'
+      monetized: monetized === 'OK',
+      skillLevel: parseInt(skillLevel, 10) // 熟練度を保存データに追加
     };
 
     if (!currentUser) {
@@ -61,6 +63,9 @@ function SongModal({ onClose, onSongUpdated, song }) {
           { !isNewSong && (
             <input type="number" value={timesSung} onChange={(e) => setTimesSung(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
           )}
+          <div>熟練度</div>
+          <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" /> 
+          <div>収益化</div>
           <select value={monetized} onChange={(e) => setMonetized(e.target.value)} className="input bg-gray-100 p-3 rounded">
             <option value="OK">OK</option>
             <option value="NG">NG</option>

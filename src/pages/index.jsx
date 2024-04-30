@@ -85,6 +85,7 @@ export default function Home() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">カラオケ音源のYoutubeURL</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">歌唱回数</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">収益化</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">熟練度</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                 </tr>
               </thead>
@@ -95,16 +96,23 @@ export default function Home() {
                     <td className="px-6 py-4 whitespace-nowrap">{song.artist}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{song.tags.join(", ")}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{song.genres.join(", ")}</td>
-                    <td className="px-6 py-4 whitespace-nowrap"><a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-800">リンク</a></td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {song.youtubeUrl ? (
+                        <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-800">リンク</a>
+                      ) : (
+                        <span>未登録</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">{song.timesSung}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={song.monetized ? "text-green-500" : "text-red-500"}>
                         {song.monetized ? "〇" : "×"}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button onClick={() => handleEditSong(song.id)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">編集</button>
-                      {EditSongshowModal && currentSong === song ? <SongFieldModal song={currentSong} onClose={() => setEditSongshowModal(false)} onSongUpdated={refreshSongs}/> : null}
+                      {EditSongshowModal && currentSong === song ? <SongFieldModal song={currentSong} onClose={() => setEditSongshowModal(false)} onSongUpdated={refreshSongs} /> : null}
                       <button onClick={() => handleDeleteSong(song.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">削除</button>
                     </td>
                   </tr>
