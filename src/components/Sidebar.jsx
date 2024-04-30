@@ -43,6 +43,7 @@ export function Sidebar() {
             <div>
                 <div className="flex flex-col items-center py-4">
                     <div className="text-gray-700 text-2xl font-semibold">メニュー</div>
+                    <div className="text-red-500">※新規開発中</div>
                 </div>
                 <div className="mt-8">
                     <ul>
