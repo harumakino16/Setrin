@@ -1,5 +1,6 @@
 // pages/api/refresh_token.js
 import fetch from 'node-fetch';
+import { youtubeConfig } from '../../../youtubeConfig';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -13,9 +14,9 @@ export default async function handler(req, res) {
     }
 
     try {
-        const clientId = process.env.NEXT_PUBLIC_CLIENT_ID;
-        const clientSecret = process.env.CLIENT_SECRET;
-        const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI; // OAuthで使用したリダイレクトURIを指定
+        const clientId = youtubeConfig.clientId;
+        const clientSecret = youtubeConfig.clientSecret;
+        const redirectUri = youtubeConfig.redirectUri; // OAuthで使用したリダイレクトURIを指定
         const tokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
 
 

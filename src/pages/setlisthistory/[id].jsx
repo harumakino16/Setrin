@@ -72,6 +72,7 @@ const SetlistDetail = () => {
 
             const data = await response.json();
             console.log('Playlist created:', data);
+            alert('再生リストを作成しました');
         } catch (error) {
             console.error('Error creating playlist:', error);
         }

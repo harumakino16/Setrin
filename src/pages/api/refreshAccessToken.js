@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+import { youtubeConfig } from '../../../youtubeConfig';
+
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -14,8 +16,8 @@ export default async function handler(req, res) {
     
     try {
         console.log('リクエストトークンがあります');
-        const clientId = process.env.NEXT_PUBLIC_CLIENT_ID;       // 環境変数からクライアントIDを取得
-        const clientSecret = process.env.CLIENT_SECRET; // 環境変数からクライアントシークレットを取得
+        const clientId = youtubeConfig.clientId;       // 環境変数からクライアントIDを取得
+        const clientSecret = youtubeConfig.clientSecret; // 環境変数からクライアントシークレットを取得
         const tokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
 
         const tokenResponse = await fetch(tokenUrl, {

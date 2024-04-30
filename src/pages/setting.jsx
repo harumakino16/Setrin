@@ -4,6 +4,8 @@ import { db } from '../../firebaseConfig';
 import { updateDoc, doc } from 'firebase/firestore';
 import { Sidebar } from "@/components/Sidebar";
 import { useRouter } from 'next/router';
+import { youtubeConfig } from '../../youtubeConfig';
+
 
 
 function Settings() {
@@ -12,7 +14,7 @@ function Settings() {
     const [displayName, setDisplayName] = useState('');
     const router = useRouter();
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_SCOPE}&response_type=code&prompt=consent&access_type=offline`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${youtubeConfig.clientId}&redirect_uri=${youtubeConfig.redirectUri}&scope=${youtubeConfig.scope}&response_type=code&prompt=consent&access_type=offline`;
 
 
 
