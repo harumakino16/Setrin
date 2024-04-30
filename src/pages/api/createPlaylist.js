@@ -3,7 +3,7 @@ import { google } from 'googleapis';
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         try {
-            const { token, videoUrls, playlistName } = req.body;
+            const { token, videoUrls, setlistName } = req.body;
 
             if (!token) {
                 return res.status(400).json({ message: 'Access token is required' });
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
                     part: ['snippet,status'],
                     requestBody: {
                         snippet: {
-                            title: playlistName,
+                            title: setlistName,
                             description: 'APIを通じて作成されたプレイリスト',
                             defaultLanguage: 'ja',
                         },

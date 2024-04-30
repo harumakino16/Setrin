@@ -1,16 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-const SongTable = ({ songs, setSongs, onEdit, onDelete, onMoveUp, onMoveDown, pageName, refreshSongs }) => {
+const SongTable = ({ songs, setSongs, onDelete, pageName }) => {
   const isSetlistHistoryDetail = pageName === 'setlisthistory/[id]';
 
-  useEffect(() => {
-    if (refreshSongs) {
-      refreshSongs(); // 初回マウント時にデータをリフレッシュ
-    }
-  }, [refreshSongs]); // refreshSongsが更新された時のみリフレッシュをトリガー
-
-  const renderOperations = (index, song) => (
+  const renderOperations = (song) => (
     <td className="border px-4 py-2">
       {onDelete && <button className="bg-red-500 text-white px-3 py-1 rounded mr-2" onClick={() => onDelete(song.id)}>削除</button>}
     </td>
@@ -66,7 +60,7 @@ const SongTable = ({ songs, setSongs, onEdit, onDelete, onMoveUp, onMoveDown, pa
             {song.monetized ? '〇' : '×'}
           </span>
         </td>
-        <td className="border px-4 py-2">{song.skillLevel}</td>
+        <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
         {!isSetlistHistoryDetail && renderOperations(index, song)}
       </tr>
     );

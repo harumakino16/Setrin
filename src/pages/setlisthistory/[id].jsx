@@ -6,11 +6,12 @@ import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SongTable from '@/components/SongTable'; // SongTable コンポーネントをインポート
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null);
     const [songs, setSongs] = useState([]);
-    const [playlistName, setPlaylistName] = useState(''); // プレイリスト名のための状態
     const { currentUser } = useContext(AuthContext);
     const router = useRouter();
     const { id } = router.query;
@@ -26,6 +27,7 @@ const SetlistDetail = () => {
                     const songsSnapshot = await getDocs(songsRef);
                     const songsData = songsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     setSongs(songsData);
+                    console.log(setlist);
                 } else {
                     console.log('セットリストが見つかりません');
                 }
@@ -35,7 +37,7 @@ const SetlistDetail = () => {
         fetchSetlistDetail();
     }, [currentUser, id]);
 
-    async function createPlaylist(songs, playlistName) {
+    async function createPlaylist(songs, setlistName) {
         try {
             const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
                 method: 'POST',
@@ -60,7 +62,7 @@ const SetlistDetail = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: accessToken, videoUrls, playlistName }),
+                body: JSON.stringify({ token: accessToken, videoUrls, setlistName }),
             });
 
             if (!response.ok) {
@@ -76,37 +78,37 @@ const SetlistDetail = () => {
         } catch (error) {
             console.error('Error creating playlist:', error);
         }
-
-
     }
-
 
     return (
         <div className="flex">
             <Sidebar /> {/* サイドバーを表示 */}
-            <div className="flex-grow">
+            <div className="flex-grow p-5">
                 <Link href="/setlisthistory" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
-                <h1 className="text-2xl font-bold mb-4">セットリスト詳細</h1>
-                {setlist && (
-                    <div>
-                        <p>作成日: {setlist.createdAt.toDate().toLocaleDateString()}</p>
-                        <p>曲数: {songs.length}</p>
+                <h1 className="text-3xl font-bold mb-4 text-gray-800">セットリスト詳細</h1>
+                {setlist ? (
+                    <div className="bg-white shadow-md rounded-lg p-6">
+                        <p className="text-lg"><strong>名前：</strong>{setlist.name}</p>
+                        <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
+                        <p className="text-lg"><strong>曲数:</strong> {songs.length}</p>
                         <div className="mt-4">
                             <h2 className="text-xl font-bold">曲リスト</h2>
-                            <SongTable songs={songs} pageName="setlisthistory/[id]" />
-                            <input
-                                type="text"
-                                placeholder="プレイリスト名を入力"
-                                value={playlistName}
-                                onChange={(e) => setPlaylistName(e.target.value)}
-                                className="border p-2 rounded w-full mb-4"
-                            />
-                            <button onClick={() => createPlaylist(songs, playlistName ? playlistName : "無名のプレイリスト")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">YouTubeの再生リストに追加</button>
+                            <DndProvider backend={HTML5Backend}>
+                                <SongTable songs={songs} setSongs={setSongs}  // ここで setSongs 関数を渡す
+                                    pageName="setlisthistory/[id]" />
+                            </DndProvider>
+                            <button
+                                onClick={() => createPlaylist(songs, setlist.name)}
+                                disabled={currentUser.refreshToken}
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out"
+                            >
+                                YouTubeの再生リストに追加
+                            </button>
                         </div>
                     </div>
-                )}
-                {/* <button onClick={() => getAccessToken()}>アクセストークンを取得</button>
-                <div>アクセストークン：{accessToken}</div> */}
+                ) : (<div>
+                    <p>再生リストはありません。</p>
+                </div>)}
             </div>
         </div>
     );

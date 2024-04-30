@@ -11,6 +11,7 @@ function CreateSetlist() {
     const [searchCriteria, setSearchCriteria] = useState({ maxSung: 0, maxSungOption: '以上', tag: '', artist: '', genre: '', monetized: 'all', skillLevel: 0, skillLevelOption: '以上' });
     const [setlist, setSetlist] = useState([]);
     const [searchPerformed, setSearchPerformed] = useState(false);
+    const [setlistName, setSetlistName] = useState(''); // セットリスト名の状態を追加
     const { currentUser } = useContext(AuthContext);
 
     const fetchSongs = async () => {
@@ -58,9 +59,13 @@ function CreateSetlist() {
             alert('ログインしてください');
             return;
         }
+        if (!setlistName) {
+            alert('セットリスト名を入力してください');
+            return;
+        }
 
         const setlistRef = collection(db, 'users', currentUser.uid, 'Setlists');
-        const setlistDoc = await addDoc(setlistRef, { createdAt: new Date() });
+        const setlistDoc = await addDoc(setlistRef, { name: setlistName, createdAt: new Date() });
         const songsRef = collection(db, 'users', currentUser.uid, 'Setlists', setlistDoc.id, 'Songs');
         for (const song of setlist) {
             await addDoc(songsRef, song);
@@ -69,27 +74,9 @@ function CreateSetlist() {
         // セットリスト保存後、検索前の状態にリセット
         setSetlist([]);
         setSearchPerformed(false);
+        setSetlistName(''); // セットリスト名をリセット
     };
 
-    const handleMoveUp = (index) => {
-        const newSetlist = [...setlist];
-        if (index > 0) {
-            [newSetlist[index - 1], newSetlist[index]] = [newSetlist[index], newSetlist[index - 1]];
-            setSetlist(newSetlist);
-        }
-    };
-
-    const handleMoveDown = (index) => {
-        const newSetlist = [...setlist];
-        if (index < setlist.length - 1) {
-            [newSetlist[index + 1], newSetlist[index]] = [newSetlist[index], newSetlist[index + 1]];
-            setSetlist(newSetlist);
-        }
-    };
-
-    const handleDelete = (id) => {
-        setSetlist(setlist.filter(s => s.id !== id));
-    };
 
     return (
         <div className="flex">
@@ -97,7 +84,7 @@ function CreateSetlist() {
             <div className="flex-grow p-8">
                 <h1 className="text-2xl font-bold mb-4">セットリスト作成</h1>
                 <div className="mb-6">
-                    <label className="block mb-2">歌唱回数: </label>
+                    <label className="block mb-2 mt-4">歌唱回数: </label>
                     <input type="number" className="border p-2 rounded" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
                     <div className="mt-2">
                         <label><input type="radio" name="maxSungOption" value="以下" checked={searchCriteria.maxSungOption === '以下'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} /> 以下</label>
@@ -123,16 +110,18 @@ function CreateSetlist() {
                     </div>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={fetchSongs}>検索</button>
                 </div>
-                <DndProvider backend={HTML5Backend}>
-                    <SongTable
-                        songs={setlist}
-                        setSongs={setSetlist}  // ここで setSongs 関数を渡す
-                        onMoveUp={handleMoveUp}
-                        onMoveDown={handleMoveDown}
-                        onDelete={handleDelete}
-                    />
-                </DndProvider>
-                {searchPerformed && setlist.length === 0 && <p className='text-center mt-5'>検索結果は0件です</p>}
+                <div className="mb-6">
+
+                    <DndProvider backend={HTML5Backend}>
+                        <SongTable
+                            songs={setlist}
+                            setSongs={setSetlist}  // ここで setSongs 関数を渡す
+                        />
+                    </DndProvider>
+                </div>
+                {searchPerformed && setlist.length === 0 && <p className='text-center'>検索結果は0件です</p>}
+                <label className="block">セットリスト名: </label>
+                <input type="text" className="border p-2 rounded mr-4" value={setlistName} onChange={(e) => setSetlistName(e.target.value)} />
                 {searchPerformed && setlist.length > 0 && <button className="bg-green-500 text-white px-4 py-2 rounded mt-4" onClick={saveSetlist}>セットリストを保存</button>}
             </div>
         </div>
