@@ -4,6 +4,8 @@ import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import { Sidebar } from "@/components/Sidebar"; // サイドバーをインポート
 import SongTable from "@/components/SongTable"; // SongTable コンポーネントをインポート
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 function CreateSetlist() {
     const [searchCriteria, setSearchCriteria] = useState({ maxSung: 0, maxSungOption: '以上', tag: '', artist: '', genre: '', monetized: 'all', skillLevel: 0, skillLevelOption: '以上' });
@@ -94,7 +96,6 @@ function CreateSetlist() {
             <Sidebar /> {/* サイドバーを表示 */}
             <div className="flex-grow p-8">
                 <h1 className="text-2xl font-bold mb-4">セットリスト作成</h1>
-                <div>これは曲順をドラックで移動</div>
                 <div className="mb-6">
                     <label className="block mb-2">歌唱回数: </label>
                     <input type="number" className="border p-2 rounded" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
@@ -122,12 +123,15 @@ function CreateSetlist() {
                     </div>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={fetchSongs}>検索</button>
                 </div>
-                <SongTable
-                    songs={setlist}
-                    onMoveUp={handleMoveUp}
-                    onMoveDown={handleMoveDown}
-                    onDelete={handleDelete}
-                />
+                <DndProvider backend={HTML5Backend}>
+                    <SongTable
+                        songs={setlist}
+                        setSongs={setSetlist}  // ここで setSongs 関数を渡す
+                        onMoveUp={handleMoveUp}
+                        onMoveDown={handleMoveDown}
+                        onDelete={handleDelete}
+                    />
+                </DndProvider>
                 {searchPerformed && setlist.length === 0 && <p className='text-center mt-5'>検索結果は0件です</p>}
                 {searchPerformed && setlist.length > 0 && <button className="bg-green-500 text-white px-4 py-2 rounded mt-4" onClick={saveSetlist}>セットリストを保存</button>}
             </div>
