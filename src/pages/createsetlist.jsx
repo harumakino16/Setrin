@@ -83,35 +83,48 @@ function CreateSetlist() {
             <Sidebar /> {/* サイドバーを表示 */}
             <div className="flex-grow p-8">
                 <h1 className="text-2xl font-bold mb-4">セットリスト作成</h1>
-                <div className="mb-6">
-                    <label className="block mb-2 mt-4">歌唱回数: </label>
-                    <input type="number" className="border p-2 rounded" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
-                    <div className="mt-2">
-                        <label><input type="radio" name="maxSungOption" value="以下" checked={searchCriteria.maxSungOption === '以下'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} /> 以下</label>
-                        <label><input type="radio" name="maxSungOption" value="以上" checked={searchCriteria.maxSungOption === '以上'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} /> 以上</label>
+                <div className="flex flex-wrap gap-8 mb-8">
+                    <div className="flex items-center gap-2">
+                        <label className="whitespace-nowrap">歌唱回数:</label>
+                        <input type="number" className="border p-2 rounded" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
+                        <div className="flex gap-2">
+                            <label><input type="radio" name="maxSungOption" value="以下" checked={searchCriteria.maxSungOption === '以下'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} /> 以下</label>
+                            <label><input type="radio" name="maxSungOption" value="以上" checked={searchCriteria.maxSungOption === '以上'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} /> 以上</label>
+                        </div>
                     </div>
-                    <label className="block mb-2 mt-4">タグ: </label>
-                    <input type="text" className="border p-2 rounded" value={searchCriteria.tag} onChange={(e) => handleCriteriaChange('tag', e.target.value)} />
-                    <label className="block mb-2 mt-4">アーティスト名: </label>
-                    <input type="text" className="border p-2 rounded" value={searchCriteria.artist} onChange={(e) => handleCriteriaChange('artist', e.target.value)} />
-                    <label className="block mb-2 mt-4">ジャンル: </label>
-                    <input type="text" className="border p-2 rounded" value={searchCriteria.genre} onChange={(e) => handleCriteriaChange('genre', e.target.value)} />
-                    <label className="block mb-2 mt-4">熟練度: </label>
-                    <input type="number" className="border p-2 rounded" value={searchCriteria.skillLevel} onChange={(e) => handleCriteriaChange('skillLevel', parseInt(e.target.value, 10))} />
-                    <div className="mt-2">
-                        <label><input type="radio" name="skillLevelOption" value="以下" checked={searchCriteria.skillLevelOption === '以下'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} /> 以下</label>
-                        <label><input type="radio" name="skillLevelOption" value="以上" checked={searchCriteria.skillLevelOption === '以上'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} /> 以上</label>
+                    <div className="flex items-center gap-2">
+                        <label className="whitespace-nowrap">タグ:</label>
+                        <input type="text" className="border p-2 rounded" value={searchCriteria.tag} onChange={(e) => handleCriteriaChange('tag', e.target.value)} />
                     </div>
-                    <div className="mt-4">
-                        <label className="block mb-2">収益化: </label>
-                        <label><input type="radio" name="monetized" value="all" checked={searchCriteria.monetized === 'all'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> すべて</label>
-                        <label><input type="radio" name="monetized" value="yes" checked={searchCriteria.monetized === 'yes'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> OK</label>
-                        <label><input type="radio" name="monetized" value="no" checked={searchCriteria.monetized === 'no'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> NG</label>
+                    <div className="flex items-center gap-2">
+                        <label className="whitespace-nowrap">アーティスト名:</label>
+                        <input type="text" className="border p-2 rounded" value={searchCriteria.artist} onChange={(e) => handleCriteriaChange('artist', e.target.value)} />
                     </div>
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={fetchSongs}>検索</button>
+                    <div className="flex items-center gap-2">
+                        <label className="whitespace-nowrap">ジャンル:</label>
+                        <input type="text" className="border p-2 rounded" value={searchCriteria.genre} onChange={(e) => handleCriteriaChange('genre', e.target.value)} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="whitespace-nowrap">熟練度:</label>
+                        <input type="number" className="border p-2 rounded" value={searchCriteria.skillLevel} onChange={(e) => handleCriteriaChange('skillLevel', parseInt(e.target.value, 10))} />
+                        <div className="flex gap-2">
+                            <label><input type="radio" name="skillLevelOption" value="以下" checked={searchCriteria.skillLevelOption === '以下'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} /> 以下</label>
+                            <label><input type="radio" name="skillLevelOption" value="以上" checked={searchCriteria.skillLevelOption === '以上'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} /> 以上</label>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="whitespace-nowrap">収益化:</label>
+                        <div className="flex gap-2">
+                            <label><input type="radio" name="monetized" value="all" checked={searchCriteria.monetized === 'all'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> すべて</label>
+                            <label><input type="radio" name="monetized" value="yes" checked={searchCriteria.monetized === 'yes'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> OK</label>
+                            <label><input type="radio" name="monetized" value="no" checked={searchCriteria.monetized === 'no'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> NG</label>
+                        </div>
+                    </div>
                 </div>
-                <div className="mb-6">
-
+                <div className='flex justify-center mb-8'>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-40 rounded" onClick={fetchSongs}>検索</button>
+                </div>
+                <div className='mb-8'>
                     <DndProvider backend={HTML5Backend}>
                         <SongTable
                             songs={setlist}
@@ -119,10 +132,18 @@ function CreateSetlist() {
                         />
                     </DndProvider>
                 </div>
-                {searchPerformed && setlist.length === 0 && <p className='text-center'>検索結果は0件です</p>}
-                <label className="block">セットリスト名: </label>
-                <input type="text" className="border p-2 rounded mr-4" value={setlistName} onChange={(e) => setSetlistName(e.target.value)} />
-                {searchPerformed && setlist.length > 0 && <button className="bg-green-500 text-white px-4 py-2 rounded mt-4" onClick={saveSetlist}>セットリストを保存</button>}
+                {searchPerformed && setlist.length === 0 && <p>検索結果は0件です</p>}
+
+                {searchPerformed && setlist.length > 0 &&
+                    <div className='flex items-center flex-col gap-4'>
+                        <div>
+                            <label className='ml-2'>セットリスト名: </label>
+                            <input type="text" className="border p-2 rounded" value={setlistName} onChange={(e) => setSetlistName(e.target.value)} />
+                        </div>
+                        <div>
+                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-20 rounded" onClick={saveSetlist}>セットリストを保存</button>
+                        </div>
+                    </div>}
             </div>
         </div>
     );

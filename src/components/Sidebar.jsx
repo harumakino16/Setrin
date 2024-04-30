@@ -9,11 +9,6 @@ import useLogOut from '../hooks/logOut';
 
 const MENU = [
     {
-        title: "セトリ作成",
-        iconName: faMusic,
-        path: "/createsetlist",
-    },
-    {
         title: "曲リスト",
         iconName: faMusic,
         path: "/",
@@ -28,6 +23,7 @@ const MENU = [
         iconName: faTools,
         path: "/setting",
     },
+
 ]
 
 export function Sidebar() {
@@ -39,7 +35,7 @@ export function Sidebar() {
 
     return (
         // {/* Sidebar */ }
-        <div className="w-64 h-screen bg-white shadow-md flex flex-col justify-between">
+        <div className="w-64 min-w-[256px] h-screen bg-white shadow-md flex flex-col justify-between">
             <div>
                 <div className="flex flex-col items-center py-4">
                     <div className="text-gray-700 text-2xl font-semibold">メニュー</div>
@@ -57,12 +53,19 @@ export function Sidebar() {
                         })}
                     </ul>
                 </div>
+            <div className="mt-4 px-6">
+                <Link href="/createsetlist">
+                    <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
+                        セトリを作る
+                    </button>
+                </Link>
+            </div>
             </div>
             <div className=" flex flex-col px-6 pb-4 gap-3">
                 {currentUser ? (
                     <>
                         <button onClick={logOut} className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">ログアウト</button>
-                        <button className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">現在のユーザーを削除</button>
+                        
                     </>
                 ) : (
                     <>

@@ -82,11 +82,12 @@ const SigninAndSignupForm = () => {
                 >
                     {isSignup ? '登録' : 'ログイン'}
                 </button>
+                
                 <button 
                     onClick={handleGoogleSignIn}
                     className="w-full p-3 text-white bg-red-500 rounded hover:bg-red-600"
                 >
-                    Googleでログイン
+                    {isSignup ? 'Googleで登録' : 'Googleでログイン'}
                 </button>
                 <button 
                     onClick={() => setIsSignup(!isSignup)}

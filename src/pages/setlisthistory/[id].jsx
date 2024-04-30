@@ -87,7 +87,7 @@ const SetlistDetail = () => {
                 <Link href="/setlisthistory" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
                 <h1 className="text-3xl font-bold mb-4 text-gray-800">セットリスト詳細</h1>
                 {setlist ? (
-                    <div className="bg-white shadow-md rounded-lg p-6">
+                    <div className="bg-white p-6">
                         <p className="text-lg"><strong>名前：</strong>{setlist.name}</p>
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
                         <p className="text-lg"><strong>曲数:</strong> {songs.length}</p>
