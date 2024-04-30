@@ -62,6 +62,7 @@ export default async function handler(req, res) {
             } catch (apiError) {
                 if (apiError.code === 401 && apiError.errors[0].reason === 'youtubeSignupRequired') {
                     res.status(401).json({ message: 'YouTubeチャンネルが必要です。チャンネルを作成してください。' });
+                    console.log('YouTubeチャンネルが必要です。チャンネルを作成してください。');
                 } else {
                     throw apiError;
                 }

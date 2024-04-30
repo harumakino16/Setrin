@@ -36,6 +36,11 @@ const ImportModal = ({ onClose, onSongsUpdated }) => {
         event.preventDefault();
     };
 
+    const csvSchema = {
+        headers: ['曲名', 'アーティスト', 'カラオケ音源のYoutubeURL', 'タグ', 'ジャンル', '収益化', '歌った回数','熟練度'],
+        templateData: '曲名,アーティスト,カラオケ音源のYoutubeURL,タグ,ジャンル,収益化,歌った回数\nサンプルです。,この行は削除してください。,https://www.youtube.com/sample/watch?v=sample,"盛り上がる曲,眠れる曲","ボカロ,アニソン",はい,15,10\n'
+    };
+
     const updateDatabase = async (data, mode) => {
         const songsRef = collection(db, "users", currentUser.uid, "Songs");
         const batch = writeBatch(db);
@@ -52,11 +57,12 @@ const ImportModal = ({ onClose, onSongsUpdated }) => {
             const songData = {
                 title: song['曲名'],
                 artist: song['アーティスト'],
-                youtubeUrl: song['Youtube URL'],
+                youtubeUrl: song['カラオケ音源のYoutubeURL'],
                 tags: song['タグ'].split(',').map(tag => tag.trim()),
                 genres: song['ジャンル'].split(',').map(genre => genre.trim()),
                 monetized: song['収益化'] === 'はい', // monetizedをbool型で保存
-                timesSung: parseInt(song['歌った回数']) // timesSungをint型で保存
+                timesSung: parseInt(song['歌った回数']), // timesSungをint型で保存
+                skillLevel: parseInt(song['熟練度']) // skillLevelをint型で保存
             };
             batch.set(docRef, songData);
         });
@@ -75,9 +81,8 @@ const ImportModal = ({ onClose, onSongsUpdated }) => {
                 const data = results.data;
                 const headers = results.meta.fields;
 
-                const requiredHeaders = ['曲名', 'アーティスト', 'Youtube URL', 'タグ', 'ジャンル', '収益化', '歌った回数'];
-                if (!headers || !requiredHeaders.every(header => headers.includes(header))) {
-                    alert('CSVファイルの形式が正しくありません。必要なヘッダー: ' + requiredHeaders.join(', '));
+                if (!headers || !csvSchema.headers.every(header => headers.includes(header))) {
+                    alert('CSVファイルの形式が正しくありません。必要なヘッダー: ' + csvSchema.headers.join(', '));
                     return;
                 }
 
@@ -92,8 +97,7 @@ const ImportModal = ({ onClose, onSongsUpdated }) => {
     };
 
     const handleDownloadTemplate = () => {
-        const templateData = '曲名,アーティスト,Youtube URL,タグ,ジャンル,収益化,歌った回数\nサンプルです。,この行は削除してください。,https://www.youtube.com/sample/watch?v=sample,"盛り上がる曲,眠れる曲","ボカロ,アニソン",はい,15\n';
-        const blob = new Blob([templateData], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([csvSchema.templateData], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);

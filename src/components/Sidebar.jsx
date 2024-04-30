@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import { AuthContext } from '../context/AuthContext'; // AuthContextをインポート
-import { useLogOut } from '../hooks/logOut';
+import useLogOut from '../hooks/logOut';
 
 const MENU = [
     {
@@ -34,6 +34,7 @@ export function Sidebar() {
     const [showModal, setShowModal] = useState(false);
     const router = useRouter();
     const { currentUser } = useContext(AuthContext); // currentUserを取得
+    const logOut = useLogOut();
 
 
     return (
@@ -60,7 +61,7 @@ export function Sidebar() {
             <div className=" flex flex-col px-6 pb-4 gap-3">
                 {currentUser ? (
                     <>
-                        <button onClick={useLogOut} className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">ログアウト</button>
+                        <button onClick={logOut} className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">ログアウト</button>
                         <button className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">現在のユーザーを削除</button>
                     </>
                 ) : (

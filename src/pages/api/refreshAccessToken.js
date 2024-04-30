@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     
     try {
         console.log('リクエストトークンがあります');
-        const clientId = process.env.CLIENT_ID;       // 環境変数からクライアントIDを取得
+        const clientId = process.env.NEXT_PUBLIC_CLIENT_ID;       // 環境変数からクライアントIDを取得
         const clientSecret = process.env.CLIENT_SECRET; // 環境変数からクライアントシークレットを取得
         const tokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
 

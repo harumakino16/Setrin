@@ -13,9 +13,9 @@ export default async function handler(req, res) {
     }
 
     try {
-        const clientId = process.env.CLIENT_ID;
+        const clientId = process.env.NEXT_PUBLIC_CLIENT_ID;
         const clientSecret = process.env.CLIENT_SECRET;
-        const redirectUri = process.env.REDIRECT_URI; // OAuthで使用したリダイレクトURIを指定
+        const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI; // OAuthで使用したリダイレクトURIを指定
         const tokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
 
 

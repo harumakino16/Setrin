@@ -1,11 +1,8 @@
-import { useContext } from 'react';
-import { AuthContext } from '@/context/AuthContext';
 import { getAuth, signOut } from 'firebase/auth';
-import { Router, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
-export const useLogOut = () => {
+const useLogOut = () => {
     const auth = getAuth();
-    console.log(auth);
     const router = useRouter();
 
     const logOut = async () => {
@@ -18,7 +15,7 @@ export const useLogOut = () => {
         }
     };
 
-    logOut();
-
     return logOut;
 };
+
+export default useLogOut;

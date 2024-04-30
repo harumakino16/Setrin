@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/Sidebar"; // サイドバーをインポ�
 import SongTable from "@/components/SongTable"; // SongTable コンポーネントをインポート
 
 function CreateSetlist() {
-    const [searchCriteria, setSearchCriteria] = useState({ maxSung: 0, maxSungOption: '以上', tag: '', artist: '', genre: '', monetized: 'all' });
+    const [searchCriteria, setSearchCriteria] = useState({ maxSung: 0, maxSungOption: '以上', tag: '', artist: '', genre: '', monetized: 'all', skillLevel: 0, skillLevelOption: '以上' });
     const [setlist, setSetlist] = useState([]);
     const [searchPerformed, setSearchPerformed] = useState(false);
     const { currentUser } = useContext(AuthContext);
@@ -36,6 +36,11 @@ function CreateSetlist() {
         }
         if (searchCriteria.monetized !== 'all') {
             q = query(q, where('monetized', '==', searchCriteria.monetized === 'yes'));
+        }
+        if (searchCriteria.skillLevelOption === '以下') {
+            q = query(q, where('skillLevel', '<=', searchCriteria.skillLevel));
+        } else {
+            q = query(q, where('skillLevel', '>=', searchCriteria.skillLevel));
         }
         const querySnapshot = await getDocs(q);
         const songsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -102,6 +107,12 @@ function CreateSetlist() {
                     <input type="text" className="border p-2 rounded" value={searchCriteria.artist} onChange={(e) => handleCriteriaChange('artist', e.target.value)} />
                     <label className="block mb-2 mt-4">ジャンル: </label>
                     <input type="text" className="border p-2 rounded" value={searchCriteria.genre} onChange={(e) => handleCriteriaChange('genre', e.target.value)} />
+                    <label className="block mb-2 mt-4">熟練度: </label>
+                    <input type="number" className="border p-2 rounded" value={searchCriteria.skillLevel} onChange={(e) => handleCriteriaChange('skillLevel', parseInt(e.target.value, 10))} />
+                    <div className="mt-2">
+                        <label><input type="radio" name="skillLevelOption" value="以下" checked={searchCriteria.skillLevelOption === '以下'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} /> 以下</label>
+                        <label><input type="radio" name="skillLevelOption" value="以上" checked={searchCriteria.skillLevelOption === '以上'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} /> 以上</label>
+                    </div>
                     <div className="mt-4">
                         <label className="block mb-2">収益化: </label>
                         <label><input type="radio" name="monetized" value="all" checked={searchCriteria.monetized === 'all'} onChange={(e) => handleCriteriaChange('monetized', e.target.value)} /> すべて</label>

@@ -30,6 +30,7 @@ const SongTable = ({ songs, onEdit, onDelete, onMoveUp, onMoveDown, pageName, re
           <th className="px-4 py-2">アーティスト</th>
           <th className="px-4 py-2">歌唱回数</th>
           <th className="px-4 py-2">収益化</th>
+          <th className="px-4 py-2">熟練度</th>
           {!isSetlistHistoryDetail && <th className="px-4 py-2">操作</th>}
           {!isSetlistHistoryDetail && <th className="px-4 py-2">削除</th>}
         </tr>
@@ -46,6 +47,7 @@ const SongTable = ({ songs, onEdit, onDelete, onMoveUp, onMoveDown, pageName, re
                 {song.monetized ? '〇' : '×'}
               </span>
             </td>
+            <td className="border px-4 py-2">{song.skillLevel}</td>
             {!isSetlistHistoryDetail && renderOperations(index, song)}
           </tr>
         ))}

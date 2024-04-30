@@ -35,10 +35,6 @@ const SetlistDetail = () => {
         fetchSetlistDetail();
     }, [currentUser, id]);
 
-    useEffect(() => {
-        console.log(playlistName);
-    }, [playlistName]);
-
     async function createPlaylist(songs, playlistName) {
         try {
             const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
@@ -69,6 +65,8 @@ const SetlistDetail = () => {
 
             if (!response.ok) {
                 console.log('Failed to create playlist');
+                console.log(response);
+                alert('エラー：再生リストの作成に失敗しました');
                 throw new Error('Failed to create playlist');
             }
 
@@ -80,20 +78,7 @@ const SetlistDetail = () => {
 
 
     }
-    // const getAccessToken = async () => {
-    //     const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({ refreshToken: currentUser.youtubeRefreshToken }),
-    //     });
-    //     console.log(currentUser.youtubeRefreshToken);
-    //     console.log(refreshTokenResponse);
-    //     return refreshTokenResponse.json().then(data => {
-    //         setAccessToken(data.accessToken);
-    //     });
-    // }
+
 
     return (
         <div className="flex">
