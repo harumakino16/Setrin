@@ -94,6 +94,7 @@ function CreateSetlist() {
             <Sidebar /> {/* サイドバーを表示 */}
             <div className="flex-grow p-8">
                 <h1 className="text-2xl font-bold mb-4">セットリスト作成</h1>
+                <div>これは曲順をドラックで移動</div>
                 <div className="mb-6">
                     <label className="block mb-2">歌唱回数: </label>
                     <input type="number" className="border p-2 rounded" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
