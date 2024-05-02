@@ -4,12 +4,12 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig, db } from '../../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);  // ローディング状態の追加
-  const auth = getAuth();
+  const auth = getAuth(initializeApp(firebaseConfig));
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, user => {
@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
           setCurrentUser({ ...user, ...userData });
           setLoading(false);  // データが読み込まれたらローディングを終了
         });
+        return () => unsubscribeDoc();  // Firestore の監視を解除
       } else {
         setCurrentUser(null);
         setLoading(false);  // ユーザーがいない場合もローディングを終了
@@ -32,10 +33,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading }}>
+    <AuthContext.Provider value={{ currentUser, loading, setCurrentUser }}>
       {loading ? <div>ローディング中...</div> : children}
     </AuthContext.Provider>
   );
 };
-
-

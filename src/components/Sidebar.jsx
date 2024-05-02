@@ -6,6 +6,7 @@ import { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import { AuthContext } from '../context/AuthContext'; // AuthContextをインポート
 import useLogOut from '../hooks/logOut';
+import { useMessage } from '@/context/MessageContext';
 
 const MENU = [
     {
@@ -16,7 +17,7 @@ const MENU = [
     {
         title: "セットリスト",
         iconName: faHistory,
-        path: "/setlisthistory",
+        path: "/setlist",
     },
     {
         title: "設定",
@@ -27,15 +28,16 @@ const MENU = [
 ]
 
 export function Sidebar() {
-    const [showModal, setShowModal] = useState(false);
     const router = useRouter();
     const { currentUser } = useContext(AuthContext); // currentUserを取得
     const logOut = useLogOut();
+    const { setMessageInfo } = useMessage();
+
 
 
     return (
         // {/* Sidebar */ }
-        <div className="w-64 min-w-[256px] h-screen bg-white shadow-md flex flex-col justify-between">
+        <div className="w-64 min-w-[256px] h-screen shadow-md flex flex-col justify-between">
             <div>
                 <div className="flex flex-col items-center py-4">
                     <div className="text-gray-700 text-2xl font-semibold">メニュー</div>
@@ -45,7 +47,7 @@ export function Sidebar() {
                         {MENU.map((item) => {
                             return (
                                 <Link key={item.title} href={item.path}>
-                                    <li className="flex items-center text-gray-700 text-sm font-medium py-2 px-6 hover:bg-gray-200 cursor-pointer gap-2">
+                                    <li className={`flex items-center text-gray-700 text-sm font-medium py-2 px-6 ${router.pathname === item.path ? 'bg-gray-200' : 'hover:bg-gray-200'} cursor-pointer gap-2`}>
                                         <FontAwesomeIcon icon={item.iconName} />{item.title}
                                     </li>
                                 </Link>

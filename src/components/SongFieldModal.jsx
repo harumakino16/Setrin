@@ -2,8 +2,9 @@ import { useState, useContext } from 'react';
 import { db } from '../../firebaseConfig';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
+import Modal from './modal';
 
-function SongModal({ onClose, onSongUpdated, song }) {
+function SongModal({ isOpen, onClose, onSongUpdated, song }) {
   const isNewSong = !song;
   const [title, setTitle] = useState(isNewSong ? '' : song.title);
   const [artist, setArtist] = useState(isNewSong ? '' : song.artist);
@@ -50,30 +51,27 @@ function SongModal({ onClose, onSongUpdated, song }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-90 flex justify-center items-center">
-      <div className="modal bg-white p-20 rounded-lg shadow-lg">
-        <span className="close text-3xl cursor-pointer" onClick={onClose}>&times;</span>
-        <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
-        <div className="flex flex-col space-y-3">
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
-          <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="アーティスト" className="input bg-gray-100 p-3 rounded" />
-          <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="タグ (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
-          <input type="text" value={genres} onChange={(e) => setGenres(e.target.value)} placeholder="ジャンル (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
-          <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="カラオケ音源のYoutube URL" className="input bg-gray-100 p-3 rounded" />
-          { !isNewSong && (
-            <input type="number" value={timesSung} onChange={(e) => setTimesSung(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
-          )}
-          <div>熟練度</div>
-          <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" /> 
-          <div>収益化</div>
-          <select value={monetized} onChange={(e) => setMonetized(e.target.value)} className="input bg-gray-100 p-3 rounded">
-            <option value="OK">OK</option>
-            <option value="NG">NG</option>
-          </select>
-        </div>
-        <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
+      <div className="flex flex-col space-y-3">
+        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
+        <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="アーティスト" className="input bg-gray-100 p-3 rounded" />
+        <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="タグ (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
+        <input type="text" value={genres} onChange={(e) => setGenres(e.target.value)} placeholder="ジャンル (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
+        <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="カラオケ音源のYoutube URL" className="input bg-gray-100 p-3 rounded" />
+        {!isNewSong && (
+          <input type="number" value={timesSung} onChange={(e) => setTimesSung(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
+        )}
+        <div>熟練度</div>
+        <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" />
+        <div>収益化</div>
+        <select value={monetized} onChange={(e) => setMonetized(e.target.value)} className="input bg-gray-100 p-3 rounded">
+          <option value="OK">OK</option>
+          <option value="NG">NG</option>
+        </select>
       </div>
-    </div>
+      <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
+    </Modal>
   );
 }
 
