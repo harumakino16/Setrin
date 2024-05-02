@@ -14,7 +14,7 @@ const MENU = [
         path: "/",
     },
     {
-        title: "セトリ履歴",
+        title: "セットリスト",
         iconName: faHistory,
         path: "/setlisthistory",
     },

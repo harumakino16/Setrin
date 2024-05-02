@@ -38,7 +38,7 @@ const ImportModal = ({ onClose, onSongsUpdated }) => {
 
     const csvSchema = {
         headers: ['曲名', 'アーティスト', 'カラオケ音源のYoutubeURL', 'タグ', 'ジャンル', '収益化', '歌った回数','熟練度'],
-        templateData: '曲名,アーティスト,カラオケ音源のYoutubeURL,タグ,ジャンル,収益化,歌った回数\nサンプルです。,この行は削除してください。,https://www.youtube.com/sample/watch?v=sample,"盛り上がる曲,眠れる曲","ボカロ,アニソン",はい,15,10\n'
+        templateData: '曲名,アーティスト,カラオケ音源のYoutubeURL,タグ,ジャンル,収益化,歌った回数,熟練度\nサンプルです。,この行は削除してください。,https://www.youtube.com/sample/watch?v=sample,"盛り上がる曲,眠れる曲","ボカロ,アニソン",はい,15,10\n'
     };
 
     const updateDatabase = async (data, mode) => {

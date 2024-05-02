@@ -8,13 +8,16 @@ import SongTable from '@/components/SongTable'; // SongTable コンポーネン�
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import MessageBox from '@/components/MessageBox'; // MessageBox コンポーネントをインポート
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null);
     const [songs, setSongs] = useState([]);
+    const [message, setMessage] = useState(''); // MessageBox用のメッセージ状態
     const { currentUser } = useContext(AuthContext);
     const router = useRouter();
     const { id } = router.query;
+    const [messageType, setMessageType] = useState(''); // MessageBox の種類
 
     useEffect(() => {
         const fetchSetlistDetail = async () => {
@@ -68,15 +71,19 @@ const SetlistDetail = () => {
             if (!response.ok) {
                 console.log('Failed to create playlist');
                 console.log(response);
-                alert('エラー：再生リストの作成に失敗しました');
+                setMessageType('error');
+                setMessage('エラー：再生リストの作成に失敗しました');
                 throw new Error('Failed to create playlist');
             }
 
             const data = await response.json();
             console.log('Playlist created:', data);
-            alert('再生リストを作成しました');
+            setMessageType('success');
+            setMessage('再生リストを作成しました');
         } catch (error) {
             console.error('Error creating playlist:', error);
+            setMessageType('error');
+            setMessage('エラー：再生リストの作成中にエラーが発生しました');
         }
     }
 
@@ -110,6 +117,7 @@ const SetlistDetail = () => {
                     <p>再生リストはありません。</p>
                 </div>)}
             </div>
+            <MessageBox message={message} type={messageType} /> {/* MessageBox を表示 */}
         </div>
     );
 };
