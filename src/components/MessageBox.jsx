@@ -23,9 +23,15 @@ const MessageBox = () => {
 
   if (!visible) return null;
 
-  const backgroundColor = messageInfo.type === 'error' ? 'rgba(255, 0, 0, 0.7)' : 
-                         messageInfo.type === 'success' ? 'rgba(0, 128, 0, 0.7)' : 
-                         'rgba(255, 255, 0, 0.7)';
+  const backgroundColor = messageInfo.type === 'error' ? '#ffeff1' : 
+                         messageInfo.type === 'success' ? '#e9feee' : 
+                         messageInfo.type === 'warning' ? '#fcfae2' : 
+                         '#e9f5fb';
+
+  const fontColor = messageInfo.type === 'error' ? '#ff565c' : 
+                    messageInfo.type === 'success' ? '#00d05e' : 
+                    messageInfo.type === 'warning' ? '#ffd923' : 
+                    '#01a2ff';
 
   return (
     <div style={{
@@ -34,7 +40,8 @@ const MessageBox = () => {
       left: '50%',
       transform: 'translateX(-50%)',
       backgroundColor,
-      color: 'white',
+      color: fontColor,
+      border: `1px solid ${fontColor}`,
       padding: '10px 20px',
       borderRadius: '10px',
       zIndex: 1000,
