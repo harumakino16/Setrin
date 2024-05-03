@@ -1,15 +1,39 @@
 import { useEffect, useState, useContext } from 'react';
 import { db } from '../../firebaseConfig';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 import SetlistNameModal from '@/components/setlistNameModal';
+import { useRouter } from 'next/router';
+
 
 export default function Setlist() {
   const [setlists, setSetlists] = useState([]);
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
+
+  const router = useRouter();
+
+  // セットリストデータを取得する関数
+  const fetchSetlists = async () => {
+    if (currentUser) {
+      const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
+      const q = query(setlistsRef, orderBy('createdAt', 'desc')); // 作成日時で降順に並べ替え
+      const querySnapshot = await getDocs(q);
+      const setlistsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt.toDate().toLocaleDateString() // Firestore TimestampをJavaScript Dateに変換
+      }));
+      setSetlists(setlistsData);
+    }
+  };
+
+  useEffect(() => {
+    fetchSetlists();
+  }, [currentUser]);  // currentUserが変更されたときにも再取得
+
 
   const handleOpenModal = () => {
     setIsOpen(true);
@@ -19,27 +43,10 @@ export default function Setlist() {
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    const fetchSetlists = async () => {
-      console.log(isOpen);
-      if (currentUser) {
-        const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
-        const querySnapshot = await getDocs(setlistsRef);
-        const setlistsData = await Promise.all(querySnapshot.docs.map(async doc => {
-          const songsRef = collection(db, 'users', currentUser.uid, 'Setlists', doc.id, 'Songs');
-          const songsSnapshot = await getDocs(songsRef);
-          return { 
-            id: doc.id, 
-            ...doc.data(), 
-            songCount: songsSnapshot.docs.length 
-          };
-        }));
-        setSetlists(setlistsData);
-      }
-    };
+  const handleSetlistAdded = () => {
+    fetchSetlists();  // 
+  };
 
-    fetchSetlists();
-  }, [currentUser]);
 
   return (
     <div className="flex">
@@ -68,21 +75,21 @@ export default function Setlist() {
                   曲数
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                  
+
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {setlists.map((setlist) => (
-                <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => window.location.href = `/setlist/${setlist.id}`} >
+                <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => router.push(`/setlist/${setlist.id}`)} >
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                     {setlist.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.createdAt.toDate().toLocaleDateString()}
+                    {setlist.createdAt}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.songCount} 曲
+                    {setlist.songCount? setlist.songCount : 0} 曲
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,7 +102,7 @@ export default function Setlist() {
           </table>
         </div>
       </div>
-      {isOpen ? <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} /> : null}
+      {isOpen ? <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} onSetlistAdded={handleSetlistAdded} /> : null}
     </div>
   );
 }

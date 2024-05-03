@@ -29,13 +29,12 @@ const SetlistDetail = () => {
                     const songsSnapshot = await getDocs(songsRef);
                     const songsData = songsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     setSongs(songsData);
-                    console.log(setlist);
                 } else {
                     console.log('セットリストが見つかりません');
                 }
             }
         };
-
+        
         fetchSetlistDetail();
     }, [currentUser, id]);
 
@@ -87,7 +86,7 @@ const SetlistDetail = () => {
         <div className="flex">
             <Sidebar /> {/* サイドバーを表示 */}
             <div className="flex-grow p-5">
-                <Link href="/setlisthistory" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
+                <Link href="/setlist" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
                 <h1 className="text-3xl font-bold mb-4 text-gray-800">セットリスト詳細</h1>
                 {setlist ? (
                     <div className="bg-white p-6">
@@ -98,7 +97,7 @@ const SetlistDetail = () => {
                             <h2 className="text-xl font-bold">曲リスト</h2>
                             <DndProvider backend={HTML5Backend}>
                                 <SongTable songs={songs} setSongs={setSongs}  // ここで setSongs 関数を渡す
-                                    pageName="setlisthistory/[id]" />
+                                    pageName="setlist/[id]" />
                             </DndProvider>
                             <button
                                 onClick={() => createPlaylist(songs, setlist.name)}

@@ -6,11 +6,15 @@ import { db } from '../../firebaseConfig';
 import { collection, doc, setDoc, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Modal from './modal.jsx'; // Modal コンポーネントをインポート
+import { useMessage } from '../context/MessageContext';
 
 const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
     const [file, setFile] = useState(null);
     const [importMode, setImportMode] = useState('replace');
     const { currentUser } = useContext(AuthContext);
+
+    const { setMessageInfo } = useMessage();
+
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
@@ -69,7 +73,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
         });
 
         await batch.commit();
-        alert('インポートが完了しました。');
+        setMessageInfo('success', 'インポートが完了しました');
         onClose(); // モーダルを閉じる
         onSongsUpdated(); // 曲データを再読み込み
     };

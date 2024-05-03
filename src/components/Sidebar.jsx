@@ -57,7 +57,7 @@ export function Sidebar() {
                 </div>
             <div className="mt-4 px-6">
                 <Link href="/createsetlist">
-                    <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
+                    <button className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
                         セトリを作る
                     </button>
                 </Link>

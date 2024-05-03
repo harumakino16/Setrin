@@ -5,19 +5,20 @@ import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/fires
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 
-const SetlistNameModal = ({ isOpen, onClose }) => {
+const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const [inputValue, setInputValue] = useState('');
     const { currentUser } = useContext(AuthContext);
     const { setMessageInfo } = useMessage();
 
     const handleSubmit = async () => {
         if (currentUser) {
-            const setlistRef = collection(db, 'users', currentUser.uid, 'Setlist');
+            const setlistRef = collection(db, 'users', currentUser.uid, 'Setlists');
             await addDoc(setlistRef, {
                 name: inputValue,
                 createdAt: serverTimestamp()
             });
             setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
+            onSetlistAdded();  // 親コンポーネントに通知
             onClose(); // モーダルを閉じる
         } else {
             alert("ユーザーが認証されていません。");
