@@ -9,7 +9,7 @@ const useLogOut = () => {
         try {
             await signOut(auth);
             console.log('ログアウトしました。');
-            router.push('/SigninAndSignupForm');
+            router.push('/register');
         } catch (error) {
             console.error('ログアウトに失敗しました:', error);
         }

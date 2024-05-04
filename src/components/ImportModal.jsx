@@ -42,8 +42,8 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
     };
 
     const csvSchema = {
-        headers: ['曲名', 'アーティスト', 'カラオケ音源のYoutubeURL', 'タグ', 'ジャンル', '収益化', '歌った回数', '熟練度'],
-        templateData: '曲名,アーティスト,カラオケ音源のYoutubeURL,タグ,ジャンル,収益化,歌った回数,熟練度\nサンプルです。,この行は削除してください。,https://www.youtube.com/sample/watch?v=sample,"盛り上がる曲,眠れる曲","ボカロ,アニソン",はい,15,10\n'
+        headers: ["曲名", "アーティスト", "カラオケ音源のYoutubeURL", "ジャンル", "タグ1", "タグ2", "タグ3", "歌った回数", "熟練度", "備考"],
+        templateData: '曲名,アーティスト,カラオケ音源のYoutubeURL,ジャンル,タグ1,タグ2,タグ3,歌った回数,熟練度,備考\nサンプルです。,この行は削除してください。,https://www.youtube.com/sample/watch?v=sample,ボカロ,楽しい,盛り上がる,眠れる,15,5,ここは備考欄です。\n'
     };
 
     const updateDatabase = async (data, mode) => {
@@ -63,7 +63,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
                 title: song['曲名'],
                 artist: song['アーティスト'],
                 youtubeUrl: song['カラオケ音源のYoutubeURL'],
-                tags: song['タグ'].split(',').map(tag => tag.trim()),
+                tags: [song['タグ1'], song['タグ2'], song['タグ3']].filter(tag => tag.trim() !== ''), // 空のタグを除外
                 genres: song['ジャンル'].split(',').map(genre => genre.trim()),
                 monetized: song['収益化'] === 'はい', // monetizedをbool型で保存
                 timesSung: song['歌った回数'] ? parseInt(song['歌った回数']) : 0, // timesSungをint型で保存
