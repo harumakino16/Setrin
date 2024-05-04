@@ -1,11 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
 import { db } from "../../firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { AuthContext } from '../context/AuthContext';
 
-const useFetchSongs = (refreshTrigger) => {
+const useFetchSongs = (refreshTrigger,currentUser) => {
   const [songs, setSongs] = useState([]);
-  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchSongs = async () => {
