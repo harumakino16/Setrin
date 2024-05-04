@@ -115,7 +115,6 @@ export default function Home() {
 
   return (
     <div className="flex">
-      これはDevの新機能です
       <Sidebar />
       <div className="flex-grow p-8">
         <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} />
