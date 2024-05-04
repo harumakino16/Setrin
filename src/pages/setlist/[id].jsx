@@ -8,7 +8,7 @@ import SongTable from '@/components/SongTable'; // SongTable コンポーネン�
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import MessageBox from '@/components/MessageBox'; // MessageBox コンポーネントをインポート
+import { useMessage } from '@/context/MessageContext';
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null);
@@ -16,7 +16,8 @@ const SetlistDetail = () => {
     const { currentUser } = useContext(AuthContext);
     const router = useRouter();
     const { id } = router.query;
-    const [messageInfo, setMessageInfo] = useState({ message: '', type: '' }); // MessageBox用のメッセージ状態をオブジェクトで管理
+    const { setMessageInfo } = useMessage();
+
 
     useEffect(() => {
         const fetchSetlistDetail = async () => {
@@ -25,9 +26,15 @@ const SetlistDetail = () => {
                 const setlistDoc = await getDoc(setlistDocRef);
                 if (setlistDoc.exists()) {
                     setSetlist({ id: setlistDoc.id, ...setlistDoc.data() });
-                    const songsRef = collection(db, 'users', currentUser.uid, 'Setlists', id, 'Songs');
-                    const songsSnapshot = await getDocs(songsRef);
-                    const songsData = songsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    const songIds = setlistDoc.data().songIds || [];
+                    const songsData = [];
+                    for (const songId of songIds) {
+                        const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', songId);
+                        const songDoc = await getDoc(songDocRef);
+                        if (songDoc.exists()) {
+                            songsData.push({ id: songDoc.id, ...songDoc.data() });
+                        }
+                    }
                     setSongs(songsData);
                 } else {
                     console.log('セットリストが見つかりません');
@@ -51,6 +58,7 @@ const SetlistDetail = () => {
             console.log(currentUser.youtubeRefreshToken);
 
             if (!refreshTokenResponse.ok) {
+                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
                 throw new Error('Failed to refresh access token');
             }
 
@@ -69,7 +77,7 @@ const SetlistDetail = () => {
             if (!response.ok) {
                 console.log('Failed to create playlist');
                 console.log(response);
-                setMessageInfo({ message: 'エラー：再生リストの作成に失敗しました', type: 'error' });
+                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
                 throw new Error('Failed to create playlist');
             }
 
@@ -112,7 +120,6 @@ const SetlistDetail = () => {
                     <p>再生リストはありません。</p>
                 </div>)}
             </div>
-            <MessageBox message={messageInfo.message} type={messageInfo.type} /> {/* MessageBox を表示 */}
         </div>
     );
 };

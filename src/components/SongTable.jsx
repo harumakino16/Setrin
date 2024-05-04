@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-const SongTable = ({ songs, setSongs, onDelete, pageName }) => {
-  const isSetlistHistoryDetail = pageName === 'setlisthistory/[id]';
+const SongTable = ({ songs, setSongs}) => {
 
-  const renderOperations = (song) => (
-    <td className="border px-4 py-2">
-      {onDelete && <button className="bg-red-500 text-white px-3 py-1 rounded mr-2" onClick={() => onDelete(song.id)}>削除</button>}
-    </td>
-  );
+  const onDelete = (id) => {
+    const filteredSongs = songs.filter((song) => song.id !== id);
+    setSongs(filteredSongs);
+  };
+
+
 
   const moveRow = (dragIndex, hoverIndex) => {
     const dragRow = songs[dragIndex];
@@ -61,7 +61,11 @@ const SongTable = ({ songs, setSongs, onDelete, pageName }) => {
           </span>
         </td>
         <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
-        {!isSetlistHistoryDetail && renderOperations(index, song)}
+        <td className="border px-4 py-2">
+          <button onClick={() => onDelete(song.id)} className="text-red-500 hover:text-red-700">
+            削除
+          </button>
+        </td>
       </tr>
     );
   };
@@ -76,7 +80,7 @@ const SongTable = ({ songs, setSongs, onDelete, pageName }) => {
           <th className="px-4 py-2">歌唱回数</th>
           <th className="px-4 py-2">収益化</th>
           <th className="px-4 py-2">熟練度</th>
-          {!isSetlistHistoryDetail && <th className="px-4 py-2">削除</th>}
+          <th className="px-4 py-2">削除</th>
         </tr>
       </thead>
       <tbody>

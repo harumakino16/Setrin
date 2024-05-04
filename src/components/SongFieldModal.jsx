@@ -3,6 +3,8 @@ import { db } from '../../firebaseConfig';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import Modal from './modal';
+import { useMessage } from '../context/MessageContext';
+
 
 function SongModal({ isOpen, onClose, onSongUpdated, song }) {
   const isNewSong = !song;
@@ -16,6 +18,8 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
   const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel); // 熟練度の状態を追加
   const authContext = useContext(AuthContext);
   const { currentUser } = authContext || {};
+  const { setMessageInfo } = useMessage();
+
 
   const handleSaveSong = async () => {
     const songData = {
@@ -38,6 +42,8 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
       if (isNewSong) {
         const userSongsCollection = collection(db, 'users', currentUser.uid, 'Songs');
         await addDoc(userSongsCollection, songData);
+        setMessageInfo({ message: isNewSong ? '曲の追加に成功しました' : '曲の更新に成功しました', type: 'success' });
+
       } else {
         const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', song.id);
         await updateDoc(songDocRef, songData);
@@ -46,7 +52,7 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
       onSongUpdated();
     } catch (error) {
       console.error(isNewSong ? '曲の追加に失敗しました:' : '曲の更新に失敗しました:', error);
-      alert(isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました');
+      setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
     }
   };
 

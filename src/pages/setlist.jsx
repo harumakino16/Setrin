@@ -6,33 +6,24 @@ import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
+import fetchUsersSetlists from '@/hooks/fetchUsersSetlists';
 
 
 export default function Setlist() {
-  const [setlists, setSetlists] = useState([]);
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
+  const [usersSetlists, setUsersSetlists] = useState([]);
+
+  // セットリストデータを取得する
+  useEffect(() => {
+    async function fetchSetlists() {
+      await fetchUsersSetlists(currentUser, setUsersSetlists);
+      console.log(usersSetlists);
+    }
+    fetchSetlists();
+  }, [currentUser]);
 
   const router = useRouter();
-
-  // セットリストデータを取得する関数
-  const fetchSetlists = async () => {
-    if (currentUser) {
-      const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
-      const q = query(setlistsRef, orderBy('createdAt', 'desc')); // 作成日時で降順に並べ替え
-      const querySnapshot = await getDocs(q);
-      const setlistsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt.toDate().toLocaleDateString() // Firestore TimestampをJavaScript Dateに変換
-      }));
-      setSetlists(setlistsData);
-    }
-  };
-
-  useEffect(() => {
-    fetchSetlists();
-  }, [currentUser]);  // currentUserが変更されたときにも再取得
 
 
   const handleOpenModal = () => {
@@ -80,16 +71,16 @@ export default function Setlist() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {setlists.map((setlist) => (
+              {usersSetlists.map((setlist) => (
                 <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => router.push(`/setlist/${setlist.id}`)} >
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                     {setlist.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.createdAt}
+                    {setlist.createdAt.toDate().toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.songCount? setlist.songCount : 0} 曲
+                    {setlist.songCount ? setlist.songCount : 0} 曲
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
