@@ -61,14 +61,7 @@ export default function Home() {
     }
   };
 
-  const handleEditSong = (songId) => {
-    const songToEdit = songs.find(song => song.id === songId);
-    setModalState(prev => ({
-      ...prev,
-      currentSong: songToEdit,
-      editSong: true
-    }));
-  };
+  
 
   const handleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -146,9 +139,12 @@ export default function Home() {
           handleSelectAll={handleSelectAll}
           selectedSongs={selectedSongs}
           handleSelectSong={handleSelectSong}
-          handleEditSong={handleEditSong}
           handleDeleteSong={handleDeleteSong}
           requestSort={requestSort}
+          setModalState={setModalState}
+          modalState={modalState}
+          songs={songs}
+          refreshSongs={refreshSongs}
         />
 
         <div className="flex justify-center mt-4">

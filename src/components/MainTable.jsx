@@ -1,6 +1,8 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
+import SongFieldModal from './SongFieldModal';
+
 
 function MainTable({
   currentSongs,
@@ -8,10 +10,21 @@ function MainTable({
   handleSelectAll,
   selectedSongs,
   handleSelectSong,
-  handleEditSong,
   handleDeleteSong,
-  requestSort
+  requestSort,
+  songs,
+  setModalState,
+  modalState,
+  refreshSongs
 }) {
+  const handleEditSong = (songId) => {
+    const songToEdit = songs.find(song => song.id === songId);
+    setModalState(prev => ({
+      ...prev,
+      currentSong: songToEdit,
+      editSong: true
+    }));
+  };
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -50,6 +63,8 @@ function MainTable({
           ))}
         </tbody>
       </table>
+      {modalState.editSong && <SongFieldModal onClose={() => setModalState({ ...modalState, editSong: false })} onSongUpdated={refreshSongs} isOpen={modalState.editSong} song={modalState.currentSong} />}
+
     </div>
   );
 }
