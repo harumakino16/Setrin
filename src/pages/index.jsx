@@ -27,11 +27,19 @@ export default function Home() {
   const recordsPerPage = 30;
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentSongs = songs.slice(indexOfFirstRecord, indexOfLastRecord);
+  // const currentSongs = songs.slice(indexOfFirstRecord, indexOfLastRecord);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [currentSongs, setCurrentSongs] = useState([]);
+
+  useEffect(() => {
+    const indexOfLastRecord = currentPage * recordsPerPage;
+    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+    setCurrentSongs(songs.slice(indexOfFirstRecord, indexOfLastRecord));
+  }, [songs, currentPage, recordsPerPage]);
+
 
   const fetchedSongs = useFetchSongs(refreshKey, currentUser);
   useEffect(() => {
@@ -96,22 +104,31 @@ export default function Home() {
     }
   };
 
-  const requestSort = key => {
+  const requestSort = (key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
+    const sortedSongs = [...songs].sort((a, b) => {
+      // 数値として解釈可能かどうかをチェック
+      const aValue = a[key];
+      const bValue = b[key];
+      const aIsNumber = !isNaN(Number(aValue));
+      const bIsNumber = !isNaN(Number(bValue));
+  
+      // 両方の値が数値の場合、数値として比較
+      if (aIsNumber && bIsNumber) {
+        return direction === 'ascending' ? aValue - bValue : bValue - aValue;
+      }
+      // それ以外の場合は、文字列として比較
+      return direction === 'ascending' ? String(aValue).localeCompare(String(bValue)) : String(bValue).localeCompare(String(aValue));
+    });
+  
     setSortConfig({ key, direction });
-    setSongs(songs.sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === 'ascending' ? -1 : 1;
-      }
-      if (a[key] > b[key]) {
-        return direction === 'ascending' ? 1 : -1;
-      }
-      return 0;
-    }));
+    setSongs(sortedSongs);
   };
+  
+
 
   return (
     <div className="flex">
