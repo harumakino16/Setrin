@@ -11,6 +11,8 @@ import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
 import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
 import { faDownload, faFolderPlus, faSort, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { useMessage } from "@/context/MessageContext";
+import { useRouter } from 'next/router';
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -20,6 +22,8 @@ export default function Home() {
     currentSong: null,
     addSongsInSetlist: false
   });
+
+  
   const { currentUser } = useContext(AuthContext);
   const [refreshKey, setRefreshKey] = useState(0);
   const [songs, setSongs] = useState([]);
@@ -27,12 +31,13 @@ export default function Home() {
   const recordsPerPage = 30;
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  // const currentSongs = songs.slice(indexOfFirstRecord, indexOfLastRecord);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentSongs, setCurrentSongs] = useState([]);
+  const { setMessageInfo } = useMessage();
+  const router = useRouter();
 
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
@@ -45,6 +50,15 @@ export default function Home() {
   useEffect(() => {
     setSongs(fetchedSongs);
   }, [fetchedSongs]);
+
+  useEffect(() => {
+    if (router.query.oobCode) {
+      setMessageInfo({ message: 'メール認証が完了しました', type: 'success' });
+      const newQuery = { ...router.query };
+      delete newQuery.oobCode;
+      router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
+    }
+  }, [router.query]);
 
   const handleSearchResults = (results) => {
     setSongs(results);
@@ -68,8 +82,6 @@ export default function Home() {
       console.log("ユーザーが認証されていません。");
     }
   };
-
-  
 
   const handleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -108,7 +120,7 @@ export default function Home() {
       const bValue = b[key];
       const aIsNumber = !isNaN(Number(aValue));
       const bIsNumber = !isNaN(Number(bValue));
-  
+
       // 両方の値が数値の場合、数値として比較
       if (aIsNumber && bIsNumber) {
         return direction === 'ascending' ? aValue - bValue : bValue - aValue;
@@ -116,11 +128,11 @@ export default function Home() {
       // それ以外の場合は、文字列として比較
       return direction === 'ascending' ? String(aValue).localeCompare(String(bValue)) : String(bValue).localeCompare(String(aValue));
     });
-  
+
     setSortConfig({ key, direction });
     setSongs(sortedSongs);
   };
-  
+
 
 
   return (
