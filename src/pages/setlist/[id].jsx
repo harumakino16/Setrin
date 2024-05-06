@@ -109,11 +109,16 @@ const SetlistDetail = () => {
                             </DndProvider>
                             <button
                                 onClick={() => createPlaylist(songs, setlist.name)}
-                                disabled={currentUser.refreshToken}
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out"
+                                disabled={!currentUser.youtubeRefreshToken}
+                                className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 YouTubeの再生リストに追加
                             </button>
+                            {!currentUser.youtubeRefreshToken && (
+                                <Link href="/setting" className="text-blue-600 hover:text-blue-800 ml-4">
+                                    Youtubeとリンクする(設定へ移動)
+                                </Link>
+                            )}
                         </div>
                     </div>
                 ) : (<div>

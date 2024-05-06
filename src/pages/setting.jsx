@@ -5,6 +5,9 @@ import { updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { Sidebar } from "@/components/Sidebar";
 import { useRouter } from 'next/router';
 import { youtubeConfig } from '../../youtubeConfig';
+import Image from 'next/image';
+import googleIcon from '../images/web_light_rd_SI@4x.png';
+import youtubeIcon from '../images/youtube_social_icon_red.png';
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
@@ -17,7 +20,6 @@ function Settings() {
     useEffect(() => {
         const { code } = router.query;
         if (code) {
-            console.log('取得したcode:', code);
             exchangeCodeForTokensAndSaveInFirestore(code);
             // URLからcodeパラメータをクリアする
             router.replace(router.pathname, undefined, { shallow: true });
@@ -36,8 +38,6 @@ function Settings() {
         if (currentUser) {
             setEmail(currentUser.email || '');
             setDisplayName(currentUser.displayName || '');
-            console.log(currentUser.test);
-            console.log(currentUser);
         }
     }, [currentUser]);
 
@@ -96,30 +96,55 @@ function Settings() {
         }
     };
 
-    console.count("レンダリングされました");
 
     return (
         <div className="flex">
             <Sidebar />
             <div className="flex-grow p-8">
                 <h1 className="text-2xl font-bold mb-4">設定</h1>
-                <div className="mb-6">
-                    <label className="block mb-2 text-gray-700">メールアドレス:</label>
-                    <input type="email" className="border p-2 rounded w-full shadow-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div className="mb-6">
-                    <label className="block mb-2 text-gray-700">表示名:</label>
-                    <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                </div>
-                <label className="block mb-2 text-gray-700">Youtubeとの接続:</label>
-                <div>
-                    {currentUser.youtubeRefreshToken ? (
-                        <label className="mt-4 text-green-500 font-bold">YouTubeとリンク済み</label>
-                    ) : (
-                        <a href={authUrl} className="mt-4 bg-green-500 hover:bg-green-700 text-white w-fit font-bold py-2 px-4 rounded block text-center">
-                            Youtubeに接続
-                        </a>
-                    )}
+                <div className='mb-6'>
+                    <div className="mb-6">
+                        <label className="block mb-2 text-gray-700">メールアドレス:</label>
+                        <input type="email" className="border p-2 rounded w-full shadow-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div className="mb-6">
+                        <label className="block mb-2 text-gray-700">表示名:</label>
+                        <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                    </div>
+                    <label className="block mb-2 text-gray-700">Youtubeとの連携:</label>
+                    <div className="bg-white shadow-md rounded px-5 py-3 flex justify-between items-center">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <Image src={youtubeIcon} alt="Youtubeに接続" width={50} />
+                                <div className="flex flex-col">
+                                    {currentUser.youtubeRefreshToken ? (
+                                        <div className="flex items-center">
+                                            <svg className="w-4 h-4 text-green-500 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            <label className="text-green-500 font-bold">連携中</label>
+                                        </div>
+                                    ) : (
+                                        <label className="text-red-500">未連携</label>
+                                    )}
+                                    <div className=" text-gray-700 text-sm">
+                                        Youtubeと連携することで作成したセットリストをYoutubeの再生リストに追加することができます。
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        {currentUser.youtubeRefreshToken ? (
+                            <button className="mt-4 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                解除する
+                            </button>
+                        ) : (
+                            <a href={authUrl} className="mt-4 block text-center">
+                                <Image src={googleIcon} alt="Youtubeに接続" width={180} />
+                            </a>
+                        )}
+                    </div>
+
                 </div>
                 <button onClick={handleUpdateProfile} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     更新

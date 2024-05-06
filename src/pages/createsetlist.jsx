@@ -58,6 +58,7 @@ function CreateSetlist() {
                         <SongTable
                             songs={setlist}
                             setSongs={setSetlist}  // ここで setSongs 関数を渡す
+                            currentUser={currentUser}
                         />
                     </DndProvider>
                 </div>

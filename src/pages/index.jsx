@@ -14,6 +14,7 @@ import { faDownload, faFolderPlus, faSort, faTrash, faUpload } from "@fortawesom
 import { useMessage } from "@/context/MessageContext";
 import { useRouter } from 'next/router';
 
+
 export default function Home() {
   const [modalState, setModalState] = useState({
     addSong: false,
