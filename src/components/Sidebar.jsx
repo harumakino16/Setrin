@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { AuthContext } from '../context/AuthContext'; // AuthContextをインポート
 import useLogOut from '../hooks/logOut';
 import { useMessage } from '@/context/MessageContext';
+import { getAuth } from "firebase/auth";
 
 const MENU = [
     {
@@ -32,6 +33,13 @@ export function Sidebar() {
     const { currentUser } = useContext(AuthContext); // currentUserを取得
     const logOut = useLogOut();
     const { setMessageInfo } = useMessage();
+
+    useEffect(() => {
+        const auth = getAuth();
+        if (auth.currentUser) {
+            console.log(auth.currentUser.emailVerified);
+        }
+    }, []);
 
 
 
