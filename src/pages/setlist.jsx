@@ -80,7 +80,7 @@ export default function Setlist() {
                     {setlist.createdAt.toDate().toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.songCount ? setlist.songCount : 0} 曲
+                    {setlist.songIds ? setlist.songIds.length : 0} 曲
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -40,6 +40,7 @@ function Login() {
             } else {
                 setErrorMessage('メールアドレスは登録されていますが、認証が完了していません。認証メールを再送します。');
                 await sendEmailVerification(userCredential.user);
+                console.log();
             }
         } catch (error) {
             console.error("ログインエラー:", error);

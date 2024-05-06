@@ -100,7 +100,7 @@ const SetlistDetail = () => {
                     <div className="bg-white p-6">
                         <p className="text-lg"><strong>名前：</strong>{setlist.name}</p>
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
-                        <p className="text-lg"><strong>曲数:</strong> {songs.length}</p>
+                        <p className="text-lg"><strong>曲数:</strong> {setlist.songIds ? setlist.songIds.length : 0}</p>
                         <div className="mt-4">
                             <h2 className="text-xl font-bold">曲リスト</h2>
                             <DndProvider backend={HTML5Backend}>
