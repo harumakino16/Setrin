@@ -79,7 +79,7 @@ export function Sidebar() {
                     </>
                 ) : (
                     <>
-                        <button className="bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full" onClick={() => router.push('/SigninAndSignupForm')}>ログイン</button>
+                        <button className="bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full" onClick={() => router.push('/login')}>ログイン</button>
                     </>
                 )}
             </div>
