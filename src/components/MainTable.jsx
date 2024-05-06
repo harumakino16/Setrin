@@ -25,6 +25,7 @@ function MainTable({
       editSong: true
     }));
   };
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -33,12 +34,13 @@ function MainTable({
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '30px' }}>
               <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
             </th>
-            {["曲名", "アーティスト", "タグ", "ジャンル", "カラオケ音源のYoutubeURL", "歌唱回数", "熟練度","備考", "操作"].map(header => (
+            {["曲名", "アーティスト", "タグ", "ジャンル", "カラオケ音源のYoutubeURL", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
               <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {header}
-                <FontAwesomeIcon icon={faSort} onClick={() => requestSort(header.toLowerCase())} className="ml-2 cursor-pointer" />
+                <FontAwesomeIcon icon={faSort} onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "timesSung", "skillLevel", "memo", ""][index])} className="ml-2 cursor-pointer" />
               </th>
             ))}
+
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
