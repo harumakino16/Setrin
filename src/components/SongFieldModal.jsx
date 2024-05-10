@@ -6,7 +6,7 @@ import Modal from './modal';
 import { useMessage } from '../context/MessageContext';
 
 
-function SongModal({ isOpen, onClose, onSongUpdated, song }) {
+function SongModal({ isOpen, onClose, song }) {
   const isNewSong = !song;
   const [title, setTitle] = useState(isNewSong ? '' : song.title);
   const [artist, setArtist] = useState(isNewSong ? '' : song.artist);
@@ -16,6 +16,7 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
   const [monetized, setMonetized] = useState(isNewSong ? 'NG' : (song.monetized ? 'OK' : 'NG'));
   const [timesSung, setTimesSung] = useState(isNewSong ? 0 : song.timesSung);
   const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel); // 熟練度の状態を追加
+  const [memo, setMemo] = useState(isNewSong ? '' : song.memo); // 備考の状態を追加
   const authContext = useContext(AuthContext);
   const { currentUser } = authContext || {};
   const { setMessageInfo } = useMessage();
@@ -30,7 +31,8 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
       youtubeUrl,
       timesSung: parseInt(timesSung, 10),
       monetized: monetized === 'OK',
-      skillLevel: parseInt(skillLevel, 10) // 熟練度を保存データに追加
+      skillLevel: parseInt(skillLevel, 10), // 熟練度を保存データに追加
+      memo // 備考を保存データに追加
     };
 
     if (!currentUser) {
@@ -49,7 +51,6 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
         await updateDoc(songDocRef, songData);
       }
       onClose();
-      onSongUpdated();
     } catch (error) {
       console.error(isNewSong ? '曲の追加に失敗しました:' : '曲の更新に失敗しました:', error);
       setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
@@ -75,6 +76,8 @@ function SongModal({ isOpen, onClose, onSongUpdated, song }) {
           <option value="OK">OK</option>
           <option value="NG">NG</option>
         </select>
+        <div>備考</div>
+        <textarea value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="備考" className="input bg-gray-100 p-3 rounded"></textarea>
       </div>
       <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
     </Modal>

@@ -7,12 +7,17 @@ import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポ�
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
 import fetchUsersSetlists from '@/hooks/fetchUsersSetlists';
+// import { useSongs } from '../context/SongsContext';
+
 
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [usersSetlists, setUsersSetlists] = useState([]);
+  // const { songs } = useSongs();
+
+  
 
   // セットリストデータを取得する
   useEffect(() => {

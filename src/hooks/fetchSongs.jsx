@@ -1,27 +1,32 @@
-import { useState, useEffect, useContext } from 'react';
+import { useEffect } from 'react';
+import { useSongs } from '../context/SongsContext';
 import { db } from "../../firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 
-const useFetchSongs = (refreshTrigger,currentUser) => {
-  const [songs, setSongs] = useState([]);
+const useFetchSongs = (currentUser) => {
+  const { setSongs } = useSongs();
 
   useEffect(() => {
     const fetchSongs = async () => {
-      if (currentUser) {
-        const songsRef = collection(db, 'users', currentUser.uid, 'Songs');
-        const q = query(songsRef);
-        const querySnapshot = await getDocs(q);
-        const songsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-        setSongs(songsData);
+      const localSongs = localStorage.getItem('songs');
+      if (localSongs) {
+        setSongs(JSON.parse(localSongs)); // ローカルストレージから読み込んだデータを設定
       } else {
-        setSongs([]);
+        if (currentUser) {
+          const songsRef = collection(db, 'users', currentUser.uid, 'Songs');
+          const q = query(songsRef);
+          const querySnapshot = await getDocs(q);
+          const songsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setSongs(songsData);
+          localStorage.setItem('songs', JSON.stringify(songsData)); // 新しいデータをローカルストレージに保存
+        }
       }
     };
 
     fetchSongs();
-  }, [refreshTrigger, currentUser]);
+  }, [currentUser, setSongs]); // 依存配列に currentUser と setSongs を含める
 
-  return songs;
+  return;
 };
 
 export default useFetchSongs;

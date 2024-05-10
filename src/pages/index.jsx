@@ -13,6 +13,8 @@ import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
 import { faDownload, faFolderPlus, faSort, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useMessage } from "@/context/MessageContext";
 import { useRouter } from 'next/router';
+import { useSongs } from '../context/SongsContext';
+
 
 
 export default function Home() {
@@ -26,47 +28,35 @@ export default function Home() {
 
   
   const { currentUser } = useContext(AuthContext);
+  const { songs } = useSongs();
   const [refreshKey, setRefreshKey] = useState(0);
-  const [songs, setSongs] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 30;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-  const [currentSongs, setCurrentSongs] = useState([]);
   const { setMessageInfo } = useMessage();
-  const router = useRouter();
-
+  const [tableData, setTableData] = useState([]);
+  
+  // 最初のロード時は全ての曲を取得する
   useEffect(() => {
-    const indexOfLastRecord = currentPage * recordsPerPage;
-    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-    setCurrentSongs(songs.slice(indexOfFirstRecord, indexOfLastRecord));
-  }, [songs, currentPage, recordsPerPage]);
-
-
-  const fetchedSongs = useFetchSongs(refreshKey, currentUser);
+    setTableData(songs);
+    console.log("最初のロード時は全ての曲を取得する");
+  }, []);
+  
+  // songs ステートが更新されるたびに実行されます。
   useEffect(() => {
-    setSongs(fetchedSongs);
-  }, [fetchedSongs]);
+    setTableData(songs);
+    console.log("songsステートが更新されたら実行される");
+    console.log(songs);
+  }, [songs]);  
 
-  useEffect(() => {
-    if (router.query.oobCode) {
-      setMessageInfo({ message: 'メール認証が完了しました', type: 'success' });
-      const newQuery = { ...router.query };
-      delete newQuery.oobCode;
-      router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
-    }
-  }, [router.query]);
 
   const handleSearchResults = (results) => {
-    setSongs(results);
+    setTableData(results);
     setSearchPerformed(true);
   };
 
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+
 
   const toggleModal = (modal, value) => {
     setModalState(prev => ({ ...prev, [modal]: value }));
@@ -78,7 +68,6 @@ export default function Home() {
     if (currentUser) {
       const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
       await deleteDoc(songRef);
-      refreshSongs();
     } else {
       console.log("ユーザーが認証されていません。");
     }
@@ -105,7 +94,6 @@ export default function Home() {
         const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
         return deleteDoc(songRef);
       }));
-      refreshSongs();
       setSelectedSongs([]);
     }
   };
@@ -115,7 +103,7 @@ export default function Home() {
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
-    const sortedSongs = [...songs].sort((a, b) => {
+    const sortSongs = [...songs].sort((a, b) => {
       // 数値として解釈可能かどうかをチェック
       const aValue = a[key];
       const bValue = b[key];
@@ -131,7 +119,7 @@ export default function Home() {
     });
 
     setSortConfig({ key, direction });
-    setSongs(sortedSongs);
+    setTableData(sortSongs);
   };
 
 
@@ -164,7 +152,6 @@ export default function Home() {
         </div>
 
         <MainTable
-          currentSongs={currentSongs}
           selectAll={selectAll}
           handleSelectAll={handleSelectAll}
           selectedSongs={selectedSongs}
@@ -173,23 +160,15 @@ export default function Home() {
           requestSort={requestSort}
           setModalState={setModalState}
           modalState={modalState}
-          songs={songs}
+          tableData={tableData}
           refreshSongs={refreshSongs}
         />
 
-        <div className="flex justify-center mt-4">
-          <div className="flex space-x-1">
-            {Array.from({ length: Math.ceil(songs.length / recordsPerPage) }, (_, i) => i + 1).map(page => (
-              <button key={page} onClick={() => paginate(page)} className={`px-4 py-2 ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'} border rounded`}>
-                {page}
-              </button>
-            ))}
-          </div>
-        </div>
+
+        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} onSongUpdated={refreshSongs} isOpen={modalState.addSong} />}
+        {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} onSongsUpdated={refreshSongs} isOpen={modalState.import} />}
+        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} onSongsUpdated={refreshSongs} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
       </div>
-      {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} onSongUpdated={refreshSongs} isOpen={modalState.addSong} />}
-      {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} onSongsUpdated={refreshSongs} isOpen={modalState.import} />}
-      {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} onSongsUpdated={refreshSongs} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
     </div>
   );
 }
