@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const Test = () => {
   const [count, setCount] = useState(0);
+  console.log("ちょっとした修正");
 
   console.count("レンダリングされました");
   useEffect(() => {
