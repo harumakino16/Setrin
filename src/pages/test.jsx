@@ -1,26 +1,31 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useSongs } from '../context/SongsContext';
-import useFetchSongs from '../hooks/fetchSongs';
 import { AuthContext } from "@/context/AuthContext";
-
+import { doc, getDoc, setDoc, collection } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 const Test = () => {
-  const [count, setCount] = useState(0);
-  console.log("ちょっとした修正");
   const { currentUser } = useContext(AuthContext);
-  useFetchSongs(currentUser);
-  const { songs } = useSongs();
-  
-  console.log(songs);
 
+  const testFanc = async () => {
+    const number = await getNumber();
+    console.log(number);
+  }
+
+  const getNumber = () => {
+    setTimeout(() => {
+      console.log(5);
+    }, 5000);
+  }
+
+  console.log(testFanc());
+  // console.log(testFanc().then(result => console.log(result)));
+
+  // testFanc()
 
 
   return (
     <div>
-     {songs.map((song) => (
-      <p>{song.title}</p>
-     ))}
+      <p>データの転送が完了しました。</p>
     </div>
   );
 };

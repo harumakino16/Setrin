@@ -6,7 +6,7 @@ import { db } from '../../firebaseConfig';
 import { collection, doc, setDoc, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Modal from './modal.jsx'; // Modal コンポーネントをインポート
-import { useMessage } from '../context/MessageContext';
+import { useMessage } from '@/context/MessageContext';
 
 const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
     const [file, setFile] = useState(null);
@@ -64,7 +64,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
                 artist: song['アーティスト'],
                 youtubeUrl: song['カラオケ音源のYoutubeURL'],
                 tags: [song['タグ1'], song['タグ2'], song['タグ3']].filter(tag => tag.trim() !== ''), // 空のタグを除外
-                genres: song['ジャンル'].split(',').map(genre => genre.trim()),
+                genre: song['ジャンル'],
                 timesSung: song['歌った回数'] ? parseInt(song['歌った回数']) : 0, // timesSungをint型で保存
                 skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0, // skillLevelをint型で保存
                 memo: song['備考'] // memoをstring型で保存

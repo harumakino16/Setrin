@@ -31,7 +31,7 @@ export default async function handler(req, res) {
                             defaultLanguage: 'ja',
                         },
                         status: {
-                            privacyStatus: 'public',
+                            privacyStatus: 'private', // 非公開の再生リストを作成
                         },
                     },
                 });

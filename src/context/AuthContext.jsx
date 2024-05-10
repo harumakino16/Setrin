@@ -3,6 +3,8 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig, db } from '../../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
+import Loading from '@/components/loading'; // Loading コンポーネントをインポート
+
 
 export const AuthContext = createContext(null);
 
@@ -34,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ currentUser, loading, setCurrentUser }}>
-      {loading ? <div>ローディング中...！</div> : children}
+      {loading ? <Loading /> : children}
     </AuthContext.Provider>
   );
 };

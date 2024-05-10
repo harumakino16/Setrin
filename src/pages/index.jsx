@@ -62,7 +62,6 @@ export default function Home() {
     setModalState(prev => ({ ...prev, [modal]: value }));
   };
 
-  const refreshSongs = () => setRefreshKey(prevKey => prevKey + 1);
 
   const handleDeleteSong = async (songId) => {
     if (currentUser) {
@@ -161,13 +160,12 @@ export default function Home() {
           setModalState={setModalState}
           modalState={modalState}
           tableData={tableData}
-          refreshSongs={refreshSongs}
         />
 
 
-        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} onSongUpdated={refreshSongs} isOpen={modalState.addSong} />}
+        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} isOpen={modalState.addSong} />}
         {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} onSongsUpdated={refreshSongs} isOpen={modalState.import} />}
-        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} onSongsUpdated={refreshSongs} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
+        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
       </div>
     </div>
   );

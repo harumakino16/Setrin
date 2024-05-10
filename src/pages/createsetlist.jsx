@@ -3,7 +3,7 @@ import { db } from '../../firebaseConfig';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import { Sidebar } from "@/components/Sidebar"; // サイドバーをインポート
-import SongTable from "@/components/SongTable"; // SongTable コンポーネントをインポート
+import SongTable from "@/components/SetlistTable"; // SongTable コンポーネントをインポート
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import SearchForm from '@/components/searchForm';

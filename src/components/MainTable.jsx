@@ -73,7 +73,7 @@ function MainTable({
               <td className="px-6 py-4 whitespace-nowrap">{song.title.length > 10 ? `${song.title.slice(0, 10)}...` : song.title}</td>
               <td className="px-6 py-4 whitespace-nowrap">{song.artist.length > 10 ? `${song.artist.slice(0, 10)}...` : song.artist}</td>
               <td className="px-6 py-4 whitespace-nowrap">{song.tags.join(", ")}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{song.genres.join(", ")}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{song.genre}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {song.youtubeUrl ? <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-800">リンク</a> : "未登録"}
               </td>

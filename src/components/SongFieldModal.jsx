@@ -11,7 +11,7 @@ function SongModal({ isOpen, onClose, song }) {
   const [title, setTitle] = useState(isNewSong ? '' : song.title);
   const [artist, setArtist] = useState(isNewSong ? '' : song.artist);
   const [tags, setTags] = useState(isNewSong ? '' : song.tags.join(', '));
-  const [genres, setGenres] = useState(isNewSong ? '' : song.genres.join(', '));
+  const [genre, setGenre] = useState(isNewSong ? '' : song.genre);
   const [youtubeUrl, setYoutubeUrl] = useState(isNewSong ? '' : song.youtubeUrl);
   const [monetized, setMonetized] = useState(isNewSong ? 'NG' : (song.monetized ? 'OK' : 'NG'));
   const [timesSung, setTimesSung] = useState(isNewSong ? 0 : song.timesSung);
@@ -27,7 +27,7 @@ function SongModal({ isOpen, onClose, song }) {
       title,
       artist,
       tags: tags.split(',').map(tag => tag.trim()),
-      genres: genres.split(',').map(genre => genre.trim()),
+      genre,
       youtubeUrl,
       timesSung: parseInt(timesSung, 10),
       monetized: monetized === 'OK',
@@ -64,7 +64,7 @@ function SongModal({ isOpen, onClose, song }) {
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
         <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="アーティスト" className="input bg-gray-100 p-3 rounded" />
         <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="タグ (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
-        <input type="text" value={genres} onChange={(e) => setGenres(e.target.value)} placeholder="ジャンル (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
+        <input type="text" value={genre} onChange={(e) => setGenres(e.target.value)} placeholder="ジャンル" className="input bg-gray-100 p-3 rounded" />
         <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="カラオケ音源のYoutube URL" className="input bg-gray-100 p-3 rounded" />
         {!isNewSong && (
           <input type="number" value={timesSung} onChange={(e) => setTimesSung(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />

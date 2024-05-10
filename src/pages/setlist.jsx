@@ -1,12 +1,10 @@
 import { useEffect, useState, useContext } from 'react';
-import { db } from '../../firebaseConfig';
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
-import fetchUsersSetlists from '@/hooks/fetchUsersSetlists';
+import useSetlists from '@/hooks/fetchSetlists';
 // import { useSongs } from '../context/SongsContext';
 
 
@@ -14,22 +12,9 @@ import fetchUsersSetlists from '@/hooks/fetchUsersSetlists';
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [usersSetlists, setUsersSetlists] = useState([]);
-  // const { songs } = useSongs();
-
-  
-
-  // セットリストデータを取得する
-  useEffect(() => {
-    async function fetchSetlists() {
-      await fetchUsersSetlists(currentUser, setUsersSetlists);
-      console.log(usersSetlists);
-    }
-    fetchSetlists();
-  }, [currentUser]);
+  const { setlists, loading } = useSetlists(); // カスタムフックからセットリストとローディング状態を取得
 
   const router = useRouter();
-
 
   const handleOpenModal = () => {
     setIsOpen(true);
@@ -76,13 +61,13 @@ export default function Setlist() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {usersSetlists.map((setlist) => (
+              {setlists.map((setlist) => (
                 <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => router.push(`/setlist/${setlist.id}`)} >
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                     {setlist.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.createdAt.toDate().toLocaleDateString()}
+                    {setlist.createdAt}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                     {setlist.songIds ? setlist.songIds.length : 0} 曲
@@ -102,5 +87,6 @@ export default function Setlist() {
     </div>
   );
 }
+
 
 
