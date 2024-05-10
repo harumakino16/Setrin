@@ -18,7 +18,6 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
                 createdAt: serverTimestamp()
             });
             setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
-            onSetlistAdded();  // 親コンポーネントに通知
             onClose(); // モーダルを閉じる
         } else {
             alert("ユーザーが認証されていません。");

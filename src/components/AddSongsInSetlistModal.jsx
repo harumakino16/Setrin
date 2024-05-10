@@ -2,24 +2,18 @@ import { db } from '../../firebaseConfig';
 import Modal from './modal';
 import { useEffect, useState } from 'react';
 import { collection, getDocs, doc, writeBatch, getDoc } from 'firebase/firestore';
-import fetchUsersSetlists from '../hooks/fetchUsersSetlists';
+import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useMessage } from '../context/MessageContext';
 
 
-function AddSongsInSetlistModal({ isOpen, setIsOpen, onSongsUpdated, selectedSongs, onClose, currentUser }) {
+function AddSongsInSetlistModal({ isOpen, onSongsUpdated, selectedSongs, onClose, currentUser }) {
 
-    const [usersSetlists, setUsersSetlists] = useState([]);
     const [selectedSetlists, setSelectedSetlists] = useState([]);
     const { setMessageInfo } = useMessage();
+    const { setlists } = fetchUsersSetlists(currentUser);
 
 
-    useEffect(() => {
-        async function fetchSetlists() {
-            await fetchUsersSetlists(currentUser,setUsersSetlists);
-            console.log(usersSetlists);
-        }
-        fetchSetlists();
-    }, [currentUser]);
+
 
     const handleCheckboxChange = (setlistId) => {
         setSelectedSetlists(prev => {
@@ -46,7 +40,6 @@ function AddSongsInSetlistModal({ isOpen, setIsOpen, onSongsUpdated, selectedSon
 
         try {
             await batch.commit();
-            onSongsUpdated(); // 更新後のコールバックを呼び出す
             setMessageInfo({ message: '曲がセットリストに追加されました。', type: 'success' });
         } catch (error) {
             console.error('曲をセットリストに追加中にエラーが発生しました:', error);
@@ -61,7 +54,7 @@ function AddSongsInSetlistModal({ isOpen, setIsOpen, onSongsUpdated, selectedSon
             <div className="overflow-y-auto">
                 <h2 className="text-2xl font-bold mb-4">セットリストに曲を追加</h2>
                 <ul className="space-y-4 p-4">
-                    {usersSetlists.map(setlist => (
+                    {setlists.map(setlist => (
                         <li key={setlist.id}>
                             <label className="flex items-center">
                                 <input type="checkbox" className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" checked={selectedSetlists.includes(setlist.id)} onChange={() => handleCheckboxChange(setlist.id)} />

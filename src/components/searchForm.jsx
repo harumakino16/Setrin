@@ -15,11 +15,11 @@ const SearchForm = ({ currentUser, handleSearchResults }) => {
         let songsData = songs;
 
         if (searchCriteria.freeKeyword) {
-            songsData = songsData.filter(song => 
+            songsData = songsData.filter(song =>
                 song.title.includes(searchCriteria.freeKeyword) ||
                 song.artist.includes(searchCriteria.freeKeyword) ||
                 song.tags.includes(searchCriteria.freeKeyword) ||
-                song.genres.includes(searchCriteria.freeKeyword) ||
+                song.genre.includes(searchCriteria.freeKeyword) ||
                 song.skillLevel.toString().includes(searchCriteria.freeKeyword) ||
                 song.memo.includes(searchCriteria.freeKeyword)
             );
@@ -42,7 +42,7 @@ const SearchForm = ({ currentUser, handleSearchResults }) => {
         }
 
         if (searchCriteria.genre) {
-            songsData = songsData.filter(song => song.genres.includes(searchCriteria.genre));
+            songsData = songsData.filter(song => song.genre.includes(searchCriteria.genre));
         }
 
         if (searchCriteria.skillLevel > 0) {
@@ -66,10 +66,10 @@ const SearchForm = ({ currentUser, handleSearchResults }) => {
 
     return (
         <div>
-            <div className="flex flex-wrap gap-8 mb-8">
-                <div className="w-full mb-4">
+            <div className="flex flex-col gap-8 mb-8">
+                <div className="">
                     <label className="whitespace-nowrap">フリーキーワード:</label>
-                    <input type="text" className="border p-2 rounded w-full" placeholder="キーワードで検索" onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)} />
+                    <input type="text" className="border p-2 rounded w-full h-14" placeholder="キーワードで検索" onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)} />
                 </div>
                 <div onClick={() => setShowAdvancedSearch(!showAdvancedSearch)} className="text-gray-500 font-bold py-2 px-4 cursor-pointer flex items-center">
                     <span className="text-gray-500">詳細検索</span> <span className="text-gray-500"><GoChevronDown size={20} /></span>
