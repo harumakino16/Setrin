@@ -1,22 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
 import SongFieldModal from './SongFieldModal';
+import { useSongs } from '../context/SongsContext';
+
 
 
 function MainTable({
-  currentSongs,
   selectAll,
   handleSelectAll,
   selectedSongs,
   handleSelectSong,
   handleDeleteSong,
   requestSort,
-  songs,
+  tableData,
   setModalState,
   modalState,
   refreshSongs
 }) {
+  const { songs } = useSongs();
+
+
+  const recordsPerPage = 30;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentSongs, setCurrentSongs] = useState([]);
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  // const indexOfLastRecord = currentPage * recordsPerPage;
+  // const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+
+
+
+
+  useEffect(() => {
+    const indexOfLastRecord = currentPage * recordsPerPage;
+    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+    setCurrentSongs(tableData.slice(indexOfFirstRecord, indexOfLastRecord));
+  }, [tableData, currentPage, recordsPerPage]);
+
+
+
   const handleEditSong = (songId) => {
     const songToEdit = songs.find(song => song.id === songId);
     setModalState(prev => ({
@@ -65,9 +88,21 @@ function MainTable({
           ))}
         </tbody>
       </table>
+
+      <div className="flex justify-center mt-4">
+        <div className="flex space-x-1">
+          {Array.from({ length: Math.ceil(tableData.length / recordsPerPage) }, (_, i) => i + 1).map(page => (
+            <button key={page} onClick={() => paginate(page)} className={`px-4 py-2 ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'} border rounded`}>
+              {page}
+            </button>
+          ))}
+        </div>
+      </div>
+
+
       {modalState.editSong && <SongFieldModal onClose={() => setModalState({ ...modalState, editSong: false })} onSongUpdated={refreshSongs} isOpen={modalState.editSong} song={modalState.currentSong} />}
 
-    </div>
+    </div >
   );
 }
 
