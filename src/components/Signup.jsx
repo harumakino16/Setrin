@@ -79,7 +79,7 @@ function Signup({ setShowSignup, setShowEmailVerification, setEmail, email }) {
     };
 
     return (
-            <div className=" w-[600px] mx-auto p-16 bg-white rounded-lg">
+            <div className=" w-[600px] mx-auto p-16 pb-5 bg-white rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">会員登録</h1>
                 <form onSubmit={handleSubmit} className="space-y-4 ">
                     <div>
@@ -123,7 +123,7 @@ function Signup({ setShowSignup, setShowEmailVerification, setEmail, email }) {
                     </button>
 
                 </div>
-                <p className="mt-6 text-sm text-gray-600">利用規約、プライバシーポリシーに同意の上、ご登録ください</p>
+                <p className="mt-6 text-sm text-gray-600 text-center mb-5"><a href="/termsuser" className="text-blue-500">利用規約</a>、<a href="/privacypolicy" className="text-blue-500">プライバシーポリシー</a>に同意の上、ご登録ください</p>
                 <div className='text-center'>
                     すでにアカウントをお持ちですか？<Link href="/login" className="text-blue-500"> ログイン</Link>
                 </div>
