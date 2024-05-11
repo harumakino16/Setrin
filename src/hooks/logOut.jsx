@@ -12,7 +12,7 @@ const useLogOut = () => {
             await signOut(auth);
             console.log('ログアウトしました。');
             setMessageInfo({ message: 'ログアウトしました。', type: 'info' });
-            router.push('/register');
+            router.push('/login');
         } catch (error) {
             console.error('ログアウトに失敗しました:', error);
             setMessageInfo({ message: 'ログアウトに失敗しました: ' + error.message, type: 'error' });

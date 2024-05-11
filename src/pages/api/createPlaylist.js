@@ -40,8 +40,15 @@ export default async function handler(req, res) {
 
                 const videoIds = videoUrls.map(url => {
                     const urlObj = new URL(url);
-                    return urlObj.searchParams.get('v');
+                    if (urlObj.hostname === 'youtu.be') {
+                        // 短縮URLの場合、パスからIDを抽出
+                        return urlObj.pathname.slice(1); // 先頭のスラッシュを取り除く
+                    } else {
+                        // 通常のYouTube URLの場合
+                        return urlObj.searchParams.get('v');
+                    }
                 });
+
 
                 for (const videoId of videoIds) {
                     await youtube.playlistItems.insert({
@@ -76,3 +83,4 @@ export default async function handler(req, res) {
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 }
+

@@ -14,8 +14,7 @@ import { faDownload, faFolderPlus, faSort, faTrash, faUpload } from "@fortawesom
 import { useMessage } from "@/context/MessageContext";
 import { useRouter } from 'next/router';
 import { useSongs } from '../context/SongsContext';
-
-
+import { CSVLink } from "react-csv";
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -121,7 +120,29 @@ export default function Home() {
     setTableData(sortSongs);
   };
 
+  const headers = [
+    { label: "曲名", key: "title" },
+    { label: "アーティスト", key: "artist" },
+    { label: "カラオケ音源のYoutubeURL", key: "youtubeUrl" },
+    { label: "ジャンル", key: "genre" },
+    { label: "タグ1", key: "tag1" },
+    { label: "タグ2", key: "tag2" },
+    { label: "タグ3", key: "tag3" },
+    { label: "歌った回数", key: "timesSung" },
+    { label: "熟練度", key: "skillLevel" },
+    { label: "備考", key: "memo" }
+  ];
 
+  const csvReport = {
+    filename: 'SongList.csv',
+    headers: headers,
+    data: tableData.map(song => ({
+      ...song,
+      tag1: song.tags[0] || '',
+      tag2: song.tags[1] || '',
+      tag3: song.tags[2] || ''
+    }))
+  };
 
   return (
     <div className="flex">
@@ -144,9 +165,9 @@ export default function Home() {
             <button onClick={() => toggleModal('import', true)} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
               <FontAwesomeIcon icon={faDownload} className="mr-2" />インポート
             </button>
-            <button onClick={() => alert("エクスポート機能はまだ実装されていません")} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
+            <CSVLink {...csvReport} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
               <FontAwesomeIcon icon={faUpload} className="mr-2" />エクスポート
-            </button>
+            </CSVLink>
           </div>
         </div>
 
@@ -164,7 +185,7 @@ export default function Home() {
 
 
         {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} isOpen={modalState.addSong} />}
-        {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} onSongsUpdated={refreshSongs} isOpen={modalState.import} />}
+        {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} isOpen={modalState.import} />}
         {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
       </div>
     </div>
