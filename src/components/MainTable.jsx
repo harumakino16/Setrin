@@ -57,7 +57,7 @@ function MainTable({
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '30px' }}>
               <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
             </th>
-            {["曲名", "アーティスト", "タグ", "ジャンル", "カラオケ音源のYoutubeURL", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
+            {["曲名", "アーティスト", "ジャンル", "タグ", "カラオケ音源のYoutubeURL", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
               <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {header}
                 <FontAwesomeIcon icon={faSort} onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "timesSung", "skillLevel", "memo", ""][index])} className="ml-2 cursor-pointer" />
@@ -72,8 +72,8 @@ function MainTable({
               <td className="px-3 py-4 whitespace-nowrap"><input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" type="checkbox" checked={selectedSongs.includes(song.id)} onChange={() => handleSelectSong(song.id)} /></td>
               <td className="px-6 py-4 whitespace-nowrap">{song.title.length > 10 ? `${song.title.slice(0, 10)}...` : song.title}</td>
               <td className="px-6 py-4 whitespace-nowrap">{song.artist.length > 10 ? `${song.artist.slice(0, 10)}...` : song.artist}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{song.tags.join(", ")}</td>
               <td className="px-6 py-4 whitespace-nowrap">{song.genre}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{song.tags.join(", ")}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {song.youtubeUrl ? <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-800">リンク</a> : "未登録"}
               </td>
