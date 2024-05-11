@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { FcGoogle } from "react-icons/fc";
 import { MdEmail } from "react-icons/md";
 import Link from 'next/link';
@@ -9,9 +9,15 @@ import { useRouter } from 'next/router';
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { setCurrentUser } = useContext(AuthContext);
+    const { currentUser, setCurrentUser } = useContext(AuthContext);
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+        if (currentUser) {
+            router.push('/');
+        }
+    }, [currentUser, router]);
 
     const validateEmail = (email) => {
         return String(email)
@@ -62,7 +68,7 @@ function Login() {
 
     return (
         <div className="flex justify-center items-center h-screen bg-gray-100">
-            <div className=" w-[600px] mx-auto p-16 bg-white rounded-lg">
+            <div className=" w-[600px] mx-auto p-10 pb-5 bg-white rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">ログイン</h1>
                 {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4 ">
@@ -98,7 +104,7 @@ function Login() {
                     <div className="text-center text-gray-500 mx-4 text-sm">または</div>
                     <hr className="flex-grow" />
                 </div>
-                <div className="flex flex-col space-y-4">
+                <div className="flex flex-col space-y-4 mb-5">
                     <button onClick={handleGoogleLogin} className="bg-white hover:bg-gray-100 text-gray-700 font-semibold py-4 px-4 border border-gray-200 rounded w-full">
                         <div className="flex items-center justify-start space-x-2">
                             <FcGoogle size={24} />
@@ -106,9 +112,12 @@ function Login() {
                         </div>
                     </button>
                 </div>
-                <p className="mt-6 text-sm text-gray-600">利用規約、プライバシーポリシーに同意の上、ご利用ください</p>
+                <div className="flex flex-col space-y-1 mb-5">
+                    <p className="text-center text-gray-500 text-sm">パスワードを忘れた方はこちら</p>
+                    <p className="text-center text-gray-500 text-sm">ログインできない方はこちら</p>
+                </div>
                 <div className='text-center'>
-                    アカウントをお持ちでないですか？<Link href="/register" className="text-blue-500"> 登録</Link>
+                    <Link href="/register" className="text-blue-500 font-bold">会員登録はこちら</Link>
                 </div>
             </div>
         </div>
