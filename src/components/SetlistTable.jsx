@@ -3,7 +3,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
-const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, setRefreshNum }) => {
+const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
   const [isDragged, setIsDragged] = useState(false);
 
 
@@ -14,13 +14,13 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, set
       const songIds = currentSongs.map(song => song.id);
       await updateDoc(setlistDocRef, { songIds });
       console.log('セットリストが保存されました');
+      console.log(currentSongs);
       setIsDragged(false); // ドラッグ状態をリセット
-      setRefreshNum(prev => prev + 1); // リフレッシュ状態を更新
     } catch (error) {
       console.error('セットリストの保存中にエラーが発生しました:', error);
     }
   };
-  
+
 
 
   const onDelete = async (songId) => {
@@ -69,6 +69,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, set
     newSongs.splice(hoverIndex, 0, dragRow);
     setCurrentSongs(newSongs);
     setIsDragged(true); // ドラッグ操作があったことを記録
+    console.log(currentSongs);
   };
 
   const handleSaveButton = () => {

@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SetlistTable from '@/components/SetlistTable'; // SongTable コンポーネントをインポート
@@ -14,57 +14,54 @@ import Loading from '@/components/loading'; // Loading コンポーネントを�
 
 
 const SetlistDetail = () => {
-    const [setlist, setSetlist] = useState(null);
+    const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
     const [currentSongs, setCurrentSongs] = useState([]);
     const { currentUser } = useContext(AuthContext);
     const router = useRouter();
     const { setMessageInfo } = useMessage();
     const { songs } = useSongs();
     const [loading, setLoading] = useState(false); // ローディング状態を追加
-    const [refreshNum, setRefreshNum] = useState(0); // リフレッシュ状態を追加
+    const [firstLoad, setFirstLoad] = useState(true);
 
     useEffect(() => {
-        const fetchSetlist = async () => {
-            const setlistDocRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
-            const setlistSnapshot = await getDoc(setlistDocRef);
-            if (setlistSnapshot.exists()) {
-                const setlistData = setlistSnapshot.data();
-                const setlistWithId = {
-                    ...setlistData,
-                    id: setlistSnapshot.id  // ドキュメントIDをデータに追加
-                };
-                setSetlist(setlistWithId);
-                console.log(setlistWithId);
+        const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
+        const unsubscribe = onSnapshot(setlistRef, (doc) => {
+            if (doc.exists()) {
+                setSetlist({ id: doc.id, ...doc.data() });
+                console.log("セットリストが存在します");
             } else {
                 setSetlist(null);
+                console.log("セットリストが存在しないか、曲がありません。");
             }
-        };
-
-        fetchSetlist();
+        });
 
 
-    }, [currentUser, router.query.id, refreshNum]);
+        return () => unsubscribe(); // Clean up subscription
+    }, [currentUser, router.query.id]);
 
-    console.log(refreshNum);
 
     useEffect(() => {
         const fetchCurrentSongs = async () => {
-            if (setlist && setlist.songIds && songs) {
-                console.log(currentSongs);
-                const filteredSongs = songs.filter(song => setlist.songIds.includes(song.id));
+            if (setlist && setlist.songIds) {
+                // 全てのソングをフィルタリングし、それからIDの順にソートする
+                const songIdIndexMap = new Map(setlist.songIds.map((id, index) => [id, index]));
+                const filteredSongs = songs
+                    .filter(song => setlist.songIds.includes(song.id))
+                    .sort((a, b) => songIdIndexMap.get(a.id) - songIdIndexMap.get(b.id));
                 setCurrentSongs(filteredSongs);
                 console.log("フェッチしました");
-                console.log(refreshNum);
             } else {
                 console.log("セットリストが存在しないか、曲がありません。");
-                setCurrentSongs([]); // setlist が null の場合は���の配列を設定
+                setCurrentSongs([]); // setlist が null の場合は空の配列を設定
             }
         };
-        if (setlist && songs) { // setlist と songs が存在する場合のみ fetchCurrentSongs を実行
+        if (setlist && firstLoad) { // setlistが 存在する場合のみ fetchCurrentSongs を実行
             fetchCurrentSongs();
+            setFirstLoad(false);
         }
         console.log(setlist);
-    }, [setlist, songs, refreshNum]); // setlist と songs と refreshNum に依存
+    }, [setlist, songs, firstLoad]);
+    
 
     async function createPlaylist(songs, setlistName) {
         setLoading(true); // ローディング開始
@@ -145,7 +142,7 @@ const SetlistDetail = () => {
                                 )}
                             </div>
                             <DndProvider backend={HTML5Backend}>
-                                <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} setlist={setlist} setSetlist={setSetlist} currentUser={currentUser} router={router} setRefreshNum={setRefreshNum} />
+                                <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} setlist={setlist} setSetlist={setSetlist} currentUser={currentUser} router={router} />
                             </DndProvider>
                         </div>
                     </div>

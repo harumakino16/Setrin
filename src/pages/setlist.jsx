@@ -1,43 +1,57 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
-import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
+import { Sidebar } from '@/components/Sidebar';
 import SetlistNameModal from '@/components/setlistNameModal';
+import EditSetlistNameModal from '@/components/EditSetlistNameModal';
 import { useRouter } from 'next/router';
-import useSetlists from '@/hooks/fetchSetlists';
-// import { useSongs } from '../context/SongsContext';
-
+import { db } from '@/../firebaseConfig';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
-  const { setlists, loading } = useSetlists(); // カスタムフックからセットリストとローディング状態を取得
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedSetlist, setSelectedSetlist] = useState(null);
+  const [setlists, setSetlists] = useState([]); // スナップショットによるセットリスト
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
 
-  const handleOpenModal = () => {
-    setIsOpen(true);
-  };
+  useEffect(() => {
+    if (!currentUser) return;
 
-  const handleCloseModal = () => {
-    setIsOpen(false);
-  };
+    const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
+    const unsubscribe = onSnapshot(setlistsRef, (snapshot) => {
+      const updatedSetlists = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000).toLocaleDateString() : '不明' // 日付の変換
+      }));
+      setSetlists(updatedSetlists);
+    });
 
-  const handleSetlistAdded = () => {
-    fetchSetlists();  // 
-  };
+    return () => unsubscribe(); // Clean up subscription
+  }, [currentUser]);
 
+  const handleOpenModal = () => setIsOpen(true);
+  const handleCloseModal = () => setIsOpen(false);
+  const handleOpenEditModal = (setlist) => {
+    setSelectedSetlist(setlist);
+    setIsEditOpen(true);
+  };
+  const handleCloseEditModal = () => setIsEditOpen(false);
 
   return (
     <div className="flex">
-      <Sidebar /> {/* サイドバーを表示 */}
+      <Sidebar />
       <div className="flex-grow p-8">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">セットリスト</h1>
           <button onClick={handleOpenModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
             <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             新しいセットリストを追加
           </button>
@@ -56,7 +70,7 @@ export default function Setlist() {
                   曲数
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-
+                  編集
                 </th>
               </tr>
             </thead>
@@ -73,9 +87,9 @@ export default function Setlist() {
                     {setlist.songIds ? setlist.songIds.length : 0} 曲
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <button onClick={(e) => { e.stopPropagation(); handleOpenEditModal(setlist); }} className="text-blue-500 hover:text-blue-700">
+                      編集
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -83,10 +97,9 @@ export default function Setlist() {
           </table>
         </div>
       </div>
-      {isOpen ? <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} onSetlistAdded={handleSetlistAdded} /> : null}
+      {isOpen && <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} />}
+      {isEditOpen && <EditSetlistNameModal setlist={selectedSetlist} isOpen={isEditOpen} onClose={handleCloseEditModal} />}
     </div>
   );
 }
-
-
 

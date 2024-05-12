@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { db } from '@/../firebaseConfig';
 import { AuthContext } from "@/context/AuthContext";
 
 const SongsContext = createContext();
