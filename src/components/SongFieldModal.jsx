@@ -31,15 +31,21 @@ function SongModal({ isOpen, onClose, song }) {
       return;
     }
 
-    if (!validateYoutubeUrl(youtubeUrl)) {
+    if (youtubeUrl && !validateYoutubeUrl(youtubeUrl)) {
       setMessageInfo({ message: '無効なYouTube URLです。', type: 'error' });
+      return;
+    }
+
+    const tagArray = tags.split(',').map(tag => tag.trim());
+    if (tagArray.length > 3) {
+      setMessageInfo({ message: 'タグは3つまでです。', type: 'error' });
       return;
     }
 
     const songData = {
       title,
       artist,
-      tags: tags.split(',').map(tag => tag.trim()),
+      tags: tagArray,
       genre,
       youtubeUrl,
       timesSung: parseInt(timesSung, 10),
