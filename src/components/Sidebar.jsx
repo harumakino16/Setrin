@@ -7,7 +7,9 @@ import { useRouter } from "next/router";
 import { AuthContext } from '../context/AuthContext'; // AuthContextをインポート
 import useLogOut from '../hooks/logOut';
 import { useMessage } from '@/context/MessageContext';
-import { getAuth } from "firebase/auth";
+import CreateRandomSetlist from '@/components/CreateRandomSetlist'; // createsetlistをインポート
+
+
 
 const MENU = [
     {
@@ -33,15 +35,15 @@ export function Sidebar() {
     const { currentUser } = useContext(AuthContext); // currentUserを取得
     const logOut = useLogOut();
     const { setMessageInfo } = useMessage();
+    const [showCreateSetlistModal, setShowCreateSetlistModal] = useState(false);
 
-    useEffect(() => {
-        const auth = getAuth();
-        if (auth.currentUser) {
-            console.log(auth.currentUser.emailVerified);
-        }
-    }, []);
+    const handleCreateSetlist = () => {
+        setShowCreateSetlistModal(true);
+    };
 
-
+    const handleCloseModal = () => {
+        setShowCreateSetlistModal(false);
+    };
 
     return (
         // {/* Sidebar */ }
@@ -63,19 +65,17 @@ export function Sidebar() {
                         })}
                     </ul>
                 </div>
-            <div className="mt-4 px-6">
-                <Link href="/createsetlist">
-                    <button className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
+                <div className="mt-4 px-6">
+                    <button onClick={handleCreateSetlist} className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
                         セトリを作る
                     </button>
-                </Link>
-            </div>
+                </div>
             </div>
             <div className=" flex flex-col px-6 pb-4 gap-3">
                 {currentUser ? (
                     <>
                         <button onClick={logOut} className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">ログアウト</button>
-                        
+
                     </>
                 ) : (
                     <>
@@ -83,6 +83,7 @@ export function Sidebar() {
                     </>
                 )}
             </div>
+            <CreateRandomSetlist isOpen={showCreateSetlistModal} onClose={handleCloseModal} />
         </div>
     );
 }

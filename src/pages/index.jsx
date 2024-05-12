@@ -39,14 +39,11 @@ export default function Home() {
   // 最初のロード時は全ての曲を取得する
   useEffect(() => {
     setTableData(songs);
-    console.log("最初のロード時は全ての曲を取得する");
   }, []);
   
   // songs ステートが更新されるたびに実行されます。
   useEffect(() => {
     setTableData(songs);
-    console.log("songsステートが更新されたら実行される");
-    console.log(songs);
   }, [songs]);  
 
 
