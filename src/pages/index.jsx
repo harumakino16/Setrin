@@ -25,7 +25,7 @@ export default function Home() {
     addSongsInSetlist: false
   });
 
-  
+
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -35,16 +35,16 @@ export default function Home() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const { setMessageInfo } = useMessage();
   const [tableData, setTableData] = useState([]);
-  
+
   // 最初のロード時は全ての曲を取得する
   useEffect(() => {
     setTableData(songs);
   }, []);
-  
+
   // songs ステートが更新されるたびに実行されます。
   useEffect(() => {
     setTableData(songs);
-  }, [songs]);  
+  }, [songs]);
 
 
   const handleSearchResults = (results) => {
@@ -53,10 +53,9 @@ export default function Home() {
   };
 
 
-
-  const toggleModal = (modal, value) => {
-    setModalState(prev => ({ ...prev, [modal]: value }));
-  };
+  const toggleModal = (modal) => {
+    setModalState(prev => ({ ...prev, [modal]: !prev[modal] }));
+};
 
 
   const handleDeleteSong = async (songId) => {
@@ -93,29 +92,30 @@ export default function Home() {
     }
   };
 
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    const sortSongs = [...songs].sort((a, b) => {
-      // 数値として解釈可能かどうかをチェック
+  const sortSongs = (songs, key, direction) => {
+    return [...songs].sort((a, b) => {
       const aValue = a[key];
       const bValue = b[key];
       const aIsNumber = !isNaN(Number(aValue));
       const bIsNumber = !isNaN(Number(bValue));
 
-      // 両方の値が数値の場合、数値として比較
       if (aIsNumber && bIsNumber) {
         return direction === 'ascending' ? aValue - bValue : bValue - aValue;
       }
-      // それ以外の場合は、文字列として比較
       return direction === 'ascending' ? String(aValue).localeCompare(String(bValue)) : String(bValue).localeCompare(String(aValue));
     });
-
-    setSortConfig({ key, direction });
-    setTableData(sortSongs);
   };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    const sortedSongs = sortSongs(songs, key, direction);
+    setSortConfig({ key, direction });
+    setTableData(sortedSongs);
+  };
+
 
   const headers = [
     { label: "曲名", key: "title" },
@@ -181,9 +181,9 @@ export default function Home() {
         />
 
 
-        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} isOpen={modalState.addSong} />}
-        {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} isOpen={modalState.import} />}
-        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
+{modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
+{modalState.import && <ImportModal onClose={() => toggleModal('import')} isOpen={modalState.import} />}
+{modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
       </div>
     </div>
   );
