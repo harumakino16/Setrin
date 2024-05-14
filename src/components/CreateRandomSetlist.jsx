@@ -3,7 +3,7 @@ import { db } from '../../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import SearchForm from '@/components/SearchForm';
-import Modal from '@/components/modal.jsx'; // Modal コンポーネントをインポート
+import Modal from '@/components/Modal.jsx'; // Modal コンポーネントをインポート
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);

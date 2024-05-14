@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { db } from '../../firebaseConfig';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
-import Modal from './modal';
+import Modal from './Modal';
 import { useMessage } from '../context/MessageContext';
 
 

@@ -4,9 +4,9 @@ import SongFieldModal from "@/components/SongFieldModal";
 import ImportModal from "@/components/ImportModal";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, collection, getDocs, writeBatch } from "firebase/firestore";
 import useFetchSongs from "@/hooks/fetchSongs";
-import SearchForm from "@/components/searchForm";
+import SearchForm from "@/components/SearchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
 import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
@@ -15,6 +15,7 @@ import { useMessage } from "@/context/MessageContext";
 import { useRouter } from 'next/router';
 import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
+import { COLUMN_HEADERS } from "@/constants/columnHeaders";
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -25,7 +26,6 @@ export default function Home() {
     addSongsInSetlist: false
   });
 
-  
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -35,42 +35,55 @@ export default function Home() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const { setMessageInfo } = useMessage();
   const [tableData, setTableData] = useState([]);
-  
+
   // 最初のロード時は全ての曲を取得する
   useEffect(() => {
     setTableData(songs);
   }, []);
-  
+
   // songs ステートが更新されるたびに実行されます。
   useEffect(() => {
     setTableData(songs);
-  }, [songs]);  
-
+  }, [songs]);
 
   const handleSearchResults = (results) => {
     setTableData(results);
     setSearchPerformed(true);
   };
 
-
-
   const toggleModal = (modal, value) => {
     setModalState(prev => ({ ...prev, [modal]: value }));
   };
 
-
   const handleDeleteSong = async (songId) => {
-    if (currentUser) {
-      const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
-      await deleteDoc(songRef);
-    } else {
-      console.log("ユーザーが認証されていません。");
+    try {
+      // 曲を削除
+      await deleteDoc(doc(db, 'users', currentUser.uid, 'Songs', songId));
+      
+      // セットリストを更新
+      const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
+      const setlistsSnapshot = await getDocs(setlistsRef);
+      const batch = writeBatch(db);
+
+      setlistsSnapshot.forEach((setlistDoc) => {
+        const setlistData = setlistDoc.data();
+        if (setlistData.songIds.includes(songId)) {
+          const updatedSongIds = setlistData.songIds.filter(id => id !== songId);
+          batch.update(setlistDoc.ref, { songIds: updatedSongIds });
+        }
+      });
+
+      await batch.commit();
+      setMessageInfo({ message: '曲が削除され、セットリストが更新されました。', type: 'success' });
+    } catch (error) {
+      console.error('曲の削除中にエラーが発生しました:', error);
+      setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
     }
   };
 
   const handleSelectAll = () => {
     setSelectAll(!selectAll);
-    setSelectedSongs(selectAll ? [] : songs.map(song => song.id));
+    setSelectedSongs(selectAll ? [] : tableData.map(song => song.id));
   };
 
   const handleSelectSong = (songId) => {
@@ -85,11 +98,34 @@ export default function Home() {
 
   const handleDeleteSelectedSongs = async () => {
     if (currentUser && selectedSongs.length > 0) {
-      await Promise.all(selectedSongs.map(songId => {
-        const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
-        return deleteDoc(songRef);
-      }));
-      setSelectedSongs([]);
+      try {
+        const batch = writeBatch(db);
+
+        // 選択された曲を削除
+        selectedSongs.forEach(songId => {
+          const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
+          batch.delete(songRef);
+        });
+
+        // セットリストを更新
+        const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
+        const setlistsSnapshot = await getDocs(setlistsRef);
+
+        setlistsSnapshot.forEach((setlistDoc) => {
+          const setlistData = setlistDoc.data();
+          const updatedSongIds = setlistData.songIds.filter(id => !selectedSongs.includes(id));
+          if (updatedSongIds.length !== setlistData.songIds.length) {
+            batch.update(setlistDoc.ref, { songIds: updatedSongIds });
+          }
+        });
+
+        await batch.commit();
+        setSelectedSongs([]);
+        setMessageInfo({ message: '選択された曲が削除され、セットリストが更新されました。', type: 'success' });
+      } catch (error) {
+        console.error('曲の削除中にエラーが発生しました:', error);
+        setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
+      }
     }
   };
 
@@ -98,18 +134,15 @@ export default function Home() {
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
-    const sortSongs = [...songs].sort((a, b) => {
-      // 数値として解釈可能かどうかをチェック
+    const sortSongs = [...tableData].sort((a, b) => {
       const aValue = a[key];
       const bValue = b[key];
       const aIsNumber = !isNaN(Number(aValue));
       const bIsNumber = !isNaN(Number(bValue));
 
-      // 両方の値が数値の場合、数値として比較
       if (aIsNumber && bIsNumber) {
         return direction === 'ascending' ? aValue - bValue : bValue - aValue;
       }
-      // それ以外の場合は、文字列として比較
       return direction === 'ascending' ? String(aValue).localeCompare(String(bValue)) : String(bValue).localeCompare(String(aValue));
     });
 
@@ -150,7 +183,7 @@ export default function Home() {
           {selectedSongs.length > 0 ? (
             <div className="flex space-x-2">
               <button onClick={() => toggleModal('addSongsInSetlist', true)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />再生リストに追加
+                <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
               </button>
               <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
                 <FontAwesomeIcon icon={faTrash} className="mr-2" />まとめて削除
@@ -179,7 +212,6 @@ export default function Home() {
           modalState={modalState}
           tableData={tableData}
         />
-
 
         {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} isOpen={modalState.addSong} />}
         {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} isOpen={modalState.import} />}

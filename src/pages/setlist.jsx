@@ -3,11 +3,10 @@ import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
 import SetlistNameModal from '@/components/setlistNameModal';
-import EditSetlistNameModal from '@/components/EditSetlistNameModal';
 import { useRouter } from 'next/router';
 import { db } from '@/../firebaseConfig';
-import { collection, onSnapshot } from 'firebase/firestore';
-
+import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import Modal from '@/components/Modal';
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
@@ -27,11 +26,12 @@ export default function Setlist() {
       const updatedSetlists = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000).toLocaleDateString() : '不明' // 日付の変換
+        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000).toLocaleString() : '不明' // 日付と時間の変換
       }));
+      // 作成日時順に並べる、新しい方が上
+      updatedSetlists.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setSetlists(updatedSetlists);
     });
-
     return () => unsubscribe(); // Clean up subscription
   }, [currentUser]);
 
@@ -42,6 +42,15 @@ export default function Setlist() {
     setIsEditOpen(true);
   };
   const handleCloseEditModal = () => setIsEditOpen(false);
+
+  const handleDeleteSetlist = async () => {
+    if (selectedSetlist) {
+      const setlistRef = doc(db, 'users', currentUser.uid, 'Setlists', selectedSetlist.id);
+      await deleteDoc(setlistRef);
+      setSetlists(setlists.filter(setlist => setlist.id !== selectedSetlist.id));
+      setIsEditOpen(false);
+    }
+  };
 
   return (
     <div className="flex">
@@ -70,7 +79,7 @@ export default function Setlist() {
                   曲数
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                  編集
+                  
                 </th>
               </tr>
             </thead>
@@ -87,8 +96,8 @@ export default function Setlist() {
                     {setlist.songIds ? setlist.songIds.length : 0} 曲
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
-                    <button onClick={(e) => { e.stopPropagation(); handleOpenEditModal(setlist); }} className="text-blue-500 hover:text-blue-700">
-                      編集
+                    <button onClick={(e) => { e.stopPropagation(); setSelectedSetlist(setlist); setIsEditOpen(true); }} className="text-red-500 hover:text-red-700">
+                      削除
                     </button>
                   </td>
                 </tr>
@@ -98,8 +107,21 @@ export default function Setlist() {
         </div>
       </div>
       {isOpen && <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} />}
-      {isEditOpen && <EditSetlistNameModal setlist={selectedSetlist} isOpen={isEditOpen} onClose={handleCloseEditModal} />}
+      {isEditOpen && (
+        <Modal isOpen={isEditOpen} onClose={handleCloseEditModal}>
+          <div className="p-4">
+            <h2 className="text-lg font-bold mb-4">セットリストを削除しますか？</h2>
+            <div className="flex justify-end mt-4">
+              <button onClick={handleDeleteSetlist} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2">
+                削除
+              </button>
+              <button onClick={handleCloseEditModal} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
-

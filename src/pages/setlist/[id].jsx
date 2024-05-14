@@ -11,7 +11,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useMessage } from '@/context/MessageContext';
 import { useSongs } from '@/context/SongsContext';
 import Loading from '@/components/loading'; // Loading コンポーネントをインポート
-
+import EditSetlistNameModal from '@/components/EditSetlistNameModal'; // Added import for EditSetlistNameModal
+import { FaPen } from 'react-icons/fa'; // ペンアイコンをインポート
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
@@ -22,6 +23,8 @@ const SetlistDetail = () => {
     const { songs } = useSongs();
     const [loading, setLoading] = useState(false); // ローディング状態を追加
     const [firstLoad, setFirstLoad] = useState(true);
+    const [isEditOpen, setIsEditOpen] = useState(false); // Added state for edit modal
+    const [selectedSetlist, setSelectedSetlist] = useState(null); // Added state for selected setlist
 
     useEffect(() => {
         const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
@@ -51,7 +54,7 @@ const SetlistDetail = () => {
                 setCurrentSongs(filteredSongs);
                 console.log("フェッチしました");
             } else {
-                console.log("セットリストが存在しないか、曲がありません。");
+                console.log("セットリストが存在しないか、曲がありませ��。");
                 setCurrentSongs([]); // setlist が null の場合は空の配列を設定
             }
         };
@@ -111,6 +114,9 @@ const SetlistDetail = () => {
         }
     }
 
+    const handleOpenEditModal = () => setIsEditOpen(true); // Added function to open edit modal
+    const handleCloseEditModal = () => setIsEditOpen(false); // Added function to close edit modal
+
     return (
         <div className="flex">
             <Sidebar /> {/* サイドバーを表示 */}
@@ -122,7 +128,13 @@ const SetlistDetail = () => {
                 )}
                 {setlist && (
                     <div className="bg-white p-6">
-                        <p className="text-lg"><strong>名前：</strong>{setlist.name}</p>
+                        <p className="text-lg">
+                            <strong>名前：</strong>{setlist.name}
+                            <FaPen 
+                                onClick={handleOpenEditModal} 
+                                className="inline ml-1 text-gray-500 cursor-pointer text-sm" 
+                            />
+                        </p>
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
                         <p className="text-lg"><strong>曲数:</strong> {setlist.songIds ? setlist.songIds.length : 0}</p>
                         <div className="mt-4">
@@ -150,6 +162,14 @@ const SetlistDetail = () => {
                 {!setlist && (<div>
                     <p>再生リストはありません。</p>
                 </div>)}
+                {isEditOpen && (
+                    <EditSetlistNameModal
+                        setlist={setlist}
+                        isOpen={isEditOpen}
+                        onClose={handleCloseEditModal}
+                        onSetlistUpdated={(updatedSetlist) => setSetlist(updatedSetlist)}
+                    />
+                )}
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
@@ -27,7 +27,7 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="mb-4">
+            <div className="mb-4 min-w-[400px]">
                 <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="search">
                     フォルダを作成
                 </label>
@@ -40,7 +40,7 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
                     onChange={(e) => setInputValue(e.target.value)}
                 />
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
                 <button
                     className={`bg-blue-500 hover:bg-blue-7000 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${inputValue ? '' : 'opacity-50 cursor-not-allowed bg-gray-500 hover:bg-gray-400'}`}
                     type="submit"

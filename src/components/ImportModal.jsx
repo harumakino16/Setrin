@@ -5,7 +5,7 @@ import Papa from 'papaparse';
 import { db } from '../../firebaseConfig';
 import { collection, doc, setDoc, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
-import Modal from '@/components/modal.jsx'; // Modal コンポーネントをインポート
+import Modal from '@/components/Modal.jsx'; // Modal コンポーネントをインポート
 import { useMessage } from '@/context/MessageContext';
 
 const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {

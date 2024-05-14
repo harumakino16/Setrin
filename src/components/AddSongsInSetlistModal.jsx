@@ -1,19 +1,17 @@
 import { db } from '../../firebaseConfig';
-import Modal from './modal';
-import { useEffect, useState } from 'react';
-import { collection, getDocs, doc, writeBatch, getDoc } from 'firebase/firestore';
+import Modal from './Modal';
+import { useEffect, useState, useContext } from 'react';
+import { collection, getDocs, doc, writeBatch, getDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useMessage } from '../context/MessageContext';
-
+import { AuthContext } from '@/context/AuthContext';
 
 function AddSongsInSetlistModal({ isOpen, onSongsUpdated, selectedSongs, onClose, currentUser }) {
 
     const [selectedSetlists, setSelectedSetlists] = useState([]);
+    const [newSetlistName, setNewSetlistName] = useState('');
     const { setMessageInfo } = useMessage();
     const { setlists } = fetchUsersSetlists(currentUser);
-
-
-
 
     const handleCheckboxChange = (setlistId) => {
         setSelectedSetlists(prev => {
@@ -41,12 +39,34 @@ function AddSongsInSetlistModal({ isOpen, onSongsUpdated, selectedSongs, onClose
         try {
             await batch.commit();
             setMessageInfo({ message: '曲がセットリストに追加されました。', type: 'success' });
+            onSongsUpdated(); // セットリスト更新を通知
         } catch (error) {
             console.error('曲をセットリストに追加中にエラーが発生しました:', error);
             setMessageInfo({ message: '曲の追加に失敗しました。', type: 'error' });
         }
         onClose();
+    };
 
+    const handleCreateAndAddSongsToNewSetlist = async () => {
+        if (newSetlistName.trim() === '') {
+            setMessageInfo({ message: 'セットリスト名を入力してください。', type: 'error' });
+            return;
+        }
+
+        try {
+            const setlistRef = collection(db, 'users', currentUser.uid, 'Setlists');
+            const newSetlistDoc = await addDoc(setlistRef, {
+                name: newSetlistName,
+                songIds: selectedSongs,
+                createdAt: serverTimestamp()
+            });
+
+            setMessageInfo({ message: '新しいセットリストが作成され、曲が追加されました。', type: 'success' });
+            onClose();
+        } catch (error) {
+            console.error('新しいセットリストの作成中にエラーが発生しました:', error);
+            setMessageInfo({ message: '新しいセットリストの作成に失敗しました。', type: 'error' });
+        }
     };
 
     return (
@@ -72,11 +92,29 @@ function AddSongsInSetlistModal({ isOpen, onSongsUpdated, selectedSongs, onClose
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        追加
+                        既存のセットリストに追加
+                    </button>
+                </div>
+                <div className="mt-4 p-4">
+                    <h2 className="text-xl font-bold mb-4">新しいセットリストを作成</h2>
+                    <input
+                        type="text"
+                        value={newSetlistName}
+                        onChange={(e) => setNewSetlistName(e.target.value)}
+                        placeholder="セットリスト名を入力"
+                        className="border p-2 rounded w-full mb-4"
+                    />
+                    <button
+                        className="flex items-center justify-center w-full p-2 mt-4 rounded bg-green-500 hover:bg-green-600 text-white font-bold"
+                        onClick={handleCreateAndAddSongsToNewSetlist}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        新しいセットリストを作成
                     </button>
                 </div>
             </div>
-            
         </Modal>
     );
 }
