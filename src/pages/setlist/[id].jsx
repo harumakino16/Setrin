@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, onSnapshot, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SetlistTable from '@/components/SetlistTable'; // SongTable コンポーネントをインポート
@@ -31,10 +31,8 @@ const SetlistDetail = () => {
         const unsubscribe = onSnapshot(setlistRef, (doc) => {
             if (doc.exists()) {
                 setSetlist({ id: doc.id, ...doc.data() });
-                console.log("セットリストが存在します");
             } else {
                 setSetlist(null);
-                console.log("セットリストが存在しないか、曲がありません。");
             }
         });
 
@@ -96,7 +94,7 @@ const SetlistDetail = () => {
             console.log(currentUser.youtubeRefreshToken);
 
             if (!refreshTokenResponse.ok) {
-                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
+                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生��ました', type: 'error' });
                 throw new Error('Failed to refresh access token');
             }
 
@@ -183,7 +181,12 @@ const SetlistDetail = () => {
                         setlist={setlist}
                         isOpen={isEditOpen}
                         onClose={handleCloseEditModal}
-                        onSetlistUpdated={(updatedSetlist) => setSetlist(updatedSetlist)}
+                        currentUser={currentUser}
+                        onSetlistUpdated={(updatedSetlist) => {
+                            const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
+                            updateDoc(setlistRef, { name: updatedSetlist.name });
+                            setSetlist(updatedSetlist);
+                        }}
                     />
                 )}
             </div>

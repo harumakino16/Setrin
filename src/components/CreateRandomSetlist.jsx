@@ -1,14 +1,23 @@
 import { useState, useContext } from 'react';
+import { useRouter } from 'next/router';
 import { db } from '../../firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import SearchForm from '@/components/SearchForm';
 import Modal from '@/components/Modal.jsx'; // Modal コンポーネントをインポート
+import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
+import { useMessage } from '@/context/MessageContext'; // メッセージコンテキストをインポート
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
+    const { setMessageInfo } = useMessage(); // メッセージコンテキストのフックを使用
     const [searchResults, setSearchResults] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(0); // 曲数を指定するためのstate
+    const { searchCriteria, setSearchCriteria } = useSearchCriteria({}); // カスタムフックを使用
+    const [existingSetlists, setExistingSetlists] = useState([]);
+    const [isSetlistModalOpen, setIsSetlistModalOpen] = useState(false);
+    const [selectedSetlists, setSelectedSetlists] = useState([]); // 選択されたセットリストのstate
+    const router = useRouter();
 
     const handleSearchResults = (results) => {
         setSearchResults(results);
@@ -20,7 +29,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
 
     const createRandomSetlist = async () => {
         if (searchResults.length === 0) {
-            alert('検索結果がありません。');
+            setMessageInfo({ type: 'error', message: '検索結果がありません。' });
             return;
         }
 
@@ -33,33 +42,114 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
 
         try {
             const setlistsRef = collection(db, `users/${currentUser.uid}/Setlists`);
-            await addDoc(setlistsRef, setlistData);
-            alert('セットリストが作成されました。');
+            const docRef = await addDoc(setlistsRef, setlistData);
+            setMessageInfo({ type: 'success', message: 'セットリストが作成されました。' });
+            router.push(`/setlists/${docRef.id}`);
         } catch (error) {
             console.error('セットリストの保存に失敗しました:', error);
-            alert('セットリストの保存に失敗しました。');
+            setMessageInfo({ type: 'error', message: 'セットリストの保存に失敗しました。' });
+        }
+    };
+
+    const fetchExistingSetlists = async () => {
+        const setlistsRef = collection(db, `users/${currentUser.uid}/Setlists`);
+        const setlistsSnapshot = await getDocs(setlistsRef);
+        const setlists = setlistsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setlists.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate()); // 作成日時順に並べ替え
+        setExistingSetlists(setlists);
+    };
+
+    const handleAddToExistingSetlist = async () => {
+        await fetchExistingSetlists();
+        setIsSetlistModalOpen(true);
+    };
+
+    const handleSetlistSelection = (setlistId) => {
+        setSelectedSetlists(prevSelected => {
+            if (prevSelected.includes(setlistId)) {
+                return prevSelected.filter(id => id !== setlistId);
+            } else {
+                return [...prevSelected, setlistId];
+            }
+        });
+    };
+
+    const addToSelectedSetlists = async () => {
+        try {
+            for (const setlistId of selectedSetlists) {
+                const setlistRef = doc(db, `users/${currentUser.uid}/Setlists`, setlistId);
+                const setlistDoc = await getDoc(setlistRef);
+                const setlistData = setlistDoc.data();
+                const updatedSongIds = [...new Set([...(setlistData.songIds || []), ...searchResults.map(song => song.id)])];
+                await updateDoc(setlistRef, { songIds: updatedSongIds });
+            }
+            setMessageInfo({ type: 'success', message: 'セットリストに曲が追加されました。' });
+            setIsSetlistModalOpen(false);
+            router.push(`/setlist/${selectedSetlists[0]}`);
+        } catch (error) {
+            console.error('セットリストへの追加に失敗しました:', error);
+            setMessageInfo({ type: 'error', message: 'セットリストへの追加に失敗しました。' });
         }
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <div className="flex flex-col gap-2 min-w-[600px]">
-                <h2 className="text-xl font-bold text-blue-600 underline decoration-dashed decoration-blue-300">STEP1 条件を指定する</h2>
-                <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} />
+                <h2 className=" text-2xl font-bold text-blue-600 text-center">セトリを作る</h2>
+                <SearchForm
+                    currentUser={currentUser}
+                    handleSearchResults={handleSearchResults}
+                    searchCriteria={searchCriteria}
+                    setSearchCriteria={setSearchCriteria}
+                />
                 <div className="text-sm text-gray-600 mt-2">
                     {`検索結果: ${searchResults.length} 件`}
                 </div>
-                <h2 className="text-xl font-bold text-green-600 underline decoration-dotted decoration-green-300">STEP2 出力する曲数を指定する</h2>
-                <div className="mt-2">
-                    <div className="flex justify-center items-center">
-                        <label htmlFor="numberOfSongs" className="mr-2">出力する曲数:</label>
-                        <input type="number" id="numberOfSongs" value={numberOfSongs} onChange={(e) => setNumberOfSongs(Math.min(parseInt(e.target.value, 10), searchResults.length))} className="border p-1 rounded h-12" />
-                    </div>
+                <div className="flex flex-col gap-2 mt-4">
+                    <label className="text-sm text-gray-600">出力する曲数を選択してください:</label>
+                    <input
+                        type="number"
+                        value={numberOfSongs}
+                        onChange={(e) => setNumberOfSongs(parseInt(e.target.value, 10))}
+                        className="border p-2 rounded w-full"
+                        min="1"
+                        max={searchResults.length}
+                    />
                 </div>
                 <button onClick={createRandomSetlist} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     ランダムセットリストを作成
                 </button>
+                <button onClick={handleAddToExistingSetlist} className="mt-2 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">
+                    既存のセットリストに追加する
+                </button>
             </div>
+            {isSetlistModalOpen && (
+                <Modal isOpen={isSetlistModalOpen} onClose={() => setIsSetlistModalOpen(false)}>
+                    <div className="flex flex-col gap-2 min-w-[400px]">
+                        <h2 className="text-xl font-bold text-blue-600 text-center">既存のセットリスト</h2>
+                        <ul>
+                            {existingSetlists.map(setlist => (
+                                <li
+                                    key={setlist.id}
+                                    className="border-b py-2 flex items-center cursor-pointer"
+                                    onClick={() => handleSetlistSelection(setlist.id)}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedSetlists.includes(setlist.id)}
+                                        onChange={() => handleSetlistSelection(setlist.id)}
+                                        className="mr-2"
+                                    />
+                                    {setlist.name}
+                                </li>
+                            ))}
+                        </ul>
+                        <button onClick={addToSelectedSetlists} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            選択したセットリストに追加
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </Modal>
     );
 }
