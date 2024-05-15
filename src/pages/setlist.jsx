@@ -1,39 +1,22 @@
-import { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
-import { db } from '@/../firebaseConfig';
-import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 import Modal from '@/components/modal';
+import useSetlists from '@/hooks/fetchSetlists';
+import { db } from '../../firebaseConfig';
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedSetlist, setSelectedSetlist] = useState(null);
-  const [setlists, setSetlists] = useState([]); // スナップショットによるセットリスト
-  const [loading, setLoading] = useState(true);
+  const { setlists, loading } = useSetlists();
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (!currentUser) return;
-
-    const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
-    const unsubscribe = onSnapshot(setlistsRef, (snapshot) => {
-      const updatedSetlists = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000).toLocaleString() : '不明' // 日付と時間の変換
-      }));
-      // 作成日時順に並べる、新しい方が上
-      updatedSetlists.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setSetlists(updatedSetlists);
-    });
-    return () => unsubscribe(); // Clean up subscription
-  }, [currentUser]);
 
   const handleOpenModal = () => setIsOpen(true);
   const handleCloseModal = () => setIsOpen(false);
@@ -47,7 +30,6 @@ export default function Setlist() {
     if (selectedSetlist) {
       const setlistRef = doc(db, 'users', currentUser.uid, 'Setlists', selectedSetlist.id);
       await deleteDoc(setlistRef);
-      setSetlists(setlists.filter(setlist => setlist.id !== selectedSetlist.id));
       setIsEditOpen(false);
     }
   };

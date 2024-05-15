@@ -5,14 +5,12 @@ import ImportModal from "@/components/ImportModal";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
 import { deleteDoc, doc, collection, getDocs, writeBatch } from "firebase/firestore";
-import useFetchSongs from "@/hooks/fetchSongs";
 import SearchForm from "@/components/searchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
-import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
-import { faDownload, faFolderPlus, faSort, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload, faFolderPlus, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useMessage } from "@/context/MessageContext";
-import { useRouter } from 'next/router';
 import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
@@ -28,7 +26,6 @@ export default function Home() {
 
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
-  const [refreshKey, setRefreshKey] = useState(0);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const { searchCriteria, setSearchCriteria } = useSearchCriteria({}); // カスタムフックを使用
   const [selectAll, setSelectAll] = useState(false);
@@ -51,7 +48,6 @@ export default function Home() {
     setTableData(results);
     setSearchPerformed(true);
   };
-
 
   const toggleModal = (modal) => {
     setModalState(prev => ({ ...prev, [modal]: !prev[modal] }));
@@ -150,11 +146,10 @@ export default function Home() {
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
-    const sortedSongs = sortSongs(songs, key, direction);
+    const sortedSongs = sortSongs(tableData, key, direction); // songs -> tableData
     setSortConfig({ key, direction });
     setTableData(sortedSongs);
   };
-
 
   const headers = [
     { label: "曲名", key: "title" },
@@ -188,6 +183,7 @@ export default function Home() {
         <div className="flex space-x-2 justify-between mb-3">
           {selectedSongs.length > 0 ? (
             <div className="flex space-x-2">
+              <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
               <button onClick={() => toggleModal('addSongsInSetlist', true)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
                 <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
               </button>
@@ -218,7 +214,6 @@ export default function Home() {
           modalState={modalState}
           tableData={tableData}
         />
-
 
         {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
         {modalState.import && <ImportModal onClose={() => toggleModal('import')} isOpen={modalState.import} />}

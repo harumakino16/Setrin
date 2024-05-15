@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
-import { doc, getDoc, updateDoc, batch } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
   const [isDragged, setIsDragged] = useState(false);
 
   const onSave = async () => {
     try {
-      const batch = db.batch();
+      const batch = writeBatch(db);
       const setlistDocRef = doc(db, `users/${currentUser.uid}/Setlists/${setlist.id}`);
       const songIds = currentSongs.map(song => song.id);
       batch.update(setlistDocRef, { songIds });
@@ -20,8 +20,6 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
       console.error('セットリストの保存中にエラーが発生しました:', error);
     }
   };
-
-
 
   const onDelete = async (songId) => {
     try {
@@ -51,7 +49,6 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
     }
   };
 
-
   const [saveTrigger, setSaveTrigger] = useState(false);
 
   useEffect(() => {
@@ -74,7 +71,6 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
   const handleSaveButton = () => {
     setSaveTrigger(true); // 保存トリガーを設定
   };
-
 
   const Row = ({ song, index }) => {
     const ref = useRef(null);

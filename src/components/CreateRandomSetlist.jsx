@@ -6,6 +6,8 @@ import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext'; // MessageContextをインポート
 import SearchForm from '@/components/searchForm';
 import Modal from '@/components/modal.jsx'; // Modal コンポーネントをインポート
+import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート    
+import fetchUsersSetlists from '../hooks/fetchSetlists'; // fetchUsersSetlistsをインポート
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
@@ -13,6 +15,10 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     const [searchResults, setSearchResults] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(0); // 曲数を指定するためのstate
     const router = useRouter();
+    const { searchCriteria, setSearchCriteria } = useSearchCriteria({}); // カスタムフックを使用
+    const { setlists: existingSetlists } = fetchUsersSetlists(currentUser); // fetchUsersSetlistsを使用
+    const [isSetlistModalOpen, setIsSetlistModalOpen] = useState(false);
+    const [selectedSetlists, setSelectedSetlists] = useState([]); // 選択されたセットリストのstate
 
     const handleSearchResults = (results) => {
         setSearchResults(results);
@@ -38,12 +44,43 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
         try {
             const setlistsRef = collection(db, `users/${currentUser.uid}/Setlists`);
             const docRef = await addDoc(setlistsRef, setlistData);
-            setMessageInfo({ message: 'セットリストが作成されました。', type: 'success' }); // メッセージボックスを表示
-            onClose(); // モーダルを閉じる
-            router.push(`/setlist/${docRef.id}`); // セットリストページに遷移
+            setMessageInfo({ type: 'success', message: 'セットリストが作成されました。' });
+            router.push(`/setlist/${docRef.id}`);
         } catch (error) {
             console.error('セットリストの保存に失敗しました:', error);
-            setMessageInfo({ message: 'セットリストの保存に失敗しました。', type: 'error' }); // エラーメッセージを表示
+            setMessageInfo({ type: 'error', message: 'セットリストの保存に失敗しました。' });
+        }
+    };
+
+    const handleAddToExistingSetlist = async () => {
+        setIsSetlistModalOpen(true);
+    };
+
+    const handleSetlistSelection = (setlistId) => {
+        setSelectedSetlists(prevSelected => {
+            if (prevSelected.includes(setlistId)) {
+                return prevSelected.filter(id => id !== setlistId);
+            } else {
+                return [...prevSelected, setlistId];
+            }
+        });
+    };
+
+    const addToSelectedSetlists = async () => {
+        try {
+            for (const setlistId of selectedSetlists) {
+                const setlistRef = doc(db, `users/${currentUser.uid}/Setlists`, setlistId);
+                const setlistDoc = await getDoc(setlistRef);
+                const setlistData = setlistDoc.data();
+                const updatedSongIds = [...new Set([...(setlistData.songIds || []), ...searchResults.map(song => song.id)])];
+                await updateDoc(setlistRef, { songIds: updatedSongIds });
+            }
+            setMessageInfo({ type: 'success', message: 'セットリストに曲が追加されました。' });
+            setIsSetlistModalOpen(false);
+            router.push(`/setlist/${selectedSetlists[0]}`);
+        } catch (error) {
+            console.error('セットリストへの追加に失敗しました:', error);
+            setMessageInfo({ type: 'error', message: 'セットリストへの追加に失敗しました。' });
         }
     };
 

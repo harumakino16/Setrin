@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './modal';
+import { db } from '../../firebaseConfig';
+import { doc, updateDoc } from 'firebase/firestore';
 
 const EditSetlistNameModal = ({ setlist, isOpen, onClose, onSetlistUpdated, currentUser }) => {
     const [name, setName] = useState(setlist ? setlist.name : '');

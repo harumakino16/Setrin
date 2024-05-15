@@ -73,14 +73,15 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
             <div className="overflow-y-auto">
                 <h2 className="text-2xl font-bold mb-4">セットリストに曲を追加</h2>
                 <ul className="space-y-4 p-4">
-                    {setlists.map(setlist => (
-                        <li key={setlist.id}>
-                            <label className="flex items-center">
-                                <input type="checkbox" className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" checked={selectedSetlists.includes(setlist.id)} onChange={() => handleCheckboxChange(setlist.id)} />
-                                <span className="ml-2">{setlist.name}</span>
-                            </label>
-                        </li>
-                    ))}
+                    {setlists
+                        .map(setlist => (
+                            <li key={setlist.id}>
+                                <label className="flex items-center">
+                                    <input type="checkbox" className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" checked={selectedSetlists.includes(setlist.id)} onChange={() => handleCheckboxChange(setlist.id)} />
+                                    <span className="ml-2">{setlist.name}</span>
+                                </label>
+                            </li>
+                        ))}
                 </ul>
                 <div className="mt-4 p-4">
                     <button
