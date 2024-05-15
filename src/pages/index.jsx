@@ -67,7 +67,7 @@ export default function Home() {
 
       setlistsSnapshot.forEach((setlistDoc) => {
         const setlistData = setlistDoc.data();
-        if (setlistData.songIds.includes(songId)) {
+        if (setlistData.songIds && setlistData.songIds.includes(songId)) {
           const updatedSongIds = setlistData.songIds.filter(id => id !== songId);
           batch.update(setlistDoc.ref, { songIds: updatedSongIds });
         }
