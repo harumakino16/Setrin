@@ -17,7 +17,7 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             songsData = songsData.filter(song =>
                 song.title.includes(searchCriteria.freeKeyword) ||
                 song.artist.includes(searchCriteria.freeKeyword) ||
-                song.tags.includes(searchCriteria.freeKeyword) ||
+                song.tags.some(tag => tag.includes(searchCriteria.freeKeyword)) || // タグの検索を修正
                 song.genre.includes(searchCriteria.freeKeyword) ||
                 song.skillLevel.toString().includes(searchCriteria.freeKeyword) ||
                 song.memo.includes(searchCriteria.freeKeyword)
@@ -124,4 +124,3 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 }
 
 export default SearchForm;
-
