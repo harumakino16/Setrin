@@ -5,13 +5,12 @@ import { GoChevronDown } from 'react-icons/go'; // ReactIconのインポート
 import { useSongs } from '../context/SongsContext';
 
 
-const SearchForm = ({ currentUser, handleSearchResults }) => {
-    const [searchCriteria, setSearchCriteria] = useState({ freeKeyword: '', maxSung: 0, maxSungOption: '以上', tag: '', artist: '', genre: '', skillLevel: 0, skillLevelOption: '以上', memo: '' });
+const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearchCriteria }) => {
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const { songs } = useSongs();
 
 
-    const searchSongs = async () => {
+    const searchSongs = async (searchCriteria) => {
         let songsData = songs;
 
         if (searchCriteria.freeKeyword) {
@@ -61,7 +60,11 @@ const SearchForm = ({ currentUser, handleSearchResults }) => {
     };
 
     const handleCriteriaChange = (field, value) => {
-        setSearchCriteria(prev => ({ ...prev, [field]: value }));
+        setSearchCriteria(prev => {
+            const updatedCriteria = { ...prev, [field]: value };
+            searchSongs(updatedCriteria); // 変更後の検索条件で検索を実行
+            return updatedCriteria;
+        });
     };
 
     return (
@@ -116,13 +119,9 @@ const SearchForm = ({ currentUser, handleSearchResults }) => {
                     </div>
                 )}
             </div>
-            <div className='flex justify-center mb-8'>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-40 rounded" onClick={searchSongs}>検索</button>
-            </div>
         </div>
     )
 }
 
 export default SearchForm;
-
 

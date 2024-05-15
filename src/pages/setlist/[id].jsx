@@ -50,9 +50,7 @@ const SetlistDetail = () => {
                     .filter(song => setlist.songIds.includes(song.id))
                     .sort((a, b) => songIdIndexMap.get(a.id) - songIdIndexMap.get(b.id));
                 setCurrentSongs(filteredSongs);
-                console.log("フェッチしました");
             } else {
-                console.log("セットリストが存在しないか、曲がありません。");
                 setCurrentSongs([]); // setlist が null の場合は空の配列を設定
             }
         };
@@ -60,7 +58,6 @@ const SetlistDetail = () => {
             fetchCurrentSongs();
             setFirstLoad(false);
         }
-        console.log(setlist);
     }, [setlist, songs, firstLoad]);
     
 
@@ -90,8 +87,6 @@ const SetlistDetail = () => {
                 },
                 body: JSON.stringify({ refreshToken: currentUser.youtubeRefreshToken }),
             });
-            console.log(refreshTokenResponse);
-            console.log(currentUser.youtubeRefreshToken);
 
             if (!refreshTokenResponse.ok) {
                 setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生��ました', type: 'error' });
@@ -99,7 +94,6 @@ const SetlistDetail = () => {
             }
 
             const { accessToken } = await refreshTokenResponse.json();
-            console.log(accessToken);
 
             const videoUrls = songs.map(song => song.youtubeUrl);
             const response = await fetch('/api/createPlaylist', {
@@ -146,7 +140,7 @@ const SetlistDetail = () => {
                             <strong>名前：</strong>{setlist.name}
                             <FaPen 
                                 onClick={handleOpenEditModal} 
-                                className="inline ml-1 text-gray-500 cursor-pointer text-sm" 
+                                className="inline ml-2 text-gray-500 cursor-pointer text-sm" 
                             />
                         </p>
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
@@ -195,4 +189,5 @@ const SetlistDetail = () => {
 };
 
 export default SetlistDetail;
+
 
