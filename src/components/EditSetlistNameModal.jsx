@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Modal from './Modal';
+import Modal from './modal';
 
 const EditSetlistNameModal = ({ setlist, isOpen, onClose, onSetlistUpdated }) => {
     const [name, setName] = useState(setlist ? setlist.name : '');

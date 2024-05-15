@@ -6,7 +6,7 @@ import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
 import { db } from '@/../firebaseConfig';
 import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
-import Modal from '@/components/Modal';
+import Modal from '@/components/modal';
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);

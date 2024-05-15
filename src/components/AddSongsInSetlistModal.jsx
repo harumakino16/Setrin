@@ -1,5 +1,5 @@
 import { db } from '../../firebaseConfig';
-import Modal from './Modal';
+import Modal from './modal';
 import { useEffect, useState, useContext } from 'react';
 import { collection, getDocs, doc, writeBatch, getDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import fetchUsersSetlists from '../hooks/fetchSetlists';

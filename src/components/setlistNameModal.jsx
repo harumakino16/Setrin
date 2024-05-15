@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import Modal from "@/components/Modal";
+import Modal from "@/components/modal";
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
