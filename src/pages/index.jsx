@@ -50,15 +50,16 @@ export default function Home() {
     setSearchPerformed(true);
   };
 
-  const toggleModal = (modal, value) => {
-    setModalState(prev => ({ ...prev, [modal]: value }));
+
+  const toggleModal = (modal) => {
+    setModalState(prev => ({ ...prev, [modal]: !prev[modal] }));
   };
 
   const handleDeleteSong = async (songId) => {
     try {
       // 曲を削除
       await deleteDoc(doc(db, 'users', currentUser.uid, 'Songs', songId));
-      
+
       // セットリストを更新
       const setlistsRef = collection(db, 'users', currentUser.uid, 'Setlists');
       const setlistsSnapshot = await getDocs(setlistsRef);
@@ -128,12 +129,8 @@ export default function Home() {
     }
   };
 
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    const sortSongs = [...tableData].sort((a, b) => {
+  const sortSongs = (songs, key, direction) => {
+    return [...songs].sort((a, b) => {
       const aValue = a[key];
       const bValue = b[key];
       const aIsNumber = !isNaN(Number(aValue));
@@ -144,10 +141,18 @@ export default function Home() {
       }
       return direction === 'ascending' ? String(aValue).localeCompare(String(bValue)) : String(bValue).localeCompare(String(aValue));
     });
-
-    setSortConfig({ key, direction });
-    setTableData(sortSongs);
   };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    const sortedSongs = sortSongs(songs, key, direction);
+    setSortConfig({ key, direction });
+    setTableData(sortedSongs);
+  };
+
 
   const headers = [
     { label: "曲名", key: "title" },
@@ -212,9 +217,10 @@ export default function Home() {
           tableData={tableData}
         />
 
-        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong', false)} isOpen={modalState.addSong} />}
-        {modalState.import && <ImportModal onClose={() => toggleModal('import', false)} isOpen={modalState.import} />}
-        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist', false)} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
+
+        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
+        {modalState.import && <ImportModal onClose={() => toggleModal('import')} isOpen={modalState.import} />}
+        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
       </div>
     </div>
   );
