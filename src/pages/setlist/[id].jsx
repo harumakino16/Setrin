@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, onSnapshot, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SetlistTable from '@/components/SetlistTable'; // SongTable コンポーネントをインポート
@@ -31,10 +31,8 @@ const SetlistDetail = () => {
         const unsubscribe = onSnapshot(setlistRef, (doc) => {
             if (doc.exists()) {
                 setSetlist({ id: doc.id, ...doc.data() });
-                console.log("セットリストが存在します");
             } else {
                 setSetlist(null);
-                console.log("セットリストが存在しないか、曲がありません。");
             }
         });
 
@@ -52,9 +50,7 @@ const SetlistDetail = () => {
                     .filter(song => setlist.songIds.includes(song.id))
                     .sort((a, b) => songIdIndexMap.get(a.id) - songIdIndexMap.get(b.id));
                 setCurrentSongs(filteredSongs);
-                console.log("フェッチしました");
             } else {
-                console.log("セットリストが存在しないか、曲がありません。");
                 setCurrentSongs([]); // setlist が null の場合は空の配列を設定
             }
         };
@@ -62,7 +58,6 @@ const SetlistDetail = () => {
             fetchCurrentSongs();
             setFirstLoad(false);
         }
-        console.log(setlist);
     }, [setlist, songs, firstLoad]);
     
 
@@ -92,16 +87,13 @@ const SetlistDetail = () => {
                 },
                 body: JSON.stringify({ refreshToken: currentUser.youtubeRefreshToken }),
             });
-            console.log(refreshTokenResponse);
-            console.log(currentUser.youtubeRefreshToken);
 
             if (!refreshTokenResponse.ok) {
-                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
+                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生��ました', type: 'error' });
                 throw new Error('Failed to refresh access token');
             }
 
             const { accessToken } = await refreshTokenResponse.json();
-            console.log(accessToken);
 
             const videoUrls = songs.map(song => song.youtubeUrl);
             const response = await fetch('/api/createPlaylist', {
@@ -148,7 +140,7 @@ const SetlistDetail = () => {
                             <strong>名前：</strong>{setlist.name}
                             <FaPen 
                                 onClick={handleOpenEditModal} 
-                                className="inline ml-1 text-gray-500 cursor-pointer text-sm" 
+                                className="inline ml-2 text-gray-500 cursor-pointer text-sm" 
                             />
                         </p>
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
@@ -183,7 +175,12 @@ const SetlistDetail = () => {
                         setlist={setlist}
                         isOpen={isEditOpen}
                         onClose={handleCloseEditModal}
-                        onSetlistUpdated={(updatedSetlist) => setSetlist(updatedSetlist)}
+                        currentUser={currentUser}
+                        onSetlistUpdated={(updatedSetlist) => {
+                            const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
+                            updateDoc(setlistRef, { name: updatedSetlist.name });
+                            setSetlist(updatedSetlist);
+                        }}
                     />
                 )}
             </div>
@@ -192,4 +189,5 @@ const SetlistDetail = () => {
 };
 
 export default SetlistDetail;
+
 

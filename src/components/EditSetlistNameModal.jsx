@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import Modal from './modal';
 
-const EditSetlistNameModal = ({ setlist, isOpen, onClose, onSetlistUpdated }) => {
+const EditSetlistNameModal = ({ setlist, isOpen, onClose, onSetlistUpdated, currentUser }) => {
     const [name, setName] = useState(setlist ? setlist.name : '');
 
     const handleSave = async () => {
         const updatedSetlist = { ...setlist, name };
-        await onSetlistUpdated(updatedSetlist);
+        const setlistRef = doc(db, 'users', currentUser.uid, 'Setlists', setlist.id);
+        await updateDoc(setlistRef, { name });
+        onSetlistUpdated(updatedSetlist);
         onClose();
     };
 

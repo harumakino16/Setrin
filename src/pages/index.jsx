@@ -15,6 +15,7 @@ import { useMessage } from "@/context/MessageContext";
 import { useRouter } from 'next/router';
 import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
+import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -29,6 +30,7 @@ export default function Home() {
   const { songs } = useSongs();
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const { searchCriteria, setSearchCriteria } = useSearchCriteria({}); // カスタムフックを使用
   const [selectAll, setSelectAll] = useState(false);
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -182,7 +184,7 @@ export default function Home() {
     <div className="flex">
       <Sidebar />
       <div className="flex-grow p-8">
-        <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} />
+        <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
         <div className="flex space-x-2 justify-between mb-3">
           {selectedSongs.length > 0 ? (
             <div className="flex space-x-2">

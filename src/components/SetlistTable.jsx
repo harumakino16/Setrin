@@ -42,7 +42,6 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
         // ローカルステートを更新
         const updatedSongs = currentSongs.filter(song => song.id !== songId);
         setCurrentSongs(updatedSongs);
-        setRefreshNum(prev => prev + 1); // リフレッシュ状態を更新
         console.log('曲が削除されました');
       } else {
         console.log('セットリストが存在しません');
