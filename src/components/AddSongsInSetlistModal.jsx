@@ -39,7 +39,6 @@ function AddSongsInSetlistModal({ isOpen, onSongsUpdated, selectedSongs, onClose
         try {
             await batch.commit();
             setMessageInfo({ message: '曲がセットリストに追加されました。', type: 'success' });
-            onSongsUpdated(); // セットリスト更新を通知
         } catch (error) {
             console.error('曲をセットリストに追加中にエラーが発生しました:', error);
             setMessageInfo({ message: '曲の追加に失敗しました。', type: 'error' });

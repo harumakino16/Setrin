@@ -1,14 +1,18 @@
 import { useState, useContext } from 'react';
+import { useRouter } from 'next/router';
 import { db } from '../../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
+import { useMessage } from '@/context/MessageContext'; // MessageContextをインポート
 import SearchForm from '@/components/searchForm';
 import Modal from '@/components/modal.jsx'; // Modal コンポーネントをインポート
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
+    const { setMessageInfo } = useMessage(); // setMessageInfoを取得
     const [searchResults, setSearchResults] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(0); // 曲数を指定するためのstate
+    const router = useRouter();
 
     const handleSearchResults = (results) => {
         setSearchResults(results);
@@ -33,11 +37,13 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
 
         try {
             const setlistsRef = collection(db, `users/${currentUser.uid}/Setlists`);
-            await addDoc(setlistsRef, setlistData);
-            alert('セットリストが作成されました。');
+            const docRef = await addDoc(setlistsRef, setlistData);
+            setMessageInfo({ message: 'セットリストが作成されました。', type: 'success' }); // メッセージボックスを表示
+            onClose(); // モーダルを閉じる
+            router.push(`/setlist/${docRef.id}`); // セットリストページに遷移
         } catch (error) {
             console.error('セットリストの保存に失敗しました:', error);
-            alert('セットリストの保存に失敗しました。');
+            setMessageInfo({ message: 'セットリストの保存に失敗しました。', type: 'error' }); // エラーメッセージを表示
         }
     };
 

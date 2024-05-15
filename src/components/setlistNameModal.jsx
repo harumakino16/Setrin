@@ -17,11 +17,11 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
                 name: inputValue,
                 createdAt: serverTimestamp()
             });
-            setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
+            setMessageInfo({ message: 'セットリストを作成しました', type: 'success' });
             onClose(); // モーダルを閉じる
         } else {
             alert("ユーザーが認証されていません。");
-            setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
+            setMessageInfo({ message: 'エラー：セットリストの作成中にエラーが発生しました', type: 'error' });
         }
     };
 
