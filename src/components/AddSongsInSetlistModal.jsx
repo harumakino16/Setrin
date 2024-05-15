@@ -6,7 +6,7 @@ import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useMessage } from '../context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
 
-function AddSongsInSetlistModal({ isOpen, onSongsUpdated, selectedSongs, onClose, currentUser }) {
+function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser }) {
 
     const [selectedSetlists, setSelectedSetlists] = useState([]);
     const [newSetlistName, setNewSetlistName] = useState('');
