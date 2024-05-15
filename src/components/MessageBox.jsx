@@ -17,7 +17,7 @@ const MessageBox = () => {
         setTimeout(() => {
           setVisible(false);
         }, 500); // フェードアウト後に非表示
-      }, 3500); // 4秒後にフェードアウト開始
+      }, 6500); // 7秒後にフェードアウト開始
       return () => clearTimeout(timer);
     }
   }, [messageInfo]); // messageInfo全体に依存
