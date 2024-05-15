@@ -21,7 +21,7 @@ function Settings() {
         const { code } = router.query;
         if (code) {
             exchangeCodeForTokensAndSaveInFirestore(code);
-            // URLからcodeパラメータをクリアする
+// URLからcodeパラメータをクリアする
             router.replace(router.pathname, undefined, { shallow: true });
         }
     }, [router]);

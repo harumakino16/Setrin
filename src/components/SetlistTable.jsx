@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, batch } from 'firebase/firestore';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
   const [isDragged, setIsDragged] = useState(false);
 
-
-
   const onSave = async () => {
     try {
+      const batch = db.batch();
       const setlistDocRef = doc(db, `users/${currentUser.uid}/Setlists/${setlist.id}`);
       const songIds = currentSongs.map(song => song.id);
-      await updateDoc(setlistDocRef, { songIds });
+      batch.update(setlistDocRef, { songIds });
+      await batch.commit();
       console.log('セットリストが保存されました');
       console.log(currentSongs);
       setIsDragged(false); // ドラッグ状態をリセット

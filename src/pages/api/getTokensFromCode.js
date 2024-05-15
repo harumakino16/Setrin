@@ -1,8 +1,9 @@
 // pages/api/refresh_token.js
 import fetch from 'node-fetch';
 import { youtubeConfig } from '../../../youtubeConfig';
-import { db } from '../../../firebaseConfig';
-import { doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, writeBatch } from 'firebase/firestore'; // writeBatch imported
+
+const db = getFirestore(); // Firestore instance obtained
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -38,16 +39,18 @@ export default async function handler(req, res) {
         const tokenData = await tokenResponse.json();
 
         if (!tokenResponse.ok) {
+            console.error('Token response error:', tokenData);
             throw new Error(tokenData.error || 'Failed to fetch tokens');
         }
 
         // リフレッシュトークンをデータベースに保存
         if (currentUser && tokenData.refresh_token) {
+            console.log('Saving refresh token to Firestore');
+            const batch = writeBatch(db); // writeBatch used
             const userRef = doc(db, 'users', currentUser.uid);
-            await updateDoc(userRef, {
-                youtubeRefreshToken: tokenData.refresh_token
-            });
-            console.log('リフレッシュトークンがFirestoreに保存されました。');
+            batch.update(userRef, { youtubeRefreshToken: tokenData.refresh_token });
+            await batch.commit();
+            console.log('Refresh token saved successfully');
         }
 
         res.status(200).json({
@@ -59,7 +62,7 @@ export default async function handler(req, res) {
         console.log('refreshToken:', tokenData.refresh_token);
         console.log('expiresIn:', tokenData.expires_in);
     } catch (error) {
-        res.status(500).json({ message: error.message });
         console.error('トークンの取得に失敗しました:', error);
+        res.status(500).json({ message: error.message });
     }
 }

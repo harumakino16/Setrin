@@ -15,7 +15,6 @@ import { useMessage } from "@/context/MessageContext";
 import { useRouter } from 'next/router';
 import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
-import { COLUMN_HEADERS } from "@/constants/columnHeaders";
 
 export default function Home() {
   const [modalState, setModalState] = useState({
