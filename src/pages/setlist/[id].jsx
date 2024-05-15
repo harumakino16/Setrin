@@ -54,7 +54,7 @@ const SetlistDetail = () => {
                 setCurrentSongs(filteredSongs);
                 console.log("フェッチしました");
             } else {
-                console.log("セットリストが存在しないか、曲がありませ��。");
+                console.log("セットリストが存在しないか、曲がありません。");
                 setCurrentSongs([]); // setlist が null の場合は空の配列を設定
             }
         };
@@ -68,6 +68,22 @@ const SetlistDetail = () => {
 
     async function createPlaylist(songs, setlistName) {
         setLoading(true); // ローディング開始
+        const isValidUrl = (url) => {
+            try {
+                new URL(url);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        };
+
+        const invalidUrls = songs.filter(song => !isValidUrl(song.youtubeUrl));
+        if (invalidUrls.length > 0) {
+            const invalidTitles = invalidUrls.map(song => `・ ${song.title}`).join('\n');
+            setMessageInfo({ message: `エラー：無効なURLが含まれています。\n${invalidTitles}`, type: 'error' });
+            setLoading(false); // ローディング終了
+            return;
+        }
         try {
             const refreshTokenResponse = await fetch('/api/refreshAccessToken', {
                 method: 'POST',
@@ -176,3 +192,4 @@ const SetlistDetail = () => {
 };
 
 export default SetlistDetail;
+
