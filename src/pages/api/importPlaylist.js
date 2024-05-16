@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
         try {
             // 新しいアクセストークンを取得
-            const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/refreshAccessToken`, {
+            const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_ORIGIN}/api/refreshAccessToken`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
