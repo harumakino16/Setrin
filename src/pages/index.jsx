@@ -25,6 +25,7 @@ export default function Home() {
   });
 
   console.log("process.env.NEXT_PUBLIC_BASE_URL",process.env.NEXT_PUBLIC_BASE_URL);
+  console.log("process.env.NEXT_PUBLIC_ORIGIN",process.env.NEXT_PUBLIC_ORIGIN);
 
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
