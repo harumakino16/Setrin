@@ -24,6 +24,8 @@ export default function Home() {
     addSongsInSetlist: false
   });
 
+  console.log("process.env.NEXT_PUBLIC_BASE_URL",process.env.NEXT_PUBLIC_BASE_URL);
+
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
   const [searchPerformed, setSearchPerformed] = useState(false);
