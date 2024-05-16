@@ -1,9 +1,12 @@
 // pages/api/refresh_token.js
 import fetch from 'node-fetch';
 import { youtubeConfig } from '../../../youtubeConfig';
+import { initializeApp } from 'firebase/app'; // Added
 import { getFirestore, doc, writeBatch } from 'firebase/firestore'; // writeBatch imported
+import { firebaseConfig } from '../../../firebaseConfig'; // Added
 
-const db = getFirestore(); // Firestore instance obtained
+const app = initializeApp(firebaseConfig); // Added
+const db = getFirestore(app); // Firestore instance obtained
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
