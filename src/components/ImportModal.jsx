@@ -114,7 +114,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
 
     // Modal コンポーネントを使用して UI をレンダリング
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <div>
             <div className="flex justify-between items-center px-4 py-2">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">CSVファイルをインポート</h3>
                 <button onClick={handleDownloadTemplate} className="flex items-center bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700">
@@ -147,7 +147,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
                     インポート
                 </button>
             </div>
-        </Modal>
+        </div>
     );
 };
 

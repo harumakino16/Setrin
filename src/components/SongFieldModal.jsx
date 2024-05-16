@@ -4,6 +4,7 @@ import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import Modal from './modal';
 import { useMessage } from '../context/MessageContext';
+import { formatSongData } from '../utils/songUtils';
 
 
 function SongModal({ isOpen, onClose, song }) {
@@ -20,63 +21,46 @@ function SongModal({ isOpen, onClose, song }) {
   const { currentUser } = authContext || {};
   const { setMessageInfo } = useMessage();
 
-  const validateYoutubeUrl = (url) => {
-    const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
-    return pattern.test(url);
-  };
 
   const handleSaveSong = async () => {
-    if (title.trim() === '') {
-      setMessageInfo({ message: '曲名は必須です。', type: 'error' });
-      return;
-    }
-
-    if (youtubeUrl && !validateYoutubeUrl(youtubeUrl)) {
-      setMessageInfo({ message: '無効なYouTube URLです。', type: 'error' });
-      return;
-    }
-
-    const tagArray = tags.split(',').map(tag => tag.trim());
-    if (tagArray.length > 3) {
-      setMessageInfo({ message: 'タグは3つまでです。', type: 'error' });
-      return;
-    }
-
-    const songData = {
-      title,
-      artist,
-      tags: tagArray,
-      genre,
-      youtubeUrl,
-      timesSung: parseInt(timesSung, 10),
-      skillLevel: parseInt(skillLevel, 10), // 熟練度を保存データに追加
-      memo // 備考を保存データに追加
-    };
-
-    if (!currentUser) {
-      alert('ログインしてください');
-      return;
-    }
-
     try {
-      if (isNewSong) {
-        const userSongsCollection = collection(db, 'users', currentUser.uid, 'Songs');
-        await addDoc(userSongsCollection, songData);
-        setMessageInfo({ message: isNewSong ? '曲の追加に成功しました' : '曲の更新に成功しました', type: 'success' });
+      const songData = formatSongData({
+        title,
+        artist,
+        tags,
+        genre,
+        youtubeUrl,
+        timesSung,
+        skillLevel,
+        memo
+      });
 
-      } else {
-        const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', song.id);
-        await updateDoc(songDocRef, songData);
+
+
+      try {
+        if (isNewSong) {
+          const userSongsCollection = collection(db, 'users', currentUser.uid, 'Songs');
+          await addDoc(userSongsCollection, songData);
+          setMessageInfo({ message: isNewSong ? '曲の追加に成功しました' : '曲の更新に成功しました', type: 'success' });
+
+        } else {
+          const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', song.id);
+          await updateDoc(songDocRef, songData);
+        }
+        onClose();
+      } catch (error) {
+        console.error(isNewSong ? '曲の追加に失敗しました:' : '曲の更新に失敗しました:', error);
+        setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
       }
-      onClose();
     } catch (error) {
-      console.error(isNewSong ? '曲の追加に失敗しました:' : '曲の更新に失敗しました:', error);
-      setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
+      setMessageInfo({ message: error.message, type: 'error' });
     }
   };
 
+  const Container = isNewSong ? 'div' : Modal;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Container isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col space-y-3 min-w-[500px]">
         <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
         <div className="flex flex-col space-y-3">
@@ -95,7 +79,7 @@ function SongModal({ isOpen, onClose, song }) {
         </div>
         <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
       </div>
-    </Modal>
+    </Container>
   );
 }
 

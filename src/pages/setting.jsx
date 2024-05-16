@@ -8,12 +8,15 @@ import { youtubeConfig } from '../../youtubeConfig';
 import Image from 'next/image';
 import googleIcon from '../images/web_light_rd_SI@4x.png';
 import youtubeIcon from '../images/youtube_social_icon_red.png';
+import { useMessage } from '@/context/MessageContext'; // Added
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
+    const [playlistUrl, setPlaylistUrl] = useState(''); // Added
     const router = useRouter();
+    const { setMessageInfo } = useMessage(); // Added
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${youtubeConfig.clientId}&redirect_uri=${youtubeConfig.redirectUri}&scope=${youtubeConfig.scope}&response_type=code&prompt=consent&access_type=offline`;
 
@@ -21,7 +24,6 @@ function Settings() {
         const { code } = router.query;
         if (code) {
             exchangeCodeForTokensAndSaveInFirestore(code);
-// URLからcodeパラメータをクリアする
             router.replace(router.pathname, undefined, { shallow: true });
         }
     }, [router]);
@@ -97,6 +99,7 @@ function Settings() {
     };
 
 
+
     return (
         <div className="flex">
             <Sidebar />
@@ -130,12 +133,11 @@ function Settings() {
                                     <div className=" text-gray-700 text-sm">
                                         Youtubeと連携することで作成したセットリストをYoutubeの再生リストに追加することができます。
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                         {currentUser.youtubeRefreshToken ? (
-                            <button className="mt-4 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            <button className="mt-4 block text-center bg-red-500 hover:bg-red-700 text白 font-bold py-2 px-4 rounded">
                                 解除する
                             </button>
                         ) : (
@@ -144,12 +146,11 @@ function Settings() {
                             </a>
                         )}
                     </div>
-
                 </div>
-                <button onClick={handleUpdateProfile} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button onClick={handleUpdateProfile} className="bg-blue-500 hover:bg-blue-700 text白 font-bold py-2 px-4 rounded">
                     更新
                 </button>
-                <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text白 font-bold py-2 px-4 rounded">
                     アカウントを削除
                 </button>
             </div>

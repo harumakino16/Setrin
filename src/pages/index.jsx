@@ -1,7 +1,6 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useState, useContext, useEffect } from "react";
 import SongFieldModal from "@/components/SongFieldModal";
-import ImportModal from "@/components/ImportModal";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
 import { deleteDoc, doc, collection, getDocs, writeBatch } from "firebase/firestore";
@@ -9,11 +8,12 @@ import SearchForm from "@/components/searchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faFolderPlus, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faFolderPlus, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useMessage } from "@/context/MessageContext";
 import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
+import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -194,9 +194,6 @@ export default function Home() {
           ) : (<div></div>)}
           <div className="flex space-x-2">
             <button onClick={() => toggleModal('addSong', true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow">曲を追加する</button>
-            <button onClick={() => toggleModal('import', true)} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
-              <FontAwesomeIcon icon={faDownload} className="mr-2" />インポート
-            </button>
             <CSVLink {...csvReport} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
               <FontAwesomeIcon icon={faUpload} className="mr-2" />エクスポート
             </CSVLink>
@@ -215,8 +212,7 @@ export default function Home() {
           tableData={tableData}
         />
 
-        {modalState.addSong && <SongFieldModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
-        {modalState.import && <ImportModal onClose={() => toggleModal('import')} isOpen={modalState.import} />}
+        {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
         {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
       </div>
     </div>

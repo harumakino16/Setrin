@@ -4,9 +4,10 @@ const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     const handleBackgroundClick = (event) => {
-        if (event.target === event.currentTarget) {
-            onClose();
-        }
+        //画面外をクリックした時にモーダルを閉じる
+        // if (event.target === event.currentTarget) {
+        //     onClose();
+        // }
     };
 
     useEffect(() => {
