@@ -51,18 +51,27 @@ export default async function handler(req, res) {
 
 
                 for (const videoId of videoIds) {
-                    await youtube.playlistItems.insert({
-                        part: ['snippet'],
-                        requestBody: {
-                            snippet: {
-                                playlistId: playlistId,
-                                resourceId: {
-                                    kind: 'youtube#video',
-                                    videoId: videoId,
+                    try {
+                        await youtube.playlistItems.insert({
+                            part: ['snippet'],
+                            requestBody: {
+                                snippet: {
+                                    playlistId: playlistId,
+                                    resourceId: {
+                                        kind: 'youtube#video',
+                                        videoId: videoId,
+                                    },
                                 },
                             },
-                        },
-                    });
+                        });
+                    } catch (apiError) {
+                        if (apiError.errors && apiError.errors[0].reason === 'videoNotFound') {
+                            console.log(`Video not found: ${videoId}, skipping...`);
+                            continue; // ビデオが見つからない場合はスキップ
+                        } else {
+                            throw apiError; // 他のエラーは再スロー
+                        }
+                    }
                 }
 
                 res.status(200).json({ playlistId: playlistId });

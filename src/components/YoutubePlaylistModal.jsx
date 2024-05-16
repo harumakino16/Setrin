@@ -102,120 +102,122 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
             {importedSongs.length > 0 && (
                 <div>
                     <h3 className="text-xl text-center font-bold my-8">以下の曲を追加します</h3>
-                    <table className="min-w-full divide-y divide-gray-200 mt-2 bg-gray-100">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">曲名</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">アーティスト</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ジャンル</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ(カンマ区切りで複数入力)</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">歌唱回数</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">熟練度</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">備考</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {importedSongs.map((song) => (
-                                <tr key={song.youtubeUrl} className="bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedTitle}
-                                                onChange={(e) => setEditedTitle(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.title
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedArtist}
-                                                onChange={(e) => setEditedArtist(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.artist
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedGenre}
-                                                onChange={(e) => setEditedGenre(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.genre
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedTags}
-                                                onChange={(e) => setEditedTags(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.tags
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedSingingCount}
-                                                onChange={(e) => setEditedSingingCount(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.singingCount
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedProficiency}
-                                                onChange={(e) => setEditedProficiency(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.proficiency
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <input
-                                                type="text"
-                                                value={editedNotes}
-                                                onChange={(e) => setEditedNotes(e.target.value)}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        ) : (
-                                            song.notes
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                            <button onClick={handleSaveEdit} className="text-green-500 hover:text-green-700">保存</button>
-                                        ) : (
-                                            <>
-                                                <button onClick={() => handleEditSong(song)} className="text-blue-500 hover:text-blue-700">編集</button>
-                                                <button onClick={() => handleDeleteSong(song.youtubeUrl)} className="text-red-500 hover:text-red-700 ml-2">除外</button>
-                                            </>
-                                        )}
-                                    </td>
+                    <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: '600px' }}>
+                        <table className="min-w-full divide-y divide-gray-200 mt-2 bg-gray-100 h-50">
+                            <thead className="bg-gray-100">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">曲名</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">アーティスト</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ジャンル</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ(カンマ区切りで複数入力)</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">歌唱回数</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">熟練度</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">備考</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {importedSongs.map((song) => (
+                                    <tr key={song.youtubeUrl} className="bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedTitle}
+                                                    onChange={(e) => setEditedTitle(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.title.length > 30 ? `${song.title.slice(0, 30)}...` : song.title
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedArtist}
+                                                    onChange={(e) => setEditedArtist(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.artist.length > 10 ? `${song.artist.slice(0, 10)}...` : song.artist
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedGenre}
+                                                    onChange={(e) => setEditedGenre(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.genre
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedTags}
+                                                    onChange={(e) => setEditedTags(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.tags
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedSingingCount}
+                                                    onChange={(e) => setEditedSingingCount(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.singingCount
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedProficiency}
+                                                    onChange={(e) => setEditedProficiency(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.proficiency
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedNotes}
+                                                    onChange={(e) => setEditedNotes(e.target.value)}
+                                                    className="border p-2 rounded w-full"
+                                                />
+                                            ) : (
+                                                song.notes
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
+                                                <button onClick={handleSaveEdit} className="text-green-500 hover:text-green-700">保存</button>
+                                            ) : (
+                                                <>
+                                                    <button onClick={() => handleEditSong(song)} className="text-blue-500 hover:text-blue-700">編集</button>
+                                                    <button onClick={() => handleDeleteSong(song.youtubeUrl)} className="text-red-500 hover:text-red-700 ml-2">除外</button>
+                                                </>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                     <button onClick={handleAddToSongs} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-full">
                         曲リストに追加
                     </button>
