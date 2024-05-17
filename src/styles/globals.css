@@ -7,6 +7,7 @@ button:hover {
 	transition: 0.1s;
 }
 
+
 /* ラジオボタン02のスタイル設定 */
 .radio02 {
 	float: left;
@@ -45,3 +46,4 @@ button:hover {
 	background-color: #1d5bb9;
 	color: #fff;
 }
+
