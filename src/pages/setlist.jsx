@@ -8,6 +8,7 @@ import { doc, deleteDoc } from 'firebase/firestore';
 import Modal from '@/components/modal';
 import useSetlists from '@/hooks/fetchSetlists';
 import { db } from '../../firebaseConfig';
+import Loading from '@/components/loading';
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
@@ -66,7 +67,9 @@ export default function Setlist() {
           </button>
         </div>
         <div className="overflow-x-auto">
-          {setlists.length === 0 ? (
+          {loading ? (
+            <Loading />
+          ) : setlists.length === 0 ? (
             <div className="text-center">
               <p className="text-gray-500">まだセットリストがありません</p>
               <button onClick={handleOpenModal} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

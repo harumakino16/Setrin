@@ -15,6 +15,7 @@ const useSetlists = () => {
       const unsubscribe = onSnapshot(q, snapshot => {
         if (snapshot.empty) {
           console.log('セットリストが見つかりません。');
+          setSetlists([]);
         } else {
           const fetchedSetlists = snapshot.docs.map(doc => {
             const data = doc.data();
@@ -26,6 +27,7 @@ const useSetlists = () => {
             };
           });
           setSetlists(fetchedSetlists);
+          console.log("セットリストが取得されました");
           console.log(fetchedSetlists);
         }
         setLoading(false);
