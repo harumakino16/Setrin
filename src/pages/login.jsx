@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/router';
+import { useMessage } from '@/context/MessageContext';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ function Login() {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
+    const { setMessageInfo } = useMessage();
 
     useEffect(() => {
         if (currentUser) {
@@ -42,15 +44,18 @@ function Login() {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             if (userCredential.user.emailVerified) {
                 setCurrentUser(userCredential.user);
+                setMessageInfo('ログインに成功しました。', 'success');
                 router.push('/');
             } else {
                 setErrorMessage('メールアドレスは登録されていますが、認証が完了していません。認証メールを再送します。');
                 await sendEmailVerification(userCredential.user);
-                console.log();
+                setMessageInfo('認証メールを再送しました。', 'info');
+
             }
         } catch (error) {
             console.error("ログインエラー:", error);
             setErrorMessage('ログインに失敗しました。');
+            setMessageInfo('ログインに失敗しました。', 'error');
         }
     };
 
@@ -63,6 +68,8 @@ function Login() {
             router.push('/');
         } catch (error) {
             console.error("Googleログインエラー:", error);
+            setErrorMessage('Googleログインに失敗しました。');
+            setMessageInfo('Googleログインに失敗しました。', 'error');
         }
     };
 

@@ -14,6 +14,7 @@ import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -182,7 +183,7 @@ export default function Home() {
     <div className="flex">
       <Sidebar />
       <div className="flex-grow p-8">
-        <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
+          <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
         <div className="flex space-x-2 justify-between mb-3">
           {selectedSongs.length > 0 ? (
             <div className="flex space-x-2">

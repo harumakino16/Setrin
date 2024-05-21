@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
@@ -34,6 +34,24 @@ export default function Setlist() {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && isEditOpen) {
+      handleDeleteSetlist();
+    }
+  };
+
+  useEffect(() => {
+    if (isEditOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isEditOpen]);
+
   return (
     <div className="flex">
       <Sidebar />
@@ -48,44 +66,53 @@ export default function Setlist() {
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-300 shadow-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                  セットリスト名
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                  作成日
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                  曲数
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                  
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {setlists.map((setlist) => (
-                <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => router.push(`/setlist/${setlist.id}`)} >
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.createdAt}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                    {setlist.songIds ? setlist.songIds.length : 0} 曲
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
-                    <button onClick={(e) => { e.stopPropagation(); setSelectedSetlist(setlist); setIsEditOpen(true); }} className="text-red-500 hover:text-red-700">
-                      削除
-                    </button>
-                  </td>
+          {setlists.length === 0 ? (
+            <div className="text-center">
+              <p className="text-gray-500">まだセットリストがありません</p>
+              <button onClick={handleOpenModal} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                新しいセットリストを追加
+              </button>
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-300 shadow-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                    セットリスト名
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                    作成日
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                    曲数
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                    
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {setlists.map((setlist) => (
+                  <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => router.push(`/setlist/${setlist.id}`)} >
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                      {setlist.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                      {setlist.createdAt}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                      {setlist.songIds ? setlist.songIds.length : 0} 曲
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
+                      <button onClick={(e) => { e.stopPropagation(); setSelectedSetlist(setlist); setIsEditOpen(true); }} className="text-red-500 hover:text-red-700">
+                        削除
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       {isOpen && <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} />}

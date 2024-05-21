@@ -102,12 +102,12 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
             {importedSongs.length > 0 && (
                 <div>
                     <h3 className="text-xl text-center font-bold my-8">以下の曲を追加します</h3>
-                    <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: '600px' }}>
-                        <table className="min-w-full divide-y divide-gray-200 mt-2 bg-gray-100 h-50">
+                    <div className="overflow-y-auto max-h-96">
+                        <table className="min-w-full divide-y divide-gray-200 mt-2 bg-gray-100">
                             <thead className="bg-gray-100">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">曲名</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">アーティスト</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ maxWidth: '400px' }}>曲名</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ maxWidth: '300px' }}>アーティスト</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ジャンル</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ(カンマ区切りで複数入力)</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">歌唱回数</th>
@@ -119,7 +119,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {importedSongs.map((song) => (
                                     <tr key={song.youtubeUrl} className="bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap" style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                             {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
                                                 <input
                                                     type="text"
@@ -128,10 +128,10 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
                                                     className="border p-2 rounded w-full"
                                                 />
                                             ) : (
-                                                song.title.length > 30 ? `${song.title.slice(0, 30)}...` : song.title
+                                                song.title
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                             {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
                                                 <input
                                                     type="text"
@@ -140,7 +140,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
                                                     className="border p-2 rounded w-full"
                                                 />
                                             ) : (
-                                                song.artist.length > 10 ? `${song.artist.slice(0, 10)}...` : song.artist
+                                                song.artist
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">

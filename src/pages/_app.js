@@ -6,17 +6,25 @@ import Footer from "../components/footer"; // Footer コンポーネントをイ
 import Header from "../components/header"; // Header コンポーネントをインポート
 import HeaderPadding from "../components/headerPadding"; // HeaderPadding コンポーネントをインポート
 import { SongsProvider } from "@/context/SongsContext";
+import { Noto_Sans_JP } from "next/font/google";
+
+const notoSansJP = Noto_Sans_JP({
+  weight: ['400', '700'], // 必要なウェイトを指定
+  subsets: ['latin'], // 必要なサブセットを指定
+});
 
 export default function App({ Component, pageProps }) {
   return (
     <AuthProvider>
       <MessageProvider>
-        <SongsProvider> {/* SongsProvider を追加 */}
-          <Header />
-          <HeaderPadding />
-          <Component {...pageProps} />
-          <MessageBox /> {/* MessageBox を直接 MessageProvider の子として配置 */}
-          <Footer />
+        <SongsProvider>
+          <div className={notoSansJP.className}>
+            <Header />
+            <HeaderPadding />
+            <Component {...pageProps} />
+            <MessageBox />
+            <Footer />
+          </div>
         </SongsProvider>
       </MessageProvider>
     </AuthProvider>

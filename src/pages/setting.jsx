@@ -137,7 +137,7 @@ function Settings() {
                             </div>
                         </div>
                         {currentUser.youtubeRefreshToken ? (
-                            <button className="mt-4 block text-center bg-red-500 hover:bg-red-700 text白 font-bold py-2 px-4 rounded">
+                            <button className="mt-4 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                 解除する
                             </button>
                         ) : (
@@ -147,10 +147,10 @@ function Settings() {
                         )}
                     </div>
                 </div>
-                <button onClick={handleUpdateProfile} className="bg-blue-500 hover:bg-blue-700 text白 font-bold py-2 px-4 rounded">
+                <button onClick={handleUpdateProfile} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     更新
                 </button>
-                <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text白 font-bold py-2 px-4 rounded">
+                <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                     アカウントを削除
                 </button>
             </div>
