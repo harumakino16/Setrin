@@ -37,13 +37,13 @@ const MessageBox = () => {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '30px',
+      top: '40px',
       left: '50%',
       transform: 'translateX(-50%)',
       backgroundColor,
       color: '#fff',
       fontWeight: 'bold',
-      padding: '10px 50px 10px 10px',
+      padding: '10px 100px 10px 10px',
       borderRadius: '5px',
       zIndex: 1000,
       opacity,

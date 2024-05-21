@@ -29,7 +29,7 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
         <Modal isOpen={isOpen} onClose={onClose}>
             <div className="mb-4 min-w-[400px]">
                 <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="search">
-                    フォルダを作成
+                    セットリストを作成
                 </label>
                 <input
                     className="shadow appearance-none border rounded w-full h-12 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
