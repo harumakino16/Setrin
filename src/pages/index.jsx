@@ -15,6 +15,8 @@ import { CSVLink } from "react-csv";
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
 import { Button } from "@/components/ui/button";
+import Layout from "@/components/layout";
+
 
 export default function Home() {
   const [modalState, setModalState] = useState({

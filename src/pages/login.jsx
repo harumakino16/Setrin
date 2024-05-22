@@ -6,6 +6,8 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPasswor
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/router';
 import { useMessage } from '@/context/MessageContext';
+import { registerUserInFirestore } from '@/utils/firebaseUtils'; // ここでインポート
+
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -65,6 +67,9 @@ function Login() {
         try {
             const result = await signInWithPopup(auth, provider);
             setCurrentUser(result.user);
+            if (result._tokenResponse.isNewUser) {
+                await registerUserInFirestore(result.user);
+            }
             router.push('/');
         } catch (error) {
             console.error("Googleログインエラー:", error);

@@ -9,6 +9,8 @@ import Image from 'next/image';
 import googleIcon from '../images/web_light_rd_SI@4x.png';
 import youtubeIcon from '../images/youtube_social_icon_red.png';
 import { useMessage } from '@/context/MessageContext'; // Added
+import Loading from '@/components/loading';
+import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
@@ -28,20 +30,20 @@ function Settings() {
         }
     }, [router]);
 
-    if (loading) {
-        return <div className="text-center py-10">ローディング中...</div>;
-    }
-
-    if (!currentUser) {
-        return <div className="text-center py-10">ログインが必要です。ログインページへのリンクを表示するなどの処理をここに追加。</div>;
-    }
-
     useEffect(() => {
         if (currentUser) {
             setEmail(currentUser.email || '');
             setDisplayName(currentUser.displayName || '');
         }
     }, [currentUser]);
+
+    if (loading) {
+        return <Loading />;
+    }
+
+    if (!currentUser) {
+        return <div className="text-center py-10">ログインが必要です。ログインページへのリンクを表示するなどの処理をここに追加。</div>;
+    }
 
     async function exchangeCodeForTokensAndSaveInFirestore(code) {
         try {
@@ -88,17 +90,25 @@ function Settings() {
         }
 
         const userRef = doc(db, 'users', currentUser.uid);
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+
         try {
+            // 再認証を行う
+            await reauthenticateWithPopup(auth.currentUser, provider);
+
+            // Firestoreからユーザー情報を削除
             await deleteDoc(userRef);
+
+            // Firebase Authenticationからユーザーを削除
+            await deleteUser(auth.currentUser);
+
             alert('アカウントが削除されました。');
-            router.push('/login'); // ログインページにリダイレクト
         } catch (error) {
             console.error('アカウントの削除に失敗しました:', error);
             alert('アカウントの削除に失敗しました。');
         }
     };
-
-
 
     return (
         <div className="flex">
@@ -159,3 +169,4 @@ function Settings() {
 }
 
 export default Settings;
+

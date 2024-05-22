@@ -4,7 +4,7 @@ import { collection, addDoc, writeBatch, doc } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
 import { formatSongData } from '../utils/songUtils';
-
+import Link from 'next/link';
 
 const YoutubePlaylistModal = ({ isOpen, onClose }) => {
     const { currentUser } = useContext(AuthContext);
@@ -31,14 +31,14 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to import playlist');
+                throw new Error('再生リストのインポートに失敗しました');
             }
 
             const data = await response.json();
             setImportedSongs(data.items);
             setMessageInfo({ message: '再生リストがインポートされました', type: 'success' });
         } catch (error) {
-            console.error('Error importing playlist:', error);
+            console.error('再生リストのインポートに失敗しました:', error);
             setMessageInfo({ message: '再生リストのインポートに失敗しました', type: 'error' });
         }
     };
@@ -63,7 +63,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
             setMessageInfo({ message: '曲が追加されました', type: 'success' });
             onClose();
         } catch (error) {
-            console.error('Error adding songs:', error);
+            console.error('曲の追加に失敗しました:', error);
             setMessageInfo({ message: error.message, type: 'error' });
         }
     };
@@ -80,7 +80,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
     };
 
     const handleSaveEdit = () => {
-        setImportedSongs(importedSongs.map(song => 
+        setImportedSongs(importedSongs.map(song =>
             song.youtubeUrl === editingSong.youtubeUrl ? { ...song, title: editedTitle, artist: editedArtist, singingCount: editedSingingCount, proficiency: editedProficiency, notes: editedNotes, tags: editedTags.split(',').slice(0, 3).join(','), genre: editedGenre } : song
         ));
         setEditingSong(null);
@@ -89,16 +89,24 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
     return (
         <div>
             <h2 className="text-xl font-bold mb-4">Youtube再生リストから追加</h2>
-            <input
-                type="text"
-                value={playlistUrl}
-                onChange={(e) => setPlaylistUrl(e.target.value)}
-                placeholder="再生リストのURLを入力"
-                className="border p-2 rounded w-full mb-4"
-            />
-            <button onClick={handleImport} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-                インポート
-            </button>
+            {currentUser && !currentUser.youtubeRefreshToken ? (
+                <p className="text-blue-500 mb-4 text-center">
+                    <Link href="/setting" className="underline">Youtubeと連携する(設定ページへ)</Link>
+                </p>
+            ) : (
+                <>
+                    <input
+                        type="text"
+                        value={playlistUrl}
+                        onChange={(e) => setPlaylistUrl(e.target.value)}
+                        placeholder="再生リストのURLを入力"
+                        className="border p-2 rounded w-full mb-4"
+                    />
+                    <button onClick={handleImport} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                        インポート
+                    </button>
+                </>
+            )}
             {importedSongs.length > 0 && (
                 <div>
                     <h3 className="text-xl text-center font-bold my-8">以下の曲を追加します</h3>

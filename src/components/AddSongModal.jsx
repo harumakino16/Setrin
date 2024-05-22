@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Modal from './modal';
 import SongFieldModal from './SongFieldModal';
 import ImportModal from './ImportModal';
 import YoutubePlaylistModal from './YoutubePlaylistModal'; // New component imported
+import { AuthContext } from "@/context/AuthContext";
+
 
 const AddSongModal = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('manual');
+    const { currentUser } = useContext(AuthContext);
 
     return (
         <div>
