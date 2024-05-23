@@ -24,7 +24,9 @@ const TermsOfUse = () => {
       <p className="mb-4">当社は、本サービスに関して、ユーザーに対し、その内容の正確性、完全性、有用性、特定目的への適合性、第三者の権利非侵害等について、明示または黙示を問わず、一切保証しません。</p>
       <h2 className="text-2xl font-bold mt-4">6. 契約の変更と終了</h2>
       <p className="mb-4">当社は、ユーザーに通知することなく、本サービスの内容を変更し、または本サービスの提供を終了することができます。</p>
-      <h2 className="text-2xl font-bold mt-4">7. お問い合わせ</h2>
+      <h2 className="text-2xl font-bold mt-4">7. YouTubeの利用規約</h2>
+      <p className="mb-4">ユーザーは、YouTubeの利用規約に従うものとします。詳細は<Link href="https://www.youtube.com/t/terms" className="text-blue-500 hover:text-blue-600">YouTubeの利用規約</Link>をご覧ください。</p>
+      <h2 className="text-2xl font-bold mt-4">8. お問い合わせ</h2>
       <p className="mb-4">本規約に関するお問い合わせは、<Link href="/contact" className="text-blue-500 hover:text-blue-600">お問い合わせページ</Link>からお願い致します。</p>
     </div>
   );
