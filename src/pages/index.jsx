@@ -1,6 +1,5 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useState, useContext, useEffect } from "react";
-import SongFieldModal from "@/components/SongFieldModal";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
 import { deleteDoc, doc, collection, getDocs, writeBatch } from "firebase/firestore";
@@ -14,7 +13,8 @@ import { useSongs } from '../context/SongsContext';
 import { CSVLink } from "react-csv";
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
-import { Button } from "@/components/ui/button";
+import LoginForm from "@/components/LoginForm";
+import LoginFormModal from "@/components/LoginFormModal";
 
 
 export default function Home() {
@@ -26,8 +26,8 @@ export default function Home() {
     addSongsInSetlist: false
   });
 
-  console.log("process.env.NEXT_PUBLIC_BASE_URL",process.env.NEXT_PUBLIC_BASE_URL);
-  console.log("process.env.NEXT_PUBLIC_ORIGIN",process.env.NEXT_PUBLIC_ORIGIN);
+  console.log("process.env.NEXT_PUBLIC_BASE_URL", process.env.NEXT_PUBLIC_BASE_URL);
+  console.log("process.env.NEXT_PUBLIC_ORIGIN", process.env.NEXT_PUBLIC_ORIGIN);
 
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
@@ -184,7 +184,7 @@ export default function Home() {
     <div className="flex">
       <Sidebar />
       <div className="flex-grow p-8">
-          <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
+        <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
         <div className="flex space-x-2 justify-between mb-3">
           {selectedSongs.length > 0 ? (
             <div className="flex space-x-2">
@@ -199,9 +199,9 @@ export default function Home() {
           ) : (<div></div>)}
           <div className="flex space-x-2">
             <button onClick={() => toggleModal('addSong', true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow">曲を追加する</button>
-            <CSVLink {...csvReport} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
+            {/* <CSVLink {...csvReport} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
               <FontAwesomeIcon icon={faUpload} className="mr-2" />エクスポート
-            </CSVLink>
+            </CSVLink> */}
           </div>
         </div>
 
@@ -219,6 +219,7 @@ export default function Home() {
 
         {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
         {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
+        {!currentUser && <LoginFormModal isOpen={!currentUser}/>}
       </div>
     </div>
   );

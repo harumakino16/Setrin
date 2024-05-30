@@ -1,36 +1,24 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from "@/context/AuthContext";
-import { doc, getDoc, setDoc, collection } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-const Test = () => {
-  const { currentUser } = useContext(AuthContext);
+const TestPage = () => {
+  const [data, setData] = useState(null);
 
-  const testFanc = async () => {
-    const number = await getNumber();
-    console.log(number);
-  }
-
-  const getNumber = () => {
-    setTimeout(() => {
-      console.log(5);
-    }, 5000);
-  }
-
-  console.log(testFanc());
-  // console.log(testFanc().then(result => console.log(result)));
-
-  // testFanc()
-
+  const handlePostRequest = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/booklog');
+      console.log(response);
+      setData(response.data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
     <div>
-      <button onClick={() => setCount(count + 1)}>
-        {count}
-        test修正
-      </button>
+      <button onClick={handlePostRequest}>Send POST Request</button>
     </div>
   );
 };
 
-export default Test;
+export default TestPage;

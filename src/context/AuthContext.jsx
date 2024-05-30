@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const auth = getAuth(initializeApp(firebaseConfig));
 
   useEffect(() => {
+    console.log(auth);
     const unsubscribeAuth = onAuthStateChanged(auth, user => {
       if (user) {
         const userRef = doc(db, 'users', user.uid);
