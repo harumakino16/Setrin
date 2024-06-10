@@ -5,6 +5,8 @@ import { useMessage } from '@/context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
 import { formatSongData } from '../utils/songUtils';
 import Link from 'next/link';
+import LoadingIcon from './ui/loadingIcon';
+
 
 const YoutubePlaylistModal = ({ isOpen, onClose }) => {
     const { currentUser } = useContext(AuthContext);
@@ -19,9 +21,13 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
     const [editedNotes, setEditedNotes] = useState('');
     const [editedTags, setEditedTags] = useState("");
     const [editedGenre, setEditedGenre] = useState('');
+    const [loading, setLoading] = useState(false);
+
+
 
     const handleImport = async () => {
         try {
+            setLoading(true);
             const response = await fetch('/api/importPlaylist', {
                 method: 'POST',
                 headers: {
@@ -40,6 +46,8 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
         } catch (error) {
             console.error('再生リストのインポートに失敗しました:', error);
             setMessageInfo({ message: '再生リストのインポートに失敗しました', type: 'error' });
+        } finally {
+            setLoading(false);
         }
     };
     console.log(importedSongs);
@@ -50,6 +58,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
 
     const handleAddToSongs = async () => {
         try {
+
             const batch = writeBatch(db);
             console.log(importedSongs);
             importedSongs.forEach(song => {
@@ -103,7 +112,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
                         className="border p-2 rounded w-full mb-4"
                     />
                     <button onClick={handleImport} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-                        インポート
+                        {loading ? <LoadingIcon /> : 'インポート'}
                     </button>
                 </>
             )}

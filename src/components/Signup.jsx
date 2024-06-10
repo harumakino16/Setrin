@@ -9,12 +9,14 @@ import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/router';
 import { useMessage } from '../context/MessageContext';
 import { registerUserInFirestore } from '@/utils/firebaseUtils'; // ここでインポート
+import LoadingIcon from './ui/loadingIcon';
 
 function Signup({ setShowSignup, setShowEmailVerification, setEmail, email }) {
     const { setCurrentUser } = useContext(AuthContext);
     const [password, setPassword] = useState('');
     const router = useRouter();
     const { setMessageInfo } = useMessage();
+    const [loading, setLoading] = useState(false);
 
     const validateEmail = (email) => {
         return String(email)
@@ -33,6 +35,7 @@ function Signup({ setShowSignup, setShowEmailVerification, setEmail, email }) {
     };
 
     const handleSubmit = async (event) => {
+        setLoading(true);
         event.preventDefault();
         const auth = getAuth();
         try {
@@ -47,6 +50,8 @@ function Signup({ setShowSignup, setShowEmailVerification, setEmail, email }) {
             } else {
                 console.error("メールでの登録エラー:", error);
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,7 +94,8 @@ function Signup({ setShowSignup, setShowEmailVerification, setEmail, email }) {
                     />
                 </div>
                 <button type="submit" disabled={!isFormValid()} className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isFormValid() ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-gray-400'} focus:outline-none focus:ring-2 focus:ring-offset-2 gap-3`}>
-                    <MdEmail size={24} />
+                    
+                    {loading ? <LoadingIcon /> : <MdEmail size={24} />}
                     <span>メールアドレスで登録する</span>
                 </button>
             </form>
