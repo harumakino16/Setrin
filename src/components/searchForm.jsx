@@ -14,13 +14,14 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         let songsData = songs;
 
         if (searchCriteria.freeKeyword) {
+            const keywordLower = searchCriteria.freeKeyword.toLowerCase();
             songsData = songsData.filter(song =>
-                song.title.includes(searchCriteria.freeKeyword) ||
-                song.artist.includes(searchCriteria.freeKeyword) ||
-                song.tags.some(tag => tag.includes(searchCriteria.freeKeyword)) || // タグの検索を修正
-                song.genre.includes(searchCriteria.freeKeyword) ||
-                song.skillLevel.toString().includes(searchCriteria.freeKeyword) ||
-                song.memo.includes(searchCriteria.freeKeyword)
+                song.title.toLowerCase().includes(keywordLower) ||
+                song.artist.toLowerCase().includes(keywordLower) ||
+                song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) || // タグの検索を修正
+                song.genre.toLowerCase().includes(keywordLower) ||
+                song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
+                song.memo.toLowerCase().includes(keywordLower)
             );
         }
 
@@ -33,15 +34,18 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         }
 
         if (searchCriteria.tag) {
-            songsData = songsData.filter(song => song.tags.includes(searchCriteria.tag));
+            const tagLower = searchCriteria.tag.toLowerCase();
+            songsData = songsData.filter(song => song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
         }
 
         if (searchCriteria.artist) {
-            songsData = songsData.filter(song => song.artist.includes(searchCriteria.artist));
+            const artistLower = searchCriteria.artist.toLowerCase();
+            songsData = songsData.filter(song => song.artist.toLowerCase().includes(artistLower));
         }
 
         if (searchCriteria.genre) {
-            songsData = songsData.filter(song => song.genre.includes(searchCriteria.genre));
+            const genreLower = searchCriteria.genre.toLowerCase();
+            songsData = songsData.filter(song => song.genre.toLowerCase().includes(genreLower));
         }
 
         if (searchCriteria.skillLevel > 0) {
@@ -53,7 +57,8 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         }
 
         if (searchCriteria.memo) {
-            songsData = songsData.filter(song => song.memo.includes(searchCriteria.memo));
+            const memoLower = searchCriteria.memo.toLowerCase();
+            songsData = songsData.filter(song => song.memo.toLowerCase().includes(memoLower));
         }
 
         handleSearchResults(songsData);
