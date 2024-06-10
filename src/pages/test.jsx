@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import LoadingIcon from "@/components/ui/loadingIcon";
+import { useState } from "react";
+
 
 const TestPage = () => {
-  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handlePostRequest = async () => {
-    try {
-      const response = await axios.get('http://localhost:3001/api/booklog');
-      console.log(response);
-      setData(response.data);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+  const handleClick = async () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      
+    }, 3000);
+
   };
 
   return (
     <div>
-      <button onClick={handlePostRequest}>Send POST Request</button>
+      <button onClick={handleClick} className="bg-blue-500 p-2 rounded-md w-40">
+        {isLoading ? <LoadingIcon /> : 'Send POST Request'}
+      </button>
     </div>
   );
 };

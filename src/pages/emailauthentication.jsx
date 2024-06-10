@@ -14,7 +14,7 @@ const EmailAuthentication = () => {
     if (router.query.oobCode && currentUser) {
       // Firestoreにユーザー情報を登録
       const userRef = doc(db, 'users', currentUser.uid);
-      setDoc(userRef, { emailVerified: true }, { merge: true })
+      setDoc(userRef, { emailVerified: true }, { merge: true },{email:currentUser.email})
         .then(() => {
           setMessageInfo({ message: 'メール認証が完了しました。アカウントが有効になりました。', type: 'success' });
           router.push('/'); // ホームページまたはダッシュボードにリダイレクト
