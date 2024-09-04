@@ -7,6 +7,7 @@ import Header from "../components/header"; // Header コンポーネントをイ
 import HeaderPadding from "../components/headerPadding"; // HeaderPadding コンポーネントをインポート
 import { SongsProvider } from "@/context/SongsContext";
 import { Noto_Sans_JP } from "next/font/google";
+import Layout from "./layout";
 
 const notoSansJP = Noto_Sans_JP({
   weight: ['400', '700'], // 必要なウェイトを指定
@@ -19,11 +20,10 @@ export default function App({ Component, pageProps }) {
       <MessageProvider>
         <SongsProvider>
           <div className={notoSansJP.className}>
-            <Header />
-            <HeaderPadding />
-            <Component {...pageProps} />
-            <MessageBox />
-            <Footer />
+            <Layout>
+              <Component {...pageProps} />
+              <MessageBox />
+            </Layout>
           </div>
         </SongsProvider>
       </MessageProvider>

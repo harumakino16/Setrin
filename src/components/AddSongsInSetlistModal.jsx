@@ -72,29 +72,32 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
         <Modal isOpen={isOpen} onClose={onClose}>
             <div className="overflow-y-auto">
                 <h2 className="text-2xl font-bold mb-4">セットリストに曲を追加</h2>
-                <ul className="space-y-4 p-4">
-                    {setlists
-                        .map(setlist => (
-                            <li key={setlist.id}>
-                                <label className="flex items-center">
-                                    <input type="checkbox" className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" checked={selectedSetlists.includes(setlist.id)} onChange={() => handleCheckboxChange(setlist.id)} />
-                                    <span className="ml-2">{setlist.name}</span>
-                                </label>
-                            </li>
-                        ))}
-                </ul>
-                <div className="mt-4 p-4">
-                    <button
-                        className={`flex items-center justify-center w-full p-2 mt-4 rounded ${selectedSetlists.length === 0 ? 'bg-gray-300' : 'bg-blue-500 hover:bg-blue-600 text-white font-bold'}`}
-                        onClick={selectedSetlists.length === 0 ? undefined : handleAddSongsToSetlists}
-                        disabled={selectedSetlists.length === 0}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        既存のセットリストに追加
-                    </button>
-                </div>
+                {setlists.length > 0 && (
+                    <>
+                        <ul className="space-y-4 p-4">
+                            {setlists.map(setlist => (
+                                <li key={setlist.id}>
+                                    <label className="flex items-center">
+                                        <input type="checkbox" className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" checked={selectedSetlists.includes(setlist.id)} onChange={() => handleCheckboxChange(setlist.id)} />
+                                        <span className="ml-2">{setlist.name}</span>
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="mt-4 p-4">
+                            <button
+                                className={`flex items-center justify-center w-full p-2 mt-4 rounded ${selectedSetlists.length === 0 ? 'bg-gray-300' : 'bg-blue-500 hover:bg-blue-600 text-white font-bold'}`}
+                                onClick={selectedSetlists.length === 0 ? undefined : handleAddSongsToSetlists}
+                                disabled={selectedSetlists.length === 0}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                既存のセットリストに追加
+                            </button>
+                        </div>
+                    </>
+                )}
                 <div className="mt-4 p-4">
                     <h2 className="text-xl font-bold mb-4">新しいセットリストを作成</h2>
                     <input

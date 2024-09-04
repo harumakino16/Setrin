@@ -20,7 +20,7 @@ function Settings() {
     const router = useRouter();
     const { setMessageInfo } = useMessage(); // Added
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${youtubeConfig.clientId}&redirect_uri=${youtubeConfig.redirectUri}&scope=${youtubeConfig.scope}&response_type=code&prompt=consent&access_type=offline`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_YOUTUBE_SCOPE}&response_type=code&prompt=consent&access_type=offline`;
 
     useEffect(() => {
         const { code } = router.query;
@@ -112,7 +112,6 @@ function Settings() {
 
     return (
         <div className="flex">
-            <Sidebar />
             <div className="flex-grow p-8">
                 <h1 className="text-2xl font-bold mb-4">設定</h1>
                 <div className='mb-6'>

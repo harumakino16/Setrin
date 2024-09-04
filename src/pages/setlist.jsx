@@ -55,7 +55,6 @@ export default function Setlist() {
 
   return (
     <div className="flex">
-      <Sidebar />
       <div className="flex-grow p-8">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">セットリスト</h1>

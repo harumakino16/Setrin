@@ -3,13 +3,11 @@ import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { useMessage } from "@/context/MessageContext";
-
-
+import Link from 'next/link';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
   const [isDragged, setIsDragged] = useState(false);
   const { setMessageInfo } = useMessage();
-
 
   const onSave = async () => {
     try {
@@ -125,8 +123,9 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
         <td className="border px-4 py-2">{song.timesSung}</td>
         <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
         <td className="border px-4 py-2">{song.memo}</td>
+        <td className="border px-4 py-2"><a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer">{song.youtubeUrl}</a></td>
         <td className="border px-4 py-2">
-          <button onClick={() => onDelete(song.id)} className="text-red-500 hover:text-red-700">
+          <button onClick={() => onDelete(song.id)} className="text-red-500 hover:text-red-7000">
             削除
           </button>
         </td>
@@ -147,6 +146,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
             <th className="px-4 py-2">歌唱回数</th>
             <th className="px-4 py-2">熟練度</th>
             <th className="px-4 py-2">備考</th>
+            <th className="px-4 py-2">URL</th>
             <th className="px-4 py-2">削除</th>
           </tr>
         </thead>

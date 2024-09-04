@@ -26,8 +26,6 @@ export default function Home() {
     addSongsInSetlist: false
   });
 
-  console.log("process.env.NEXT_PUBLIC_BASE_URL", process.env.NEXT_PUBLIC_BASE_URL);
-  console.log("process.env.NEXT_PUBLIC_ORIGIN", process.env.NEXT_PUBLIC_ORIGIN);
 
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
@@ -182,7 +180,6 @@ export default function Home() {
 
   return (
     <div className="flex">
-      <Sidebar />
       <div className="flex-grow p-8">
         <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
         <div className="flex space-x-2 justify-between mb-3">
@@ -219,7 +216,7 @@ export default function Home() {
 
         {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
         {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
-        {!currentUser && <LoginFormModal isOpen={!currentUser}/>}
+        {!currentUser && <LoginFormModal isOpen={!currentUser} />}
       </div>
     </div>
   );

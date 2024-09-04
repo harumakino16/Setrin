@@ -47,7 +47,7 @@ export function Sidebar() {
 
     return (
         // {/* Sidebar */ }
-        <div className="w-64 min-w-[256px] h-screen shadow-md flex flex-col justify-between">
+        <div className="w-64 min-w-[256px] shadow-md h-screen flex flex-col justify-between">
             <div>
                 <div className="flex flex-col items-center py-4">
                     <div className="text-gray-700 text-2xl font-semibold">メニュー</div>
