@@ -1,11 +1,11 @@
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useState } from 'react';
-import { GoChevronDown } from 'react-icons/go'; // ReactIconのインポート
+import { GoChevronDown, GoChevronUp } from 'react-icons/go'; // ReactIconのインポート
 import { useSongs } from '../context/SongsContext';
 
 
-const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearchCriteria }) => {
+const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearchCriteria, isRandomSetlist }) => {
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const { songs } = useSongs();
 
@@ -80,7 +80,10 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                     <input type="text" className="border p-2 rounded w-full h-14" placeholder="キーワードで検索" onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)} />
                 </div>
                 <div onClick={() => setShowAdvancedSearch(!showAdvancedSearch)} className="text-gray-500 py-2 px-4 cursor-pointer flex items-center">
-                    <span className="text-gray-500">詳細検索</span> <span className="text-gray-500"><GoChevronDown size={20} /></span>
+                    <span className="text-gray-500">{isRandomSetlist ? '絞り込み' : '詳細検索'}</span> 
+                    <span className="text-gray-500">
+                        {showAdvancedSearch ? <GoChevronUp size={20} /> : <GoChevronDown size={20} />}
+                    </span>
                 </div>
                 {showAdvancedSearch && (
                     <div className="flex flex-wrap gap-8">

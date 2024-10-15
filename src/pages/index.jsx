@@ -179,8 +179,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex">
-      <div className="flex-grow p-8">
+    <div className="flex w-full">
+      <div className="flex-grow w-full p-8">
         <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
         <div className="flex space-x-2 justify-between mb-3">
           {selectedSongs.length > 0 ? (

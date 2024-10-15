@@ -93,6 +93,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
                     handleSearchResults={handleSearchResults}
                     searchCriteria={searchCriteria}
                     setSearchCriteria={setSearchCriteria}
+                    isRandomSetlist={true}
                 />
                 <div className="text-sm text-gray-600 mt-2">
                     {`検索結果: ${searchResults.length} 件`}
