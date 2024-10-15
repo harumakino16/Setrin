@@ -48,7 +48,6 @@ const MessageBox = () => {
       zIndex: 1000,
       opacity,
       transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out',
-      transform: visible ? 'translateY(0)' : 'translateY(20px)' // フワッと表示
     }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Icon style={{ marginRight: '10px' }} />

@@ -11,10 +11,10 @@ function Signin() {
   const handleSignin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('ログイン成功:');
+      
       window.location.href = '/';
     } catch (error) {
-      console.error('ログイン失敗:', error);
+      
       alert('ログインに失敗しました。');
     }
   };

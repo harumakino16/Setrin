@@ -6,7 +6,7 @@ export const COLUMN_HEADERS = [
     { label: "タグ1", key: "tag1" },
     { label: "タグ2", key: "tag2" },
     { label: "タグ3", key: "tag3" },
-    { label: "歌った回数", key: "timesSung" },
+    { label: "歌った回数", key: "singingCount" },
     { label: "熟練度", key: "skillLevel" },
     { label: "備考", key: "memo" }
   ];

@@ -47,43 +47,45 @@ export function Sidebar() {
 
     return (
         // {/* Sidebar */ }
-        <div className="w-64 min-w-[256px] shadow-md h-screen flex flex-col justify-between">
-            <div>
-                <div className="flex flex-col items-center py-4">
-                    <div className="text-gray-700 text-2xl font-semibold">メニュー</div>
+        <div className="sidebar">
+            <div className="w-64 min-w-[256px] shadow-md h-[calc(100vh-100px)] flex flex-col justify-between">
+                <div>
+                    <div className="flex flex-col items-center py-4">
+                        <div className="text-gray-700 text-2xl font-semibold">メニュー</div>
+                    </div>
+                    <div className="mt-8">
+                        <ul>
+                            {MENU.map((item) => {
+                                return (
+                                    <Link key={item.title} href={item.path}>
+                                        <li className={`flex items-center text-gray-700 text-sm font-medium py-2 px-6 ${router.pathname === item.path ? 'bg-gray-200' : 'hover:bg-gray-200'} cursor-pointer gap-2`}>
+                                            <FontAwesomeIcon icon={item.iconName} />{item.title}
+                                        </li>
+                                    </Link>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                    <div className="mt-4 px-6">
+                        <button onClick={handleCreateSetlist} className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
+                            セトリを作る
+                        </button>
+                    </div>
                 </div>
-                <div className="mt-8">
-                    <ul>
-                        {MENU.map((item) => {
-                            return (
-                                <Link key={item.title} href={item.path}>
-                                    <li className={`flex items-center text-gray-700 text-sm font-medium py-2 px-6 ${router.pathname === item.path ? 'bg-gray-200' : 'hover:bg-gray-200'} cursor-pointer gap-2`}>
-                                        <FontAwesomeIcon icon={item.iconName} />{item.title}
-                                    </li>
-                                </Link>
-                            )
-                        })}
-                    </ul>
-                </div>
-                <div className="mt-4 px-6">
-                    <button onClick={handleCreateSetlist} className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
-                        セトリを作る
-                    </button>
-                </div>
-            </div>
-            <div className=" flex flex-col px-6 pb-4 gap-3">
-                {currentUser ? (
-                    <>
-                        <button onClick={logOut} className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">ログアウト</button>
+                <div className=" flex flex-col px-6 pb-4 gap-3">
+                    {currentUser ? (
+                        <>
+                            <button onClick={logOut} className="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full">ログアウト</button>
 
-                    </>
-                ) : (
-                    <>
-                        <button className="bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full" onClick={() => router.push('/login')}>ログイン</button>
-                    </>
-                )}
+                        </>
+                    ) : (
+                        <>
+                            <button className="bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full" onClick={() => router.push('/login')}>ログイン</button>
+                        </>
+                    )}
+                </div>
+                <CreateRandomSetlist isOpen={showCreateSetlistModal} onClose={handleCloseModal} />
             </div>
-            <CreateRandomSetlist isOpen={showCreateSetlistModal} onClose={handleCloseModal} />
         </div>
     );
 }

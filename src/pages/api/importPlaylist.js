@@ -6,12 +6,12 @@ export default async function handler(req, res) {
         const playlistId = new URL(playlistUrl).searchParams.get('list');
 
         if (!playlistId) {
-            console.error('無効な再生リストURLです');
+            
             return res.status(400).json({ message: '無効な再生リストURLです' });
         }
 
         if (!currentUser || !currentUser.youtubeRefreshToken) {
-            console.error('現在のユーザーまたはリフレッシュトークンがありません');
+            
             return res.status(400).json({ message: '現在のユーザーまたはリフレッシュトークンがありません' });
         }
 
@@ -55,14 +55,13 @@ export default async function handler(req, res) {
                 youtubeUrl: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
                 tags: "",
                 genre: '',
-                timesSung: 0,
-                skillLevel: 0,
-                memo: '',
+                singingCount: 0, // 歌唱回数を0に設定
+                skillLevel: 0, // 熟練度を0に設定
             }));
 
             res.status(200).json({ message: '再生リストのインポートに成功しました', items: songs });
         } catch (error) {
-            console.error('再生リストのインポートに失敗しました:', error);
+            
             res.status(500).json({ message: '再生リストのインポートに失敗しました', error: error.message });
         }
     } else {

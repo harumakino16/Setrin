@@ -52,14 +52,14 @@ function MainTable({
         </div>
       ) : (
         <div className="overflow-x-scroll">
-          <table className="whitespace-nowrap">
+          <table className="whitespace-nowrap w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
                 {["曲名", "アーティスト", "ジャンル", "タグ", "カラオケ音源のYoutubeURL", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ minWidth: ["150px", "100px", "110px", "100px", "200px", "120px", "110px", "100px", "120px"][index] }} onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "timesSung", "skillLevel", "memo", ""][index])}>
+                  <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ minWidth: ["150px", "100px", "110px", "100px", "200px", "120px", "110px", "100px", "120px"][index] }} onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "singingCount", "skillLevel", "memo", ""][index])}>
                     <span className="cursor-pointer">
                       {header}
                       <FontAwesomeIcon icon={faSort} className="ml-2" />
@@ -79,7 +79,7 @@ function MainTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {song.youtubeUrl ? <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-800">リンク</a> : "未登録"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.timesSung}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{song.singingCount}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.memo}</td>
                   <td className="px-6 py-4 whitespace-nowrap">

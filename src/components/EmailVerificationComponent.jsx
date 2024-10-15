@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import mailIcon from '../images/mail-icon.png';
 
-console.log(mailIcon);
+
 
 const EmailVerificationComponent = ({email}) => {
     return (

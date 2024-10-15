@@ -17,8 +17,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
     const [editedTitle, setEditedTitle] = useState('');
     const [editedArtist, setEditedArtist] = useState('');
     const [editedSingingCount, setEditedSingingCount] = useState(0);
-    const [editedProficiency, setEditedProficiency] = useState(0);
-    const [editedNotes, setEditedNotes] = useState('');
+    const [editedskillLevel, setEditedskillLevel] = useState(0);
     const [editedTags, setEditedTags] = useState("");
     const [editedGenre, setEditedGenre] = useState('');
     const [loading, setLoading] = useState(false);
@@ -44,13 +43,13 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
             setImportedSongs(data.items);
             setMessageInfo({ message: '再生リストがインポートされました', type: 'success' });
         } catch (error) {
-            console.error('再生リストのインポートに失敗しました:', error);
+            
             setMessageInfo({ message: '再生リストのインポートに失敗しました', type: 'error' });
         } finally {
             setLoading(false);
         }
     };
-    console.log(importedSongs);
+    
 
     const handleDeleteSong = (songId) => {
         setImportedSongs(importedSongs.filter(song => song.youtubeUrl !== songId));
@@ -60,11 +59,11 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
         try {
 
             const batch = writeBatch(db);
-            console.log(importedSongs);
+            
             importedSongs.forEach(song => {
                 const songData = formatSongData(song);
-                console.log(song);
-                console.log(songData);
+                
+                
                 const songRef = doc(db, 'users', currentUser.uid, 'Songs', encodeURIComponent(song.youtubeUrl).replace(/\./g, '%2E'));
                 batch.set(songRef, songData);
             });
@@ -72,7 +71,7 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
             setMessageInfo({ message: '曲が追加されました', type: 'success' });
             onClose();
         } catch (error) {
-            console.error('曲の追加に失敗しました:', error);
+            
             setMessageInfo({ message: error.message, type: 'error' });
         }
     };
@@ -82,15 +81,14 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
         setEditedTitle(song.title);
         setEditedArtist(song.artist);
         setEditedSingingCount(song.singingCount || '');
-        setEditedProficiency(song.proficiency || '');
-        setEditedNotes(song.notes || '');
+        setEditedskillLevel(song.skillLevel || '');
         setEditedTags(song.tags || '');
         setEditedGenre(song.genre || '');
     };
 
     const handleSaveEdit = () => {
         setImportedSongs(importedSongs.map(song =>
-            song.youtubeUrl === editingSong.youtubeUrl ? { ...song, title: editedTitle, artist: editedArtist, singingCount: editedSingingCount, proficiency: editedProficiency, notes: editedNotes, tags: editedTags.split(',').slice(0, 3).join(','), genre: editedGenre } : song
+            song.youtubeUrl === editingSong.youtubeUrl ? { ...song, title: editedTitle, artist: editedArtist, singingCount: editedSingingCount, skillLevel: editedskillLevel, tags: editedTags.split(',').slice(0, 3).join(','), genre: editedGenre } : song
         ));
         setEditingSong(null);
     };
@@ -129,7 +127,6 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ(カンマ区切りで複数入力)</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">歌唱回数</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">熟練度</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">備考</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                                 </tr>
                             </thead>
@@ -200,24 +197,12 @@ const YoutubePlaylistModal = ({ isOpen, onClose }) => {
                                             {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
                                                 <input
                                                     type="text"
-                                                    value={editedProficiency}
-                                                    onChange={(e) => setEditedProficiency(e.target.value)}
+                                                    value={editedskillLevel}
+                                                    onChange={(e) => setEditedskillLevel(e.target.value)}
                                                     className="border p-2 rounded w-full"
                                                 />
                                             ) : (
-                                                song.proficiency
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {editingSong && editingSong.youtubeUrl === song.youtubeUrl ? (
-                                                <input
-                                                    type="text"
-                                                    value={editedNotes}
-                                                    onChange={(e) => setEditedNotes(e.target.value)}
-                                                    className="border p-2 rounded w-full"
-                                                />
-                                            ) : (
-                                                song.notes
+                                                song.skillLevel
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">

@@ -14,7 +14,6 @@ const useSetlists = () => {
       const q = query(setlistsRef, orderBy('createdAt', 'desc')); // 作成日時順に並び替え
       const unsubscribe = onSnapshot(q, snapshot => {
         if (snapshot.empty) {
-          console.log('セットリストが見つかりません。');
           setSetlists([]);
         } else {
           const fetchedSetlists = snapshot.docs.map(doc => {
@@ -27,12 +26,12 @@ const useSetlists = () => {
             };
           });
           setSetlists(fetchedSetlists);
-          console.log("セットリストが取得されました");
-          console.log(fetchedSetlists);
+          
+          
         }
         setLoading(false);
       }, error => {
-        console.error('セットリストの取得中にエラーが発生しました:', error);
+        
         setLoading(false);
       });
 

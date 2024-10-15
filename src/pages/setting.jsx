@@ -8,24 +8,24 @@ import { youtubeConfig } from '../../youtubeConfig';
 import Image from 'next/image';
 import googleIcon from '../images/web_light_rd_SI@4x.png';
 import youtubeIcon from '../images/youtube_social_icon_red.png';
-import { useMessage } from '@/context/MessageContext'; // Added
+import { useMessage } from '@/context/MessageContext';
 import Loading from '@/components/loading';
 import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider } from 'firebase/auth';
+
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
-    const [playlistUrl, setPlaylistUrl] = useState(''); // Added
     const router = useRouter();
-    const { setMessageInfo } = useMessage(); // Added
+    const { setMessageInfo } = useMessage();
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_YOUTUBE_SCOPE}&response_type=code&prompt=consent&access_type=offline`;
 
     useEffect(() => {
         const { code } = router.query;
         if (code) {
-            exchangeCodeForTokensAndSaveInFirestore(code);
+            handleCodeExchangeAndSave(code);
             router.replace(router.pathname, undefined, { shallow: true });
         }
     }, [router]);
@@ -45,22 +45,41 @@ function Settings() {
         return <div className="text-center py-10">ログインが必要です。ログインページへのリンクを表示するなどの処理をここに追加。</div>;
     }
 
-    async function exchangeCodeForTokensAndSaveInFirestore(code) {
+
+
+    async function handleCodeExchangeAndSave(code) {
         try {
-            const response = await fetch('/api/getTokensFromCode', {
+            const tokenResponse = await fetch('/api/exchangeCodeForTokens', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ code, currentUser })
+                body: JSON.stringify({ code })
             });
 
-            if (!response.ok) {
-                throw new Error(`An error has occurred: ${response.status}`);
+            if (!tokenResponse.ok) {
+                throw new Error('トークンの取得に失敗しました。');
             }
 
+            const { refreshToken } = await tokenResponse.json();
+
+            const saveResponse = await fetch('/api/saveRefreshtokenToFirestore', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({refreshToken, currentUser})
+            });
+
+            if (!saveResponse.ok) {
+                throw new Error('Firestoreへの保存に失敗しました。');
+            }
+
+            const saveResult = await saveResponse.json();
+            setMessageInfo({ message: saveResult.message, type: 'success' });
         } catch (error) {
-            console.error('トークンの取得に失敗しました:', error);
+            
+            setMessageInfo({ message: error.message, type: 'error' });
         }
     }
 
@@ -78,7 +97,7 @@ function Settings() {
             });
             alert('プロファイルが更新されました。');
         } catch (error) {
-            console.error('プロファイルの更新に失敗しました:', error);
+            
             alert('プロファイルの更新に失敗しました。');
         }
     };
@@ -105,8 +124,34 @@ function Settings() {
 
             alert('アカウントが削除されました。');
         } catch (error) {
-            console.error('アカウントの削除に失敗しました:', error);
+            
             alert('アカウントの削除に失敗しました。');
+        }
+    };
+
+    const handleUnlinkYoutube = async () => {
+        if (!currentUser) {
+            alert('ログインしていないため、連携を解除できません。');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/unlinkYoutube', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ uid: currentUser.uid })
+            });
+
+            if (!response.ok) {
+                throw new Error('YouTube連携の解除に失敗しました。');
+            }
+
+            setMessageInfo({ message: 'YouTubeとの連携が解除されました。', type: 'success' });
+        } catch (error) {
+            
+            setMessageInfo({ message: 'YouTube連携の解除に失敗しました。', type: 'error' });
         }
     };
 
@@ -146,7 +191,7 @@ function Settings() {
                             </div>
                         </div>
                         {currentUser.youtubeRefreshToken ? (
-                            <button className="mt-4 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            <button onClick={handleUnlinkYoutube} className="mt-4 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                 解除する
                             </button>
                         ) : (
@@ -168,4 +213,3 @@ function Settings() {
 }
 
 export default Settings;
-

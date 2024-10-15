@@ -65,7 +65,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
                 genre: song['ジャンル'],
                 tags: [song['タグ1'], song['タグ2'], song['タグ3']].filter(tag => tag.trim() !== ''), // 空のタグを除外
                 youtubeUrl: song['カラオケ音源のYoutubeURL'],
-                timesSung: song['歌った回数'] ? parseInt(song['歌った回数']) : 0, // timesSungをint型で保存
+                singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0, // singingCountをint型で保存
                 skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0, // skillLevelをint型で保存
                 memo: song['備考'] // memoをstring型で保存
             };
@@ -93,7 +93,7 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
                 await updateDatabase(data, importMode);
             },
             error: (err) => {
-                console.error("Error parsing CSV:", err);
+                
             },
             header: true,
             skipEmptyLines: true

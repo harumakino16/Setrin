@@ -16,13 +16,13 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
       const songIds = currentSongs.map(song => song.id);
       batch.update(setlistDocRef, { songIds });
       await batch.commit();
-      console.log(currentSongs);
-      console.log('セットリストが保存されました');
+      
+      
       setMessageInfo({ message: 'セットリストが保存されました', type: 'success' });
 
       setIsDragged(false); // ドラッグ状態をリセット
     } catch (error) {
-      console.error('セットリストの保存中にエラーが発生しました:', error);
+      
     }
   };
 
@@ -45,14 +45,14 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
         // ローカルステートを更新
         const updatedSongs = currentSongs.filter(song => song.id !== songId);
         setCurrentSongs(updatedSongs);
-        console.log('曲が削除されました');
+        
         setMessageInfo({ message: '曲が削除されました', type: 'success' });
       } else {
-        console.log('セットリストが存在しません');
+        
         setMessageInfo({ message: 'セットリストが存在しません', type: 'error' });
       }
     } catch (error) {
-      console.error('曲の削除中にエラーが発生しました:', error);
+      
     }
   };
 
@@ -72,7 +72,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
     newSongs.splice(hoverIndex, 0, dragRow);
     setCurrentSongs(newSongs);
     setIsDragged(true); // ドラッグ操作があったことを記録
-    console.log(currentSongs);
+    
   };
 
   const handleSaveButton = () => {
@@ -120,10 +120,14 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
         <td className="border px-4 py-2">{truncateText(song.artist, 15)}</td>
         <td className="border px-4 py-2">{song.genre}</td>
         <td className="border px-4 py-2">{song.tags.join(', ')}</td>
-        <td className="border px-4 py-2">{song.timesSung}</td>
+        <td className="border px-4 py-2">{song.singingCount}</td>
         <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
         <td className="border px-4 py-2">{song.memo}</td>
-        <td className="border px-4 py-2"><a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer">{song.youtubeUrl}</a></td>
+        <td className="border px-4 py-2">
+          <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+            {song.youtubeUrl}
+          </a>
+        </td>
         <td className="border px-4 py-2">
           <button onClick={() => onDelete(song.id)} className="text-red-500 hover:text-red-7000">
             削除
@@ -134,8 +138,8 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
   };
 
   return (
-    <>
-      <table className="table-auto w-full">
+    <div className="overflow-x-auto w-full">
+      <table className="whitespace-nowrap w-full">
         <thead className="bg-gray-200">
           <tr>
             <th className="px-4 py-2">順番</th>
@@ -165,7 +169,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
           変更を保存する
         </button>
       )}
-    </>
+    </div>
   );
 };
 

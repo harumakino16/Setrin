@@ -13,7 +13,7 @@ const CallbackPage = () => {
 
             if (code) {
                 try {
-                    console.log("code",code);
+                    
                     const auth = getAuth();
                     const credential = GoogleAuthProvider.credentialFromResult(result);
                     const userCredential = await signInWithCredential(auth, credential);
@@ -22,14 +22,14 @@ const CallbackPage = () => {
                     // リフレッシュトークンの取得
                     const tokenResult = await user.getIdTokenResult(true);
                     const refreshToken = tokenResult.refreshToken;
-                    console.log("refreshToken", refreshToken);
+                    
                     // Firestoreにリフレッシュトークンを保存
                     await updateDoc(doc(db, 'users', user.uid), { refreshToken });
 
                     // ログイン後のページにリダイレクト
                     // router.push('/'); // ログイン後のページに適宜変更
                 } catch (error) {
-                    console.error("Error during authentication:", error);
+                    
                     // エラーハンドリング
                 }
             }

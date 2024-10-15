@@ -11,8 +11,8 @@ const Modal = ({ isOpen, onClose, children }) => {
     };
 
     useEffect(() => {
-        console.log("modal");
-        console.log(isOpen);
+        
+        
     }, []);
 
     return (

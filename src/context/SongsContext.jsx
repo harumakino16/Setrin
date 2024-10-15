@@ -24,7 +24,7 @@ export const SongsProvider = ({ children }) => {
                 setSongs(songsData);
                 setLoading(false);
             }, (error) => {
-                console.error("Error fetching songs:", error);
+                
                 setLoading(false); // エラー時もローディングを解除
             });
 

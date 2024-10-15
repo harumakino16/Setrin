@@ -14,7 +14,7 @@ function SongModal({ isOpen, onClose, song }) {
   const [tags, setTags] = useState(isNewSong ? '' : song.tags.join(', '));
   const [genre, setGenre] = useState(isNewSong ? '' : song.genre);
   const [youtubeUrl, setYoutubeUrl] = useState(isNewSong ? '' : song.youtubeUrl);
-  const [timesSung, setTimesSung] = useState(isNewSong ? 0 : song.timesSung);
+  const [singingCount, setsingingCount] = useState(isNewSong ? 0 : song.singingCount);
   const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel); // 熟練度の状態を追加
   const [memo, setMemo] = useState(isNewSong ? '' : song.memo); // 備考の状態を追加
   const authContext = useContext(AuthContext);
@@ -30,7 +30,7 @@ function SongModal({ isOpen, onClose, song }) {
         tags,
         genre,
         youtubeUrl,
-        timesSung,
+        singingCount,
         skillLevel,
         memo
       });
@@ -49,7 +49,7 @@ function SongModal({ isOpen, onClose, song }) {
         }
         onClose();
       } catch (error) {
-        console.error(isNewSong ? '曲の追加に失敗しました:' : '曲の更新に失敗しました:', error);
+        
         setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
       }
     } catch (error) {
@@ -70,7 +70,7 @@ function SongModal({ isOpen, onClose, song }) {
           <input type="text" value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="ジャンル" className="input bg-gray-100 p-3 rounded" />
           <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="カラオケ音源のYoutube URL" className="input bg-gray-100 p-3 rounded" />
           {!isNewSong && (
-            <input type="number" value={timesSung} onChange={(e) => setTimesSung(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
+            <input type="number" value={singingCount} onChange={(e) => setsingingCount(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
           )}
           <div>熟練度</div>
           <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" />

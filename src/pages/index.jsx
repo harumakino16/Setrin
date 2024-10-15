@@ -77,7 +77,7 @@ export default function Home() {
       await batch.commit();
       setMessageInfo({ message: '曲が削除され、セットリストが更新されました。', type: 'success' });
     } catch (error) {
-      console.error('曲の削除中にエラーが発生しました:', error);
+      
       setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
     }
   };
@@ -124,7 +124,7 @@ export default function Home() {
         setSelectedSongs([]);
         setMessageInfo({ message: '選択された曲が削除され、セットリストが更新されました。', type: 'success' });
       } catch (error) {
-        console.error('曲の削除中にエラーが発生しました:', error);
+        
         setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
       }
     }
@@ -162,7 +162,7 @@ export default function Home() {
     { label: "タグ1", key: "tag1" },
     { label: "タグ2", key: "tag2" },
     { label: "タグ3", key: "tag3" },
-    { label: "歌った回数", key: "timesSung" },
+    { label: "歌った回数", key: "singingCount" },
     { label: "熟練度", key: "skillLevel" },
     { label: "備考", key: "memo" }
   ];

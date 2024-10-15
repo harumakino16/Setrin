@@ -8,7 +8,7 @@ const Contact = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     // ここでお問い合わせ情報をバックエンドに送信する処理を実装します
-    console.log('送信された情報:', { name, email, message });
+    
     // 送信後の処理（例：フォームをクリアする、送信完了メッセージを表示するなど）
     setName('');
     setEmail('');

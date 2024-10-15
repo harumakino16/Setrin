@@ -66,7 +66,7 @@ export default async function handler(req, res) {
                         });
                     } catch (apiError) {
                         if (apiError.errors && apiError.errors[0].reason === 'videoNotFound') {
-                            console.log(`Video not found: ${videoId}, skipping...`);
+                            
                             continue; // ビデオが見つからない場合はスキップ
                         } else {
                             throw apiError; // 他のエラーは再スロー
@@ -78,13 +78,13 @@ export default async function handler(req, res) {
             } catch (apiError) {
                 if (apiError.code === 401 && apiError.errors[0].reason === 'youtubeSignupRequired') {
                     res.status(401).json({ message: 'YouTubeチャンネルが必要です。チャンネルを作成してください。' });
-                    console.log('YouTubeチャンネルが必要です。チャンネルを作成してください。');
+                    
                 } else {
                     throw apiError;
                 }
             }
         } catch (error) {
-            console.log('エラーです！:', error);
+            
             res.status(500).json({ message: error.message });
         }
     } else {

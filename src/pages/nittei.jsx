@@ -39,7 +39,7 @@ const ScheduleApp = () => {
     navigator.clipboard.writeText(textToCopy).then(() => {
       alert('コピーしました！');
     }, (err) => {
-      console.error('コピーに失敗しました: ', err);
+      
     });
   };
 

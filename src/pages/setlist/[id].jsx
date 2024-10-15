@@ -5,7 +5,6 @@ import { doc, getDoc, collection, getDocs, onSnapshot, updateDoc } from 'firebas
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SetlistTable from '@/components/SetlistTable'; // SongTable コンポーネントをインポート
-import { Sidebar } from '@/components/Sidebar'; // サイドバーをインポート
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useMessage } from '@/context/MessageContext';
@@ -24,7 +23,6 @@ const SetlistDetail = () => {
     const [loading, setLoading] = useState(false); // ローディング状態を追加
     const [firstLoad, setFirstLoad] = useState(true);
     const [isEditOpen, setIsEditOpen] = useState(false); // Added state for edit modal
-    const [selectedSetlist, setSelectedSetlist] = useState(null); // Added state for selected setlist
 
     useEffect(() => {
         const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
@@ -36,30 +34,25 @@ const SetlistDetail = () => {
             }
         });
 
-
         return () => unsubscribe(); // Clean up subscription
     }, [currentUser, router.query.id]);
-
 
     useEffect(() => {
         const fetchCurrentSongs = async () => {
             if (setlist && setlist.songIds) {
-                // 全てのソングをフィルタリングし、それからIDの順にソートする
                 const songIdIndexMap = new Map(setlist.songIds.map((id, index) => [id, index]));
                 const filteredSongs = songs
                     .filter(song => setlist.songIds.includes(song.id))
                     .sort((a, b) => songIdIndexMap.get(a.id) - songIdIndexMap.get(b.id));
                 setCurrentSongs(filteredSongs);
             } else {
-                setCurrentSongs([]); // setlist が null の場合は空の配列を設定
+                setCurrentSongs([]);
             }
         };
-        if (setlist && firstLoad) { // setlistが 存在する場合のみ fetchCurrentSongs を実行
+        if (setlist) {
             fetchCurrentSongs();
-            setFirstLoad(false);
         }
-    }, [setlist, songs, firstLoad]);
-    
+    }, [setlist, songs, router.query.id]); // Add router.query.id to dependencies
 
     async function createPlaylist(songs, setlistName) {
         setLoading(true); // ローディング開始
@@ -89,7 +82,7 @@ const SetlistDetail = () => {
             });
 
             if (!refreshTokenResponse.ok) {
-                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生��ました', type: 'error' });
+                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
                 throw new Error('Failed to refresh access token');
             }
 
@@ -105,17 +98,17 @@ const SetlistDetail = () => {
             });
 
             if (!response.ok) {
-                console.log('Failed to create playlist');
-                console.log(response);
+                
+                
                 setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
                 throw new Error('Failed to create playlist');
             }
 
             const data = await response.json();
-            console.log('Playlist created:', data);
+            
             setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
         } catch (error) {
-            console.error('Error creating playlist:', error);
+            
             setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
         } finally {
             setLoading(false); // ローディング終了
@@ -127,8 +120,8 @@ const SetlistDetail = () => {
 
     return (
         <div className="flex">
-            <Sidebar /> {/* サイドバーを表示 */}
-            <div className="flex-grow p-5">
+            {/* <Sidebar /> */} {/* サイドバーを削除 */}
+            <div className="flex-grow p-5 w-full">
                 <Link href="/setlist" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
                 <h1 className="text-3xl font-bold mb-4 text-gray-800">セットリスト詳細</h1>
                 {loading && (
@@ -138,32 +131,46 @@ const SetlistDetail = () => {
                     <div className="bg-white p-6">
                         <p className="text-lg">
                             <strong>名前：</strong>{setlist.name}
-                            <FaPen 
-                                onClick={handleOpenEditModal} 
-                                className="inline ml-2 text-gray-500 cursor-pointer text-sm" 
+                            <FaPen
+                                onClick={handleOpenEditModal}
+                                className="inline ml-2 text-gray-500 cursor-pointer text-sm"
                             />
                         </p>
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
                         <p className="text-lg"><strong>曲数:</strong> {setlist.songIds ? setlist.songIds.length : 0}</p>
                         <div className="mt-4">
                             <h2 className="text-xl font-bold">曲リスト</h2>
-                            <div className="mb-4">
-                                <button
-                                    onClick={() => createPlaylist(currentSongs, setlist.name)}
-                                    disabled={!currentUser.youtubeRefreshToken || currentSongs.length === 0}
-                                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken || currentSongs.length === 0 ? ' bg-gray-300 cursor-not-allowed disabled' : ''}`}
-                                >
-                                    YouTubeの再生リストに追加
-                                </button>
-                                {!currentUser.youtubeRefreshToken && (
-                                    <Link href="/setting" className="text-blue-600 hover:text-blue-800 ml-4">
-                                        Youtubeとリンクする(設定へ移動)
-                                    </Link>
-                                )}
-                            </div>
-                            <DndProvider backend={HTML5Backend}>
-                                <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} setlist={setlist} setSetlist={setSetlist} currentUser={currentUser} router={router} />
-                            </DndProvider>
+                            {currentSongs.length === 0 ? (
+                                <div className="text-center">
+                                    <p>このセットリストに曲はありません。</p>
+                                    <button
+                                        onClick={() => router.push('/')}
+                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out"
+                                    >
+                                        曲を追加する
+                                    </button>
+                                </div>
+                            ) : (
+                                <div>
+                                    <button
+                                        onClick={() => createPlaylist(currentSongs, setlist.name)}
+                                        disabled={!currentUser.youtubeRefreshToken || currentSongs.length === 0}
+                                        className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken || currentSongs.length === 0 ? ' bg-gray-300 cursor-not-allowed disabled' : ''}`}
+                                    >
+                                        YouTubeの再生リストに追加
+                                    </button>
+                                    {!currentUser.youtubeRefreshToken && (
+                                        <Link href="/setting" className="text-blue-600 hover:text-blue-800 ml-4">
+                                            Youtubeとリンクする(設定へ移動)
+                                        </Link>
+                                    )}
+                                    <div className="mt-4">
+                                        <DndProvider backend={HTML5Backend}>
+                                            <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} setlist={setlist} setSetlist={setSetlist} currentUser={currentUser} router={router} />
+                                        </DndProvider>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -189,5 +196,6 @@ const SetlistDetail = () => {
 };
 
 export default SetlistDetail;
+
 
 

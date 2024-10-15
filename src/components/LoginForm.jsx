@@ -21,13 +21,9 @@ const LoginForm = () => {
                     </div>
                 </button>
             </div>
-            <div className="flex flex-col space-y-1 mb-5">
-                <p className="text-center text-gray-500 text-sm">パスワードを忘れた方はこちら</p>
+            {/* <div className="flex flex-col space-y-1 mb-5">
                 <p className="text-center text-gray-500 text-sm">ログインできない方はこちら</p>
-            </div>
-            <div className='text-center'>
-                <Link href="/register" className="text-blue-500 font-bold">会員登録はこちら</Link>
-            </div>
+            </div> */}
         </div>
     );
 };

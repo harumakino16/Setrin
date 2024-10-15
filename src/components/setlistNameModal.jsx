@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Modal from "@/components/modal";
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
@@ -9,6 +9,13 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const [inputValue, setInputValue] = useState('');
     const { currentUser } = useContext(AuthContext);
     const { setMessageInfo } = useMessage();
+
+    // デフォルトのセットリスト名を設定
+    useEffect(() => {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD形式
+        setInputValue(`${formattedDate}　-　新しいセットリスト`);
+    }, []);
 
     const handleSubmit = async () => {
         if (currentUser) {
@@ -55,4 +62,3 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
 };
 
 export default SetlistNameModal;
-

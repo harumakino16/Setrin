@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GoChevronDown, GoChevronUp } from 'react-icons/go'; // ReactIconのインポート
 import { useSongs } from '../context/SongsContext';
 
@@ -27,9 +27,9 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
         if (searchCriteria.maxSung > 0) {
             if (searchCriteria.maxSungOption === '以上') {
-                songsData = songsData.filter(song => song.timesSung >= searchCriteria.maxSung);
+                songsData = songsData.filter(song => song.singingCount >= searchCriteria.maxSung);
             } else {
-                songsData = songsData.filter(song => song.timesSung <= searchCriteria.maxSung);
+                songsData = songsData.filter(song => song.singingCount <= searchCriteria.maxSung);
             }
         }
 
@@ -64,10 +64,14 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         handleSearchResults(songsData);
     };
 
+    useEffect(() => {
+        searchSongs({}); // 初期状態で全曲を検索
+    }, [songs]);
+
     const handleCriteriaChange = (field, value) => {
         setSearchCriteria(prev => {
             const updatedCriteria = { ...prev, [field]: value };
-            searchSongs(updatedCriteria); // 変更後の検索条件で検索を実行
+            searchSongs(updatedCriteria);
             return updatedCriteria;
         });
     };

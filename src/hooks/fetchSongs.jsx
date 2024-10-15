@@ -16,7 +16,12 @@ const useFetchSongs = (currentUser) => {
           const songsRef = collection(db, 'users', currentUser.uid, 'Songs');
           const q = query(songsRef);
           const querySnapshot = await getDocs(q);
-          const songsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const songsData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            singingCount: doc.data().singingCount || 0, // 0をデフォルト値として設定
+            skillLevel: doc.data().skillLevel || 0, // 0をデフォルト値として設定
+          }));
           setSongs(songsData);
           localStorage.setItem('songs', JSON.stringify(songsData)); // 新しいデータをローカルストレージに保存
         }

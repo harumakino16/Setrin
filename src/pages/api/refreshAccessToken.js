@@ -10,12 +10,12 @@ export default async function handler(req, res) {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-        console.log('リクエストトークンがありません');
+        
         return res.status(400).json({ message: 'Refresh token is required' });
     }
     
     try {
-        console.log('リクエストトークンがあります');
+        
         const clientId = youtubeConfig.clientId;       // 環境変数からクライアントIDを取得
         const clientSecret = youtubeConfig.clientSecret; // 環境変数からクライアントシークレットを取得
         const tokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
@@ -39,9 +39,9 @@ export default async function handler(req, res) {
             client_secret: clientSecret,
         }).toString();
         
-        console.log(`リクエストボディ！！: ${requestBody}`);
-        console.log('tokenResponse:', tokenResponse);
-        console.log(clientId);
+        
+        
+        
 
         const tokenData = await tokenResponse.json();
 
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
-        console.error(error);
+        
         
     }
 }

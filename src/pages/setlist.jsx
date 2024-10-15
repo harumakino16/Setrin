@@ -121,13 +121,15 @@ export default function Setlist() {
       {isEditOpen && (
         <Modal isOpen={isEditOpen} onClose={handleCloseEditModal}>
           <div className="p-4">
-            <h2 className="text-lg font-bold mb-4">セットリストを削除しますか？</h2>
+            <h2 className="text-lg mb-4">
+              {selectedSetlist ? `${selectedSetlist.name} を削除しますか？` : 'セットリストを削除しますか？'}
+            </h2>
             <div className="flex justify-end mt-4">
-              <button onClick={handleDeleteSetlist} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2">
-                削除
-              </button>
-              <button onClick={handleCloseEditModal} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+              <button onClick={handleCloseEditModal} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
                 キャンセル
+              </button>
+              <button onClick={handleDeleteSetlist} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                削除
               </button>
             </div>
           </div>

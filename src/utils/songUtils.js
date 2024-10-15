@@ -20,7 +20,7 @@ export const formatSongData = (song) => {
         tags: tags,
         genre: song.genre,
         youtubeUrl: song.youtubeUrl,
-        timesSung: parseInt(song.timesSung, 10) || 0,
+        singingCount: parseInt(song.singingCount, 10) || 0,
         skillLevel: parseInt(song.skillLevel, 10) || 0,
         memo: song.memo || ''
     };

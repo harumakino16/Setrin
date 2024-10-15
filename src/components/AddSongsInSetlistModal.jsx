@@ -40,7 +40,7 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
             await batch.commit();
             setMessageInfo({ message: '曲がセットリストに追加されました。', type: 'success' });
         } catch (error) {
-            console.error('曲をセットリストに追加中にエラーが発生しました:', error);
+            
             setMessageInfo({ message: '曲の追加に失敗しました。', type: 'error' });
         }
         onClose();
@@ -63,7 +63,7 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
             setMessageInfo({ message: '新しいセットリストが作成され、曲が追加されました。', type: 'success' });
             onClose();
         } catch (error) {
-            console.error('新しいセットリストの作成中にエラーが発生しました:', error);
+            
             setMessageInfo({ message: '新しいセットリストの作成に失敗しました。', type: 'error' });
         }
     };

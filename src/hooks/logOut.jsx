@@ -10,11 +10,11 @@ const useLogOut = () => {
     const logOut = async () => {
         try {
             await signOut(auth);
-            console.log('ログアウトしました。');
+            
             setMessageInfo({ message: 'ログアウトしました。', type: 'info' });
-            router.push('/login');
+            router.push('/');
         } catch (error) {
-            console.error('ログアウトに失敗しました:', error);
+            
             setMessageInfo({ message: 'ログアウトに失敗しました: ' + error.message, type: 'error' });
         }
     };
