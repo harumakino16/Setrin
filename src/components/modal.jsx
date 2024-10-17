@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
     if (!isOpen) return null;
 
     const handleBackgroundClick = (event) => {
@@ -18,11 +18,13 @@ const Modal = ({ isOpen, onClose, children }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center" onClick={handleBackgroundClick}>
             <div className="bg-white p-8 rounded-lg shadow-lg relative">
-                <button onClick={onClose} className="absolute top-3 right-3 text-gray-600 hover:text-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+                {showCloseButton && (
+                    <button onClick={onClose} className="absolute top-3 right-3 text-gray-600 hover:text-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
                 {children}
             </div>
         </div>
@@ -30,4 +32,3 @@ const Modal = ({ isOpen, onClose, children }) => {
 };
 
 export default Modal;
-

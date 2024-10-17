@@ -85,7 +85,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
                                 min="1"
                             />
                         </div>
-                        <button onClick={createRandomSetlist} className="mt-4 text-lg bg-blue-500 hover:bg-blue-700 text-white font-bold py-5 px-4 rounded">
+                        <button onClick={createRandomSetlist} className="mt-4 text-lg bg-blue-500 hover:bg-blue-700 text-white font-bold py-5 px-4 rounded w-full">
                             ランダムセットリストを作成
                         </button>
                     </div>

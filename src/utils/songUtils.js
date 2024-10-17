@@ -16,7 +16,7 @@ export const formatSongData = (song) => {
 
     return {
         title: song.title,
-        artist: song.artist,
+        artist: song.artist || '未設定', // デフォルト値を設定
         tags: tags,
         genre: song.genre,
         youtubeUrl: song.youtubeUrl,

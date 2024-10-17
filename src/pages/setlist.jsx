@@ -1,7 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
-import Link from 'next/link';
-import { Sidebar } from '@/components/Sidebar';
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
 import { doc, deleteDoc } from 'firebase/firestore';

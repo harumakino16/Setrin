@@ -195,7 +195,12 @@ export default function Home() {
             </div>
           ) : (<div></div>)}
           <div className="flex space-x-2">
-            <button onClick={() => toggleModal('addSong', true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow">曲を追加する</button>
+            <button onClick={() => toggleModal('addSong', true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow inline-flex items-center">
+              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              曲を追加する
+            </button>
             {/* <CSVLink {...csvReport} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
               <FontAwesomeIcon icon={faUpload} className="mr-2" />エクスポート
             </CSVLink> */}

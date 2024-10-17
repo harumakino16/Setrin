@@ -14,10 +14,8 @@ const LoginFormModal = ({ isOpen }) => {
 
     return (
         <div>
-
-            <Modal isOpen={isOpen}>
+            <Modal isOpen={isOpen} showCloseButton={false}>
                 <div className="text-xl text-center">ご利用にはログインが必要です</div>
-
                 <LoginForm />
             </Modal>
         </div>
