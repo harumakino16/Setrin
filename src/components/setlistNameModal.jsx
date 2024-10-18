@@ -34,7 +34,7 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="mb-4 min-w-[400px]">
+            <div className="mb-4 min-w-[300px] md:min-w-[400px]">
                 <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="search">
                     セットリストを作成
                 </label>

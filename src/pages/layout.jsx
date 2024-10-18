@@ -26,9 +26,9 @@ export default function Layout({ children }) {
     return (
         <div>
             <Header toggleSidebar={toggleSidebar} />
-            <div className="bg-[#efeeea] pt-[80px]">
+            <div className="bg-[#efeeea] pt-[80px] min-h-screen">
                 <main className="p-4 w-full flex">
-                    {!isMobile && <Sidebar className="hidden md:block" />}
+                    {!isMobile && <Sidebar className="hidden md:block"/>}
                     <div className={`flex-1 ${!isMobile ? 'w-[calc(100%-256px)]' : 'w-full'}`}>
                         {children}
                     </div>
@@ -39,7 +39,7 @@ export default function Layout({ children }) {
                                 <button className="absolute top-4 right-3 text-gray-700" onClick={toggleSidebar}>
                                     <FaTimes size={24} />
                                 </button>
-                                <Sidebar />
+                                <Sidebar onLinkClick={toggleSidebar} /> {/* onLinkClickを渡す */}
                             </div>
                         </div>
                     )}

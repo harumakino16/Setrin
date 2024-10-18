@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import SearchForm from '@/components/searchForm';
 import Modal from '@/components/modal.jsx';
 import useSearchCriteria from '@/hooks/useSearchCriteria';
 import fetchUsersSetlists from '../hooks/fetchSetlists';
+import { useSongs } from '@/context/SongsContext'; // SongsContextからuseSongsをインポート
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
@@ -18,6 +19,18 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { searchCriteria, setSearchCriteria } = useSearchCriteria({});
     const { setlists: existingSetlists } = fetchUsersSetlists(currentUser);
     const [activeTab, setActiveTab] = useState('random'); // タブの状態を管理
+    const { songs } = useSongs(); // 全曲を取得するためにuseSongsを使用
+
+    useEffect(() => {
+        // コンポーネントのマウント時に全曲をsearchResultsに設定
+        setSearchResults(songs);
+    }, [songs]);
+
+    useEffect(() => {
+        if (searchResults.length > 0 && searchResults.length < 10) {
+            setNumberOfSongs(searchResults.length);
+        }
+    }, [searchResults]);
 
     const handleSearchResults = (results) => {
         setSearchResults(results);
@@ -57,7 +70,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
-            <div className="flex flex-col gap-2 min-w-[600px]">
+            <div className="flex flex-col gap-2 min-w-[300px] md:min-w-[600px]">
                 <h2 className="text-2xl font-bold text-blue-600 text-center">セトリを作る</h2>
                 <div className="flex justify-center gap-4 mt-4 border-b">
                     <button

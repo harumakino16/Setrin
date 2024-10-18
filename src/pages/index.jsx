@@ -179,12 +179,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex w-full">
-      <div className="flex-grow w-full p-8">
+    <div className="flex flex-col sm:flex-row w-full">
+      <div className="flex-grow w-full p-0 sm:p-4">
         <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
-        <div className="flex space-x-2 justify-between mb-3">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-between mb-3">
           {selectedSongs.length > 0 ? (
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
               <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
               <button onClick={() => toggleModal('addSongsInSetlist', true)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
                 <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
@@ -194,16 +194,13 @@ export default function Home() {
               </button>
             </div>
           ) : (<div></div>)}
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <button onClick={() => toggleModal('addSong', true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow inline-flex items-center">
               <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               曲を追加する
             </button>
-            {/* <CSVLink {...csvReport} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded inline-flex items-center">
-              <FontAwesomeIcon icon={faUpload} className="mr-2" />エクスポート
-            </CSVLink> */}
           </div>
         </div>
 

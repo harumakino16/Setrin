@@ -52,11 +52,11 @@ export default function Setlist() {
   }, [isEditOpen]);
 
   return (
-    <div className="flex">
-      <div className="flex-grow p-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">セットリスト</h1>
-          <button onClick={handleOpenModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+    <div className="flex flex-col md:flex-row">
+      <div className="flex-grow p-4 md:p-8">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">セットリスト</h1>
+          <button onClick={handleOpenModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center mb-4 md:mb-0">
             <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -77,16 +77,16 @@ export default function Setlist() {
             <table className="min-w-full divide-y divide-gray-300 shadow-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
                     セットリスト名
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
                     作成日
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
                     曲数
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
                     
                   </th>
                 </tr>
@@ -94,16 +94,16 @@ export default function Setlist() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {setlists.map((setlist) => (
                   <tr className='hover:cursor-pointer hover:bg-gray-100 transition-all' key={setlist.id} onClick={() => router.push(`/setlist/${setlist.id}`)} >
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                    <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
                       {setlist.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                    <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
                       {setlist.createdAt}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                    <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
                       {setlist.songIds ? setlist.songIds.length : 0} 曲
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900 text-right">
+                    <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900 text-right">
                       <button onClick={(e) => { e.stopPropagation(); setSelectedSetlist(setlist); setIsEditOpen(true); }} className="text-red-500 hover:text-red-700">
                         削除
                       </button>

@@ -70,11 +70,11 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="overflow-y-auto">
+            <div className="overflow-y-auto p-4 md:p-8">
                 <h2 className="text-2xl font-bold mb-4">セットリストに曲を追加</h2>
                 {setlists.length > 0 && (
                     <>
-                        <ul className="space-y-4 p-4">
+                        <ul className="space-y-4">
                             {setlists.map(setlist => (
                                 <li key={setlist.id}>
                                     <label className="flex items-center">
@@ -84,7 +84,7 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
                                 </li>
                             ))}
                         </ul>
-                        <div className="mt-4 p-4">
+                        <div className="mt-4">
                             <button
                                 className={`flex items-center justify-center w-full p-2 mt-4 rounded ${selectedSetlists.length === 0 ? 'bg-gray-300' : 'bg-blue-500 hover:bg-blue-600 text-white font-bold'}`}
                                 onClick={selectedSetlists.length === 0 ? undefined : handleAddSongsToSetlists}
@@ -98,7 +98,7 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
                         </div>
                     </>
                 )}
-                <div className="mt-4 p-4">
+                <div className="mt-4">
                     <h2 className="text-xl font-bold mb-4">新しいセットリストを作成</h2>
                     <input
                         type="text"

@@ -114,9 +114,9 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
 
     // Modal コンポーネントを使用して UI をレンダリング
     return (
-        <div>
-            <div className="flex justify-between items-center px-4 py-2">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">CSVファイルをインポート</h3>
+        <div className="p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center px-4 py-2">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4 sm:mb-0">CSVファイルをインポート</h3>
                 <button onClick={handleDownloadTemplate} className="flex items-center bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700">
                     <FontAwesomeIcon icon={faFileDownload} className="mr-2" />
                     テンプレートファイル
@@ -128,13 +128,13 @@ const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
                     <div className='flex justify-center items-center mb-4'>
                         <FontAwesomeIcon icon={faFileCsv} size="3x" className="text-green-500" />
                     </div>
-                    <p id="drop-zone-text">ファイルをここにドラッグ&ドロップ、または</p>
-                    <input type="file" onChange={handleFileChange} accept=".csv" className="mt-2" />
+                    <p id="drop-zone-text" className="text-center">ファイルをここにドラッグ&ドロップ、または</p>
+                    <input type="file" onChange={handleFileChange} accept=".csv" className="mt-2 w-full text-center" />
                 </div>
             </div>
             <div className="items-center px-4 py-3">
-                <div className="flex justify-between mb-4">
-                    <label>
+                <div className="flex flex-col sm:flex-row justify-between mb-4">
+                    <label className="mb-2 sm:mb-0">
                         <input type="radio" name="importMode" value="replace" checked={importMode === 'replace'} onChange={() => setImportMode('replace')} />
                         曲リストを全て置き換える
                     </label>

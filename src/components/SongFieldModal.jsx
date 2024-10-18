@@ -41,7 +41,7 @@ function SongModal({ isOpen, onClose, song }) {
         if (isNewSong) {
           const userSongsCollection = collection(db, 'users', currentUser.uid, 'Songs');
           await addDoc(userSongsCollection, songData);
-          setMessageInfo({ message: isNewSong ? '曲の追加に成功しました' : '曲の更新に成功しました', type: 'success' });
+          setMessageInfo({ message: isNewSong ? '曲を追加しました' : '曲を更新しました', type: 'success' });
 
         } else {
           const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', song.id);
@@ -61,7 +61,7 @@ function SongModal({ isOpen, onClose, song }) {
 
   return (
     <Container isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col space-y-3 min-w-[500px]">
+      <div className="flex flex-col space-y-3">
         <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
         <div className="flex flex-col space-y-3">
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
