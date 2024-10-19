@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaBars } from 'react-icons/fa'; // ReactIconをインポート

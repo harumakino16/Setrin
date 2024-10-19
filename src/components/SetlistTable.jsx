@@ -3,7 +3,6 @@ import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { useMessage } from "@/context/MessageContext";
-import Link from 'next/link';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
   const [isDragged, setIsDragged] = useState(false);

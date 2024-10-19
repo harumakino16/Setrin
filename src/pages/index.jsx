@@ -1,4 +1,3 @@
-import { Sidebar } from "@/components/Sidebar";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
@@ -7,13 +6,11 @@ import SearchForm from "@/components/searchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderPlus, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faFolderPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useMessage } from "@/context/MessageContext";
 import { useSongs } from '../context/SongsContext';
-import { CSVLink } from "react-csv";
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
-import LoginForm from "@/components/LoginForm";
 import LoginFormModal from "@/components/LoginFormModal";
 
 

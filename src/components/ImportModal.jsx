@@ -1,14 +1,13 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileCsv, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import Papa from 'papaparse';
 import { db } from '../../firebaseConfig';
-import { collection, doc, setDoc, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
+import { collection, doc, writeBatch, getDocs } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
-import Modal from '@/components/modal.jsx'; // Modal コンポーネントをインポート
 import { useMessage } from '@/context/MessageContext';
 
-const ImportModal = ({ isOpen, onClose, onSongsUpdated }) => {
+const ImportModal = ({ onClose }) => {
     const [file, setFile] = useState(null);
     const [importMode, setImportMode] = useState('replace');
     const { currentUser } = useContext(AuthContext);

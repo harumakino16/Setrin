@@ -1,8 +1,8 @@
 import { faMusic } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faHistory, faHome, faTools } from "@fortawesome/free-solid-svg-icons";
+import { faHistory, faTools } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import { AuthContext } from '../context/AuthContext'; // AuthContextをインポート
 import useLogOut from '../hooks/logOut';

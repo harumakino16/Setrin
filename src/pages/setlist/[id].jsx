@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, collection, getDocs, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SetlistTable from '@/components/SetlistTable'; // SongTable コンポーネントをインポート

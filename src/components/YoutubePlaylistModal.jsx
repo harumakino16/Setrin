@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { db } from '../../firebaseConfig';
-import { collection, addDoc, writeBatch, doc } from 'firebase/firestore';
+import { writeBatch, doc } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
 import { formatSongData } from '../utils/songUtils';
@@ -8,7 +8,7 @@ import Link from 'next/link';
 import LoadingIcon from './ui/loadingIcon';
 
 
-const YoutubePlaylistModal = ({ isOpen, onClose }) => {
+const YoutubePlaylistModal = ({ onClose }) => {
     const { currentUser } = useContext(AuthContext);
     const { setMessageInfo } = useMessage();
     const [playlistUrl, setPlaylistUrl] = useState('');

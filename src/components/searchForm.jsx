@@ -1,5 +1,3 @@
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
 import { useState, useEffect } from 'react';
 import { GoChevronDown, GoChevronUp } from 'react-icons/go'; // ReactIconのインポート
 import { useSongs } from '../context/SongsContext';

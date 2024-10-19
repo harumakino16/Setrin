@@ -2,9 +2,6 @@ import { AuthProvider } from "@/context/AuthContext";
 import "@/styles/globals.css";
 import { MessageProvider, useMessage } from "@/context/MessageContext";
 import MessageBox from "@/components/MessageBox";
-import Footer from "../components/footer"; // Footer コンポーネントをインポート
-import Header from "../components/header"; // Header コンポーネントをインポート
-import HeaderPadding from "../components/headerPadding"; // HeaderPadding コンポーネントをインポート
 import { SongsProvider } from "@/context/SongsContext";
 import { Noto_Sans_JP } from "next/font/google";
 import Layout from "./layout";

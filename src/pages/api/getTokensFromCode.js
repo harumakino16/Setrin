@@ -2,7 +2,7 @@
 import fetch from 'node-fetch';
 import { youtubeConfig } from '../../../youtubeConfig';
 import { initializeApp } from 'firebase/app'; // Added
-import { getFirestore, doc, writeBatch } from 'firebase/firestore'; // writeBatch imported
+import { getFirestore } from 'firebase/firestore'; // writeBatch imported
 import { firebaseConfig } from '../../../firebaseConfig'; // Added
 
 const app = initializeApp(firebaseConfig); // Added

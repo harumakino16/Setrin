@@ -1,11 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
 import { FcGoogle } from "react-icons/fc";
-import Link from 'next/link';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { AuthContext } from '@/context/AuthContext';
-import { useRouter } from 'next/router';
-import { useMessage } from '@/context/MessageContext';
-import { registerUserInFirestore } from '@/utils/firebaseUtils'; // ここでインポート
 import useGoogleSignUpLogin from '@/hooks/googleSignUpLogin';
 
 const LoginForm = () => {

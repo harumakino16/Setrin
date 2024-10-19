@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Modal from '@/components/modal';
 import LoginForm from './LoginForm';
 

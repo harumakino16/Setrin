@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
     if (!isOpen) return null;
