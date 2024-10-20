@@ -175,6 +175,11 @@ export default function Home() {
     }))
   };
 
+  const handleAddToSetlist = (songIds) => {
+    setSelectedSongs(songIds);
+    setModalState(prev => ({ ...prev, addSongsInSetlist: true }));
+  };
+
   return (
     <div className="flex flex-col sm:flex-row w-full">
       <div className="flex-grow w-full p-0 sm:p-4">
@@ -211,6 +216,7 @@ export default function Home() {
           setModalState={setModalState}
           modalState={modalState}
           tableData={tableData}
+          onAddToSetlist={handleAddToSetlist}
         />
 
         {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}

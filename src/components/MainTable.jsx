@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
 import SongFieldModal from './SongFieldModal';
 import { useSongs } from '../context/SongsContext';
+import ContextMenu from './ContextMenu';
 
 function MainTable({
   selectAll,
@@ -14,7 +15,8 @@ function MainTable({
   tableData,
   setModalState,
   modalState,
-  refreshSongs
+  refreshSongs,
+  onAddToSetlist
 }) {
   const { songs } = useSongs();
 
@@ -23,12 +25,21 @@ function MainTable({
   const [currentPage, setCurrentPage] = useState(1);
   const [currentSongs, setCurrentSongs] = useState([]);
   const paginate = pageNumber => setCurrentPage(pageNumber);
+  const [contextMenu, setContextMenu] = useState(null);
 
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
     setCurrentSongs(tableData.slice(indexOfFirstRecord, indexOfLastRecord));
   }, [tableData, currentPage, recordsPerPage]);
+
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
 
 
@@ -70,8 +81,27 @@ function MainTable({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {currentSongs.map((song, index) => (
-                <tr key={index}>
-                  <td className="px-3 py-3 whitespace-nowrap"><input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" style={{ position: 'relative', top: '2px' }} type="checkbox" checked={selectedSongs.includes(song.id)} onChange={() => handleSelectSong(song.id)} /></td>
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 transition-colors duration-150 ease-in-out"
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setContextMenu({
+                      x: e.clientX,
+                      y: e.clientY,
+                      song: song
+                    });
+                  }}
+                >
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <input
+                      className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer"
+                      style={{ position: 'relative', top: '2px' }}
+                      type="checkbox"
+                      checked={selectedSongs.includes(song.id)}
+                      onChange={() => handleSelectSong(song.id)}
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.title.length > 15 ? `${song.title.slice(0, 15)}...` : song.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.artist.length > 15 ? `${song.artist.slice(0, 15)}...` : song.artist}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.genre}</td>
@@ -106,6 +136,25 @@ function MainTable({
 
       {modalState.editSong && <SongFieldModal onClose={() => setModalState({ ...modalState, editSong: false })} onSongUpdated={refreshSongs} isOpen={modalState.editSong} song={modalState.currentSong} />}
 
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onEdit={() => {
+            handleEditSong(contextMenu.song.id);
+            setContextMenu(null);
+          }}
+          onDelete={() => {
+            handleDeleteSong(contextMenu.song.id);
+            setContextMenu(null);
+          }}
+          onAddToSetlist={() => {
+            onAddToSetlist([contextMenu.song.id]);
+            setContextMenu(null);
+          }}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div >
   );
 }
