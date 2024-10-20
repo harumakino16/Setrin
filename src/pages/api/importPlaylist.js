@@ -45,11 +45,25 @@ export default async function handler(req, res) {
                 maxResults: 50,
             });
 
-            if (!response.data.items) {
+            let nextPageToken = response.data.nextPageToken;
+            let allItems = response.data.items;
+
+            while (nextPageToken) {
+                const nextResponse = await youtube.playlistItems.list({
+                    part: 'snippet',
+                    playlistId: playlistId,
+                    maxResults: 50,
+                    pageToken: nextPageToken,
+                });
+                allItems = allItems.concat(nextResponse.data.items);
+                nextPageToken = nextResponse.data.nextPageToken;
+            }
+
+            if (!allItems || allItems.length === 0) {
                 throw new Error('再生リストにアイテムが見つかりませんでした');
             }
 
-            const songs = response.data.items.map(item => ({
+            const songs = allItems.map(item => ({
                 title: item.snippet.title,
                 artist: item.snippet.videoOwnerChannelTitle,
                 youtubeUrl: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,

@@ -21,12 +21,14 @@ const YoutubePlaylistModal = ({ onClose }) => {
     const [editedTags, setEditedTags] = useState("");
     const [editedGenre, setEditedGenre] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isImporting, setIsImporting] = useState(false);
 
 
 
     const handleImport = async () => {
         try {
             setLoading(true);
+            setIsImporting(true);
             const response = await fetch('/api/importPlaylist', {
                 method: 'POST',
                 headers: {
@@ -43,10 +45,10 @@ const YoutubePlaylistModal = ({ onClose }) => {
             setImportedSongs(data.items);
             setMessageInfo({ message: '再生リストがインポートされました', type: 'success' });
         } catch (error) {
-            
             setMessageInfo({ message: '再生リストのインポートに失敗しました', type: 'error' });
         } finally {
             setLoading(false);
+            setIsImporting(false);
         }
     };
     
@@ -108,10 +110,20 @@ const YoutubePlaylistModal = ({ onClose }) => {
                         onChange={(e) => setPlaylistUrl(e.target.value)}
                         placeholder="再生リストのURLを入力"
                         className="border p-2 rounded w-full mb-4"
+                        disabled={isImporting}
                     />
-                    <button onClick={handleImport} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-                        {loading ? <LoadingIcon /> : 'インポート'}
+                    <button 
+                        onClick={handleImport} 
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+                        disabled={isImporting}
+                    >
+                        {isImporting ? <LoadingIcon /> : 'インポート'}
                     </button>
+                    {isImporting && (
+                        <div className="mt-4 text-center">
+                            <p>再生リストをインポート中です。しばらくお待ちください...</p>
+                        </div>
+                    )}
                 </>
             )}
             {importedSongs.length > 0 && (
