@@ -26,6 +26,7 @@ function MainTable({
   const [currentSongs, setCurrentSongs] = useState([]);
   const paginate = pageNumber => setCurrentPage(pageNumber);
   const [contextMenu, setContextMenu] = useState(null);
+  const [activeRow, setActiveRow] = useState(null); // 追加
 
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
@@ -34,14 +35,22 @@ function MainTable({
   }, [tableData, currentPage, recordsPerPage]);
 
   useEffect(() => {
-    const handleClickOutside = () => setContextMenu(null);
+    const handleClickOutside = () => {
+      setContextMenu(null);
+      setActiveRow(null); // 追加
+    };
     document.addEventListener('click', handleClickOutside);
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
 
-
+   // contextMenu が閉じられたときに activeRow をリセット
+   useEffect(() => {
+    if (!contextMenu) {
+      setActiveRow(null);
+    }
+  }, [contextMenu]);
 
   const handleEditSong = (songId) => {
     const songToEdit = songs.find(song => song.id === songId);
@@ -83,14 +92,17 @@ function MainTable({
               {currentSongs.map((song, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-gray-100 transition-colors duration-150 ease-in-out"
+                  className={`transition-colors duration-150 ease-in-out ${
+                    activeRow === song.id ? 'bg-gray-100' : 'hover:bg-gray-100'
+                  }`}
                   onContextMenu={(e) => {
                     e.preventDefault();
                     setContextMenu({
-                      x: e.clientX,
-                      y: e.clientY,
+                      x: e.pageX,
+                      y: e.pageY,
                       song: song
                     });
+                    setActiveRow(song.id);
                   }}
                 >
                   <td className="px-3 py-3 whitespace-nowrap">
@@ -155,7 +167,7 @@ function MainTable({
           onClose={() => setContextMenu(null)}
         />
       )}
-    </div >
+    </div>
   );
 }
 
