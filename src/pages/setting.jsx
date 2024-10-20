@@ -135,22 +135,25 @@ function Settings() {
         }
 
         try {
+            const idToken = await currentUser.getIdToken();
             const response = await fetch('/api/unlinkYoutube', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
                 },
                 body: JSON.stringify({ uid: currentUser.uid })
             });
 
             if (!response.ok) {
-                throw new Error('YouTube連携の解除に失敗しました。');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'YouTube連携の解除に失敗しました。');
             }
 
             setMessageInfo({ message: 'YouTubeとの連携が解除されました。', type: 'success' });
         } catch (error) {
-            
-            setMessageInfo({ message: 'YouTube連携の解除に失敗しました。', type: 'error' });
+            console.error('YouTube連携解除エラー:', error);
+            setMessageInfo({ message: error.message, type: 'error' });
         }
     };
 

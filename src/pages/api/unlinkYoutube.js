@@ -1,9 +1,4 @@
-import { getFirestore, doc, updateDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../../../firebaseConfig';
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { adminDB } from '@/lib/firebaseAdmin';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -17,14 +12,14 @@ export default async function handler(req, res) {
     }
 
     try {
-        const userRef = doc(db, 'users', uid);
-        await updateDoc(userRef, {
+        const userRef = adminDB.collection('users').doc(uid);
+        await userRef.update({
             youtubeRefreshToken: null
         });
 
         res.status(200).json({ message: 'YouTube連携が解除されました。' });
     } catch (error) {
-        
-        res.status(500).json({ message: 'YouTube連携の解除に失敗しました。' });
+        console.error('YouTube連携解除エラー:', error);
+        res.status(500).json({ message: 'YouTube連携の解除に失敗しました。', error: error.message });
     }
 }
