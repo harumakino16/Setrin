@@ -70,13 +70,14 @@ function Settings() {
             });
 
             if (!saveResponse.ok) {
-                throw new Error('Firestoreへの保存に失敗しました。');
+                const errorData = await saveResponse.json();
+                throw new Error(`Firestoreへの保存に失敗しました: ${errorData.message}`);
             }
 
             const saveResult = await saveResponse.json();
             setMessageInfo({ message: saveResult.message, type: 'success' });
         } catch (error) {
-            
+            console.error('エラー:', error);
             setMessageInfo({ message: error.message, type: 'error' });
         }
     }

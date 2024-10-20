@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
         res.status(200).json({ message: 'リフレッシュトークンが保存されました。' });
     } catch (error) {
-        
-        res.status(500).json({ message: `Firestoreへの保存に失敗しました: ${error.message}` });
+        console.error('Firestoreへの保存エラー:', error);
+        res.status(500).json({ message: `Firestoreへの保存に失敗しました: ${error.message}`, error: error.toString() });
     }
 }
