@@ -1,5 +1,4 @@
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
+import { adminDB } from '@/lib/firebaseAdmin';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -13,14 +12,17 @@ export default async function handler(req, res) {
     }
 
     try {
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {
-            youtubeRefreshToken: refreshToken
+        const userRef = adminDB.collection('users').doc(currentUser.uid);
+        await userRef.update({
+            youtubeRefreshToken: refreshToken,
         });
 
         res.status(200).json({ message: 'リフレッシュトークンが保存されました。' });
     } catch (error) {
         console.error('Firestoreへの保存エラー:', error);
-        res.status(500).json({ message: `Firestoreへの保存に失敗しました: ${error.message}`, error: error.toString() });
+        res.status(500).json({
+            message: `Firestoreへの保存に失敗しました: ${error.message}`,
+            error: error.toString(),
+        });
     }
 }
