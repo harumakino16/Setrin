@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             youtubeRefreshToken: refreshToken,
         });
 
-        res.status(200).json({ message: 'リフレッシュトークンが保存されました。' });
+        res.status(200).json({ message: '連携が完了しました' });
     } catch (error) {
         console.error('Firestoreへの保存エラー:', error);
         res.status(500).json({
