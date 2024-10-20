@@ -129,20 +129,23 @@ function Settings() {
     };
 
     const handleUnlinkYoutube = async () => {
-        if (!currentUser) {
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (!user) {
             alert('ログインしていないため、連携を解除できません。');
             return;
         }
 
         try {
-            const idToken = await currentUser.getIdToken();
+            const idToken = await user.getIdToken();
             const response = await fetch('/api/unlinkYoutube', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${idToken}`
                 },
-                body: JSON.stringify({ uid: currentUser.uid })
+                body: JSON.stringify({ uid: user.uid })
             });
 
             if (!response.ok) {
@@ -153,7 +156,7 @@ function Settings() {
             setMessageInfo({ message: 'YouTubeとの連携が解除されました。', type: 'success' });
         } catch (error) {
             console.error('YouTube連携解除エラー:', error);
-            setMessageInfo({ message: error.message, type: 'error' });
+            setMessageInfo({ message: `エラー: ${error.message}`, type: 'error' });
         }
     };
 
