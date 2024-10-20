@@ -1,12 +1,11 @@
+// SearchForm.jsx
 import { useState, useEffect } from 'react';
 import { GoChevronDown, GoChevronUp } from 'react-icons/go'; // ReactIconのインポート
 import { useSongs } from '../context/SongsContext';
 
-
 const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearchCriteria, isRandomSetlist }) => {
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const { songs } = useSongs();
-
 
     const searchSongs = async (searchCriteria) => {
         let songsData = songs;
@@ -63,8 +62,8 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
     };
 
     useEffect(() => {
-        searchSongs({}); // 初期状態で全曲を検索
-    }, [songs]);
+        searchSongs(searchCriteria); // 現在の検索条件を使用
+    }, [songs, searchCriteria]);
 
     const handleCriteriaChange = (field, value) => {
         setSearchCriteria(prev => {
@@ -130,7 +129,7 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default SearchForm;

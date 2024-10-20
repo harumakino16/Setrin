@@ -1,3 +1,5 @@
+// index.jsx
+
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
@@ -13,7 +15,6 @@ import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフッ
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
 import LoginFormModal from "@/components/LoginFormModal";
 
-
 export default function Home() {
   const [modalState, setModalState] = useState({
     addSong: false,
@@ -22,7 +23,6 @@ export default function Home() {
     currentSong: null,
     addSongsInSetlist: false
   });
-
 
   const { currentUser } = useContext(AuthContext);
   const { songs } = useSongs();
@@ -34,15 +34,15 @@ export default function Home() {
   const { setMessageInfo } = useMessage();
   const [tableData, setTableData] = useState([]);
 
-  // 最初のロード時は全ての曲を取得する
+  // 初期状態では、全曲をテーブルに表示
   useEffect(() => {
     setTableData(songs);
   }, []);
 
-  // songs ステートが更新されるたびに実行されます。
-  useEffect(() => {
-    setTableData(songs);
-  }, [songs]);
+  // この useEffect を削除またはコメントアウトします
+  // useEffect(() => {
+  //   setTableData(songs);
+  // }, [songs]);
 
   const handleSearchResults = (results) => {
     setTableData(results);
