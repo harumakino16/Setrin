@@ -154,7 +154,7 @@ export default function Home() {
   const headers = [
     { label: "曲名", key: "title" },
     { label: "アーティスト", key: "artist" },
-    { label: "カラオケ音源のYoutubeURL", key: "youtubeUrl" },
+    { label: "YouTube", key: "youtubeUrl" },
     { label: "ジャンル", key: "genre" },
     { label: "タグ1", key: "tag1" },
     { label: "タグ2", key: "tag2" },

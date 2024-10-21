@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import SongFieldModal from './SongFieldModal';
 import { useSongs } from '../context/SongsContext';
 import ContextMenu from './ContextMenu';
@@ -78,8 +78,15 @@ function MainTable({
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
-                {["曲名", "アーティスト", "ジャンル", "タグ", "カラオケ音源のYoutubeURL", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ minWidth: ["150px", "100px", "110px", "100px", "200px", "120px", "110px", "100px", "120px"][index] }} onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "singingCount", "skillLevel", "memo", ""][index])}>
+                {["曲名", "アーティスト", "ジャンル", "タグ", "YouTube", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
+                  <th 
+                    key={header} 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" 
+                    style={{ 
+                      minWidth: index === 0 || index === 1 ? "200px" : ["110px", "100px", "120px", "120px", "110px", "100px", "120px"][index - 2] 
+                    }} 
+                    onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "singingCount", "skillLevel", "memo", ""][index])}
+                  >
                     <span className="cursor-pointer">
                       {header}
                       <FontAwesomeIcon icon={faSort} className="ml-2" />
@@ -114,12 +121,22 @@ function MainTable({
                       onChange={() => handleSelectSong(song.id)}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.title.length > 15 ? `${song.title.slice(0, 15)}...` : song.title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.artist.length > 15 ? `${song.artist.slice(0, 15)}...` : song.artist}</td>
+                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                    <div className="truncate">{song.title}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                    <div className="truncate">{song.artist}</div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.genre}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.tags.join(", ")}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {song.youtubeUrl ? <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-800">リンク</a> : "未登録"}
+                    {song.youtubeUrl ? (
+                      <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:text-red-700">
+                        <FontAwesomeIcon icon={faYoutube} size="lg" />
+                      </a>
+                    ) : (
+                      "未登録"
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.singingCount}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>

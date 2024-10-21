@@ -110,10 +110,6 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
 
     preview(drop(ref));
 
-    const truncateText = (text, maxLength) => {
-      return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-    };
-
     return (
       <tr ref={ref} style={{ opacity: isDragging ? 0 : 1 }} className="bg-white">
         <td className="border px-4 py-2">
@@ -122,18 +118,19 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
           </div>
         </td>
         <td className="border px-4 py-2">{index + 1}</td>
-        <td className="border px-4 py-2">{truncateText(song.title, 15)}</td>
-        <td className="border px-4 py-2">{truncateText(song.artist, 15)}</td>
+        <td className="border px-4 py-2 max-w-xs">
+          <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+            <div className="truncate">{song.title}</div>
+          </a>
+        </td>
+        <td className="border px-4 py-2 max-w-xs">
+          <div className="truncate">{song.artist}</div>
+        </td>
         <td className="border px-4 py-2">{song.genre}</td>
         <td className="border px-4 py-2">{song.tags.join(', ')}</td>
         <td className="border px-4 py-2">{song.singingCount}</td>
         <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
         <td className="border px-4 py-2">{song.memo}</td>
-        <td className="border px-4 py-2">
-          <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-            {song.youtubeUrl}
-          </a>
-        </td>
         <td className="border px-4 py-2">
           <button onClick={() => onDelete(song.id)} className="text-red-500 hover:text-red-7000">
             削除
@@ -157,7 +154,6 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
             <th className="px-4 py-2">歌唱回数</th>
             <th className="px-4 py-2">熟練度</th>
             <th className="px-4 py-2">備考</th>
-            <th className="px-4 py-2">URL</th>
             <th className="px-4 py-2">削除</th>
           </tr>
         </thead>
