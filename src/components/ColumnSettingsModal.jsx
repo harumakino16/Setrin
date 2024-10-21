@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from './Modal';
+import Modal from '@/components/modal';
 
 const ColumnSettingsModal = ({ isOpen, onClose, visibleColumns, toggleColumnVisibility }) => {
   return (

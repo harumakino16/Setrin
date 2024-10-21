@@ -5,7 +5,6 @@ import SongFieldModal from './SongFieldModal';
 import { useSongs } from '../context/SongsContext';
 import ContextMenu from './ContextMenu';
 import ColumnSettingsModal from './ColumnSettingsModal';
-import { FaPen } from 'react-icons/fa';
 
 function MainTable({
   selectAll,
