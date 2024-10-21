@@ -89,12 +89,13 @@ const SetlistDetail = () => {
             const { accessToken } = await refreshTokenResponse.json();
 
             const videoUrls = songs.map(song => song.youtubeUrl);
+            const songTitles = songs.map(song => song.title);
             const response = await fetch('/api/createPlaylist', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: accessToken, videoUrls, setlistName }),
+                body: JSON.stringify({ token: accessToken, videoUrls, songTitles, setlistName }),
             });
 
             if (!response.ok) {

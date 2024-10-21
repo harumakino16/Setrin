@@ -3,7 +3,7 @@ import { google } from 'googleapis';
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         try {
-            const { token, videoUrls, setlistName } = req.body;
+            const { token, videoUrls, songTitles, setlistName } = req.body;
 
             if (!token) {
                 return res.status(400).json({ message: 'アクセストークンが必要です。(YouTube連携が必要です)' });
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
                 // エラーがある場合は、プレイリストを作成せずにエラーを返す
                 if (errorVideos.length > 0) {
-                    const errorMessage = `以下の動画が見つからないか非公開のため、再生リストの作成を中止しました：\n${errorVideos.map(v => `${v.index}番目の動画 (ID: ${v.videoId})`).join('\n')}`;
+                    const errorMessage = `以下の曲が見つからないか非公開のため、再生リストの作成を中止しました：\n${errorVideos.map(v => `${v.index}番目の曲: ${songTitles[v.index - 1]}`).join('\n')}`;
                     return res.status(400).json({ message: errorMessage });
                 }
 
