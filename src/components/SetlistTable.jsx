@@ -6,7 +6,7 @@ import { useMessage } from "@/context/MessageContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 
-const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
+const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, visibleColumns, setVisibleColumns }) => {
   const [isDragged, setIsDragged] = useState(false);
   const { setMessageInfo } = useMessage();
 
@@ -149,37 +149,55 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
             <FontAwesomeIcon icon={faBars} />
           </div>
         </td>
-        <td className="border px-4 py-2">{index + 1}</td>
-        <td className="border px-4 py-2 max-w-xs">
-          <a
-            href={song.youtubeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline"
-          >
-            <div className="truncate">{song.title}</div>
-          </a>
-        </td>
-        <td className="border px-4 py-2 max-w-xs">
-          <div className="truncate">{song.artist}</div>
-        </td>
-        <td className="border px-4 py-2 max-w-xs">
-          <div className="truncate">{song.genre}</div>
-        </td>
-        <td className="border px-4 py-2 max-w-xs">
-          <div className="truncate">{song.tags.join(', ')}</div>
-        </td>
-        <td className="border px-4 py-2">{song.singingCount}</td>
-        <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
-        <td className="border px-4 py-2">{song.memo}</td>
-        <td className="border px-4 py-2">
-          <button
-            onClick={() => onDelete(song.id)}
-            className="text-red-500 hover:text-red-700"
-          >
-            削除
-          </button>
-        </td>
+        {visibleColumns.order.visible && (
+          <td className="border px-4 py-2">{index + 1}</td>
+        )}
+        {visibleColumns.title.visible && (
+          <td className="border px-4 py-2 max-w-xs">
+            <a
+              href={song.youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              <div className="truncate">{song.title}</div>
+            </a>
+          </td>
+        )}
+        {visibleColumns.artist.visible && (
+          <td className="border px-4 py-2 max-w-xs">
+            <div className="truncate">{song.artist}</div>
+          </td>
+        )}
+        {visibleColumns.genre.visible && (
+          <td className="border px-4 py-2 max-w-xs">
+            <div className="truncate">{song.genre}</div>
+          </td>
+        )}
+        {visibleColumns.tags.visible && (
+          <td className="border px-4 py-2 max-w-xs">
+            <div className="truncate">{song.tags.join(', ')}</div>
+          </td>
+        )}
+        {visibleColumns.singingCount.visible && (
+          <td className="border px-4 py-2">{song.singingCount}</td>
+        )}
+        {visibleColumns.skillLevel.visible && (
+          <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
+        )}
+        {visibleColumns.memo.visible && (
+          <td className="border px-4 py-2">{song.memo}</td>
+        )}
+        {visibleColumns.delete.visible && (
+          <td className="border px-4 py-2">
+            <button
+              onClick={() => onDelete(song.id)}
+              className="text-red-500 hover:text-red-700"
+            >
+              削除
+            </button>
+          </td>
+        )}
       </tr>
     );
   };

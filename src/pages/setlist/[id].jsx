@@ -12,6 +12,9 @@ import { useSongs } from '@/context/SongsContext';
 import Loading from '@/components/loading'; // Loading コンポーネントをインポート
 import EditSetlistNameModal from '@/components/EditSetlistNameModal'; // Added import for EditSetlistNameModal
 import { FaPen } from 'react-icons/fa'; // ペンアイコンをインポート
+import ColumnSettingsModal from '@/components/ColumnSettingsModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
@@ -23,6 +26,18 @@ const SetlistDetail = () => {
     const [loading, setLoading] = useState(false); // ローディング状態を追加
     const [firstLoad, setFirstLoad] = useState(true);
     const [isEditOpen, setIsEditOpen] = useState(false); // Added state for edit modal
+    const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
+    const [visibleColumns, setVisibleColumns] = useState({
+        order: { label: '順番', visible: true, removable: false },
+        title: { label: '曲名', visible: true, removable: true },
+        artist: { label: 'アーティスト', visible: true, removable: true },
+        genre: { label: 'ジャンル', visible: true, removable: true },
+        tags: { label: 'タグ', visible: true, removable: true },
+        singingCount: { label: '歌唱回数', visible: true, removable: true },
+        skillLevel: { label: '熟練度', visible: true, removable: true },
+        memo: { label: '備考', visible: true, removable: true },
+        delete: { label: '削除', visible: true, removable: true }
+    });
 
     useEffect(() => {
         const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
@@ -53,6 +68,15 @@ const SetlistDetail = () => {
             fetchCurrentSongs();
         }
     }, [setlist, songs, router.query.id]); // Add router.query.id to dependencies
+
+    const toggleColumnVisibility = (columnKey) => {
+        if (visibleColumns[columnKey].removable) {
+            setVisibleColumns(prev => ({
+                ...prev,
+                [columnKey]: { ...prev[columnKey], visible: !prev[columnKey].visible }
+            }));
+        }
+    };
 
     async function createPlaylist(songs, setlistName) {
         setLoading(true); // ローディング開始
@@ -109,7 +133,7 @@ const SetlistDetail = () => {
             }
 
             const data = await response.json();
-            
+
             setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
         } catch (error) {
             setMessageInfo({ message: error.message, type: 'error' });
@@ -121,14 +145,15 @@ const SetlistDetail = () => {
     const handleOpenEditModal = () => setIsEditOpen(true); // Added function to open edit modal
     const handleCloseEditModal = () => setIsEditOpen(false); // Added function to close edit modal
 
+    const handleCloseColumnSettings = () => setIsColumnSettingsOpen(false);
+
     return (
         <div className="flex">
-            {/* <Sidebar /> */} {/* サイドバーを削除 */}
             <div className="flex-grow p-5 w-full">
                 <Link href="/setlist" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
                 <h1 className="text-3xl font-bold mb-4 text-gray-800">セットリスト詳細</h1>
                 {loading && (
-                    <Loading /> // ローィング表示
+                    <Loading />
                 )}
                 {setlist && (
                     <div className="bg-white p-6">
@@ -142,7 +167,9 @@ const SetlistDetail = () => {
                         <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
                         <p className="text-lg"><strong>曲数:</strong> {setlist.songIds ? setlist.songIds.length : 0}</p>
                         <div className="mt-4">
-                            <h2 className="text-xl font-bold">曲リスト</h2>
+                            <div className="flex justify-between items-center mb-2">
+
+                            </div>
                             {currentSongs.length === 0 ? (
                                 <div className="text-center">
                                     <p>このセットリストに曲はありません。</p>
@@ -155,13 +182,23 @@ const SetlistDetail = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <button
-                                        onClick={() => createPlaylist(currentSongs, setlist.name)}
-                                        disabled={!currentUser.youtubeRefreshToken || currentSongs.length === 0}
-                                        className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken || currentSongs.length === 0 ? ' bg-gray-300 cursor-not-allowed disabled' : ''}`}
-                                    >
-                                        YouTubeの再生リストに追加
-                                    </button>
+                                    <div className="flex space-x-2 justify-between">
+                                        <button
+                                            onClick={() => createPlaylist(currentSongs, setlist.name)}
+                                            disabled={!currentUser.youtubeRefreshToken || currentSongs.length === 0}
+                                            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken || currentSongs.length === 0 ? ' bg-gray-300 cursor-not-allowed disabled' : ''}`}
+                                        >
+                                            <FontAwesomeIcon icon={faYoutube} className="mr-2" />
+                                            YouTubeの再生リストに追加
+                                        </button>
+                                        <button
+                                            onClick={() => setIsColumnSettingsOpen(true)}
+                                            className="text-gray-500 py-2 px-4 rounded flex items-center"
+                                        >
+                                            <FaPen className="mr-2" />
+                                            列の表示
+                                        </button>
+                                    </div>
                                     {!currentUser.youtubeRefreshToken && (
                                         <Link href="/setting" className="text-blue-600 hover:text-blue-800 ml-4">
                                             Youtubeとリンクする(設定へ移動)
@@ -169,7 +206,7 @@ const SetlistDetail = () => {
                                     )}
                                     <div className="mt-4">
                                         <DndProvider backend={HTML5Backend}>
-                                            <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} setlist={setlist} setSetlist={setSetlist} currentUser={currentUser} router={router} />
+                                            <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} currentUser={currentUser} setlist={setlist} visibleColumns={visibleColumns} setVisibleColumns={toggleColumnVisibility} />
                                         </DndProvider>
                                     </div>
                                 </div>
@@ -193,12 +230,22 @@ const SetlistDetail = () => {
                         }}
                     />
                 )}
+                {isColumnSettingsOpen && (
+                    <ColumnSettingsModal
+                        isOpen={isColumnSettingsOpen}
+                        onClose={handleCloseColumnSettings}
+                        visibleColumns={visibleColumns}
+                        toggleColumnVisibility={toggleColumnVisibility}
+                    />
+                )}
             </div>
         </div>
     );
 };
 
 export default SetlistDetail;
+
+
 
 
 

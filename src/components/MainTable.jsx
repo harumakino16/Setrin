@@ -4,6 +4,8 @@ import { faSort, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import SongFieldModal from './SongFieldModal';
 import { useSongs } from '../context/SongsContext';
 import ContextMenu from './ContextMenu';
+import ColumnSettingsModal from './ColumnSettingsModal';
+import { FaPen } from 'react-icons/fa';
 
 function MainTable({
   selectAll,
@@ -30,6 +32,17 @@ function MainTable({
   const tableRef = useRef(null);
   const headerRefs = useRef([]);
   const [resizing, setResizing] = useState({ isResizing: false, index: null, startX: 0, startWidth: 0 });
+  const [visibleColumns, setVisibleColumns] = useState({
+    title: { label: '曲名', visible: true, removable: true },
+    artist: { label: 'アーティスト', visible: true, removable: true },
+    genre: { label: 'ジャンル', visible: true, removable: true },
+    tags: { label: 'タグ', visible: true, removable: true },
+    youtubeUrl: { label: 'YouTube', visible: true, removable: true },
+    singingCount: { label: '歌唱回数', visible: true, removable: true },
+    skillLevel: { label: '熟練度', visible: true, removable: true },
+    memo: { label: '備考', visible: true, removable: true },
+    actions: { label: '操作', visible: true, removable: true }
+  });
 
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
@@ -102,6 +115,15 @@ function MainTable({
     };
   }, [resizing]);
 
+  const toggleColumnVisibility = (columnKey) => {
+    if (visibleColumns[columnKey].removable) {
+      setVisibleColumns(prev => ({
+        ...prev,
+        [columnKey]: { ...prev[columnKey], visible: !prev[columnKey].visible }
+      }));
+    }
+  };
+
   return (
     <div>
       {currentSongs.length === 0 ? (
@@ -116,40 +138,41 @@ function MainTable({
           <table ref={tableRef} className="whitespace-nowrap w-full" style={{ tableLayout: 'fixed' }}>
             <colgroup>
               <col style={{ width: '50px' }} />
-              {["曲名", "アーティスト", "ジャンル", "タグ", "YouTube", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
-                <col key={index} style={{ width: columnWidths[index] || 'auto', minWidth: '100px' }} />
-              ))}
+              {Object.entries(visibleColumns).map(([key, { visible }]) =>
+                visible && <col key={key} style={{ width: columnWidths[key] || 'auto', minWidth: '100px' }} />
+              )}
             </colgroup>
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
-                {["曲名", "アーティスト", "ジャンル", "タグ", "YouTube", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
-                  <th
-                    ref={el => headerRefs.current[index] = el}
-                    key={header}
-                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative ${index < 8 ? 'border-r' : ''}`}
-                  >
-                    <span className="cursor-pointer">
-                      {header}
-                      <FontAwesomeIcon icon={faSort} className="ml-2" />
-                    </span>
-                    <div
-                      className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize"
-                      onMouseDown={(e) => handleMouseDown(e, index)}
-                    />
-                  </th>
-                ))}
+                {Object.entries(visibleColumns).map(([key, { label, visible }]) =>
+                  visible && (
+                    <th
+                      key={key}
+                      ref={el => headerRefs.current[key] = el}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative border-r"
+                    >
+                      <span className="cursor-pointer">
+                        {label}
+                        <FontAwesomeIcon icon={faSort} className="ml-2" />
+                      </span>
+                      <div
+                        className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize"
+                        onMouseDown={(e) => handleMouseDown(e, key)}
+                      />
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {currentSongs.map((song, index) => (
                 <tr
                   key={index}
-                  className={`transition-colors duration-150 ease-in-out ${
-                    activeRow === song.id ? 'bg-gray-100' : 'hover:bg-gray-100'
-                  }`}
+                  className={`transition-colors duration-150 ease-in-out ${activeRow === song.id ? 'bg-gray-100' : 'hover:bg-gray-100'
+                    }`}
                   onContextMenu={(e) => {
                     e.preventDefault();
                     setContextMenu({
@@ -169,34 +192,52 @@ function MainTable({
                       onChange={() => handleSelectSong(song.id)}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
-                    <div className="truncate">{song.title}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
-                    <div className="truncate">{song.artist}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
-                    <div className="truncate">{song.genre}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
-                    <div className="truncate">{song.tags.join(", ")}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {song.youtubeUrl ? (
-                      <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:text-red-700">
-                        <FontAwesomeIcon icon={faYoutube} size="lg" />
-                      </a>
-                    ) : (
-                      "未登録"
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.singingCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.memo}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button onClick={() => handleEditSong(song.id)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">編集</button>
-                    <button onClick={() => handleDeleteSong(song.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">削除</button>
-                  </td>
+                  {visibleColumns.title.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                      <div className="truncate">{song.title}</div>
+                    </td>
+                  )}
+                  {visibleColumns.artist.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                      <div className="truncate">{song.artist}</div>
+                    </td>
+                  )}
+                  {visibleColumns.genre.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                      <div className="truncate">{song.genre}</div>
+                    </td>
+                  )}
+                  {visibleColumns.tags.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                      <div className="truncate">{song.tags.join(", ")}</div>
+                    </td>
+                  )}
+                  {visibleColumns.youtubeUrl.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {song.youtubeUrl ? (
+                        <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:text-red-700">
+                          <FontAwesomeIcon icon={faYoutube} size="lg" />
+                        </a>
+                      ) : (
+                        "未登録"
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.singingCount.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap">{song.singingCount}</td>
+                  )}
+                  {visibleColumns.skillLevel.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>
+                  )}
+                  {visibleColumns.memo.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap">{song.memo}</td>
+                  )}
+                  {visibleColumns.actions.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button onClick={() => handleEditSong(song.id)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">編集</button>
+                      <button onClick={() => handleDeleteSong(song.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">削除</button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -235,6 +276,13 @@ function MainTable({
           onClose={() => setContextMenu(null)}
         />
       )}
+
+      <ColumnSettingsModal
+        isOpen={modalState.columnSettings}
+        onClose={() => setModalState(prev => ({ ...prev, columnSettings: false }))}
+        visibleColumns={visibleColumns}
+        toggleColumnVisibility={toggleColumnVisibility}
+      />
     </div>
   );
 }

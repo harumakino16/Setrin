@@ -14,6 +14,7 @@ import { useSongs } from '../context/SongsContext';
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
 import LoginFormModal from "@/components/LoginFormModal";
+import { FaPen } from 'react-icons/fa';
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -202,6 +203,13 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               曲を追加する
+            </button>
+            <button
+              onClick={() => setModalState(prev => ({ ...prev, columnSettings: true }))}
+              className="text-gray-500 py-2 px-4 rounded flex items-center"
+            >
+              <FaPen className="mr-2" />
+              列の表示
             </button>
           </div>
         </div>
