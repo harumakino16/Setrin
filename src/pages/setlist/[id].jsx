@@ -98,18 +98,20 @@ const SetlistDetail = () => {
             });
 
             if (!response.ok) {
-                
-                
-                setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
-                throw new Error('Failed to create playlist');
+                const errorData = await response.json();
+                if (response.status === 403 && errorData.message.includes('YouTubeアカウントが停止または削除されています')) {
+                    setMessageInfo({ message: 'YouTubeアカウントが停止または削除されています。設定ページでYouTube連携を解除し、有効なアカウントで再連携してください。', type: 'error' });
+                } else {
+                    setMessageInfo({ message: errorData.message, type: 'error' });
+                }
+                throw new Error(errorData.message);
             }
 
             const data = await response.json();
             
             setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
         } catch (error) {
-            
-            setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
+            setMessageInfo({ message: error.message, type: 'error' });
         } finally {
             setLoading(false); // ローディング終了
         }
