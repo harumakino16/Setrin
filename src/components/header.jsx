@@ -10,9 +10,8 @@ const Header = ({ toggleSidebar }) => {
                     <Image
                         src="/images/SetLink_white_trance (1000 x 300 px).png"
                         alt="SetLink Logo"
-                        width={150}
+                        width={190}
                         height={50}
-                        className="h-auto w-auto"
                     />
                 </Link>
                 <button className="md:hidden" onClick={toggleSidebar}>
