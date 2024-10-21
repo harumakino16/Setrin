@@ -3,6 +3,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { useMessage } from "@/context/MessageContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) => {
   const [isDragged, setIsDragged] = useState(false);
@@ -96,7 +98,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
       },
     });
 
-    const [{ isDragging }, drag] = useDrag({
+    const [{ isDragging }, drag, preview] = useDrag({
       type: 'row',
       item: () => {
         return { id: song.id, index };
@@ -106,14 +108,19 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
       }),
     });
 
-    drag(drop(ref));
+    preview(drop(ref));
 
     const truncateText = (text, maxLength) => {
       return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     };
 
     return (
-      <tr ref={ref} style={{ opacity: isDragging ? 0 : 1, cursor: 'grab' }} className="bg-white">
+      <tr ref={ref} style={{ opacity: isDragging ? 0 : 1 }} className="bg-white">
+        <td className="border px-4 py-2">
+          <div ref={drag} style={{ cursor: 'move' }}>
+            <FontAwesomeIcon icon={faBars} />
+          </div>
+        </td>
         <td className="border px-4 py-2">{index + 1}</td>
         <td className="border px-4 py-2">{truncateText(song.title, 15)}</td>
         <td className="border px-4 py-2">{truncateText(song.artist, 15)}</td>
@@ -141,6 +148,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist }) =
       <table className="whitespace-nowrap w-full">
         <thead className="bg-gray-200">
           <tr>
+            <th className="px-4 py-2"></th>
             <th className="px-4 py-2">順番</th>
             <th className="px-4 py-2">曲名</th>
             <th className="px-4 py-2">アーティスト</th>
