@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import SongFieldModal from './SongFieldModal';
@@ -20,13 +20,16 @@ function MainTable({
 }) {
   const { songs } = useSongs();
 
-
   const recordsPerPage = 30;
   const [currentPage, setCurrentPage] = useState(1);
   const [currentSongs, setCurrentSongs] = useState([]);
   const paginate = pageNumber => setCurrentPage(pageNumber);
   const [contextMenu, setContextMenu] = useState(null);
-  const [activeRow, setActiveRow] = useState(null); // 追加
+  const [activeRow, setActiveRow] = useState(null);
+  const [columnWidths, setColumnWidths] = useState({});
+  const tableRef = useRef(null);
+  const headerRefs = useRef([]);
+  const [resizing, setResizing] = useState({ isResizing: false, index: null, startX: 0, startWidth: 0 });
 
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
@@ -37,7 +40,7 @@ function MainTable({
   useEffect(() => {
     const handleClickOutside = () => {
       setContextMenu(null);
-      setActiveRow(null); // 追加
+      setActiveRow(null);
     };
     document.addEventListener('click', handleClickOutside);
     return () => {
@@ -45,8 +48,7 @@ function MainTable({
     };
   }, []);
 
-   // contextMenu が閉じられたときに activeRow をリセット
-   useEffect(() => {
+  useEffect(() => {
     if (!contextMenu) {
       setActiveRow(null);
     }
@@ -61,6 +63,45 @@ function MainTable({
     }));
   };
 
+  const handleMouseDown = (e, index) => {
+    e.preventDefault(); // テキスト選択を防止
+    const startX = e.pageX;
+    const headerCell = headerRefs.current[index];
+    const startWidth = headerCell.offsetWidth;
+
+    setResizing({
+      isResizing: true,
+      index,
+      startX,
+      startWidth,
+    });
+  };
+
+  useEffect(() => {
+    if (!resizing.isResizing) return;
+
+    const handleMouseMove = (e) => {
+      const deltaX = e.pageX - resizing.startX;
+      const newWidth = Math.max(resizing.startWidth + deltaX, 50); // 最小幅を50pxに設定
+      setColumnWidths(prev => ({
+        ...prev,
+        [resizing.index]: `${newWidth}px`,
+      }));
+    };
+
+    const handleMouseUp = () => {
+      setResizing({ isResizing: false, index: null, startX: 0, startWidth: 0 });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [resizing]);
+
   return (
     <div>
       {currentSongs.length === 0 ? (
@@ -72,25 +113,32 @@ function MainTable({
         </div>
       ) : (
         <div className="overflow-x-scroll">
-          <table className="whitespace-nowrap w-full">
+          <table ref={tableRef} className="whitespace-nowrap w-full" style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: '50px' }} />
+              {["曲名", "アーティスト", "ジャンル", "タグ", "YouTube", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
+                <col key={index} style={{ width: columnWidths[index] || 'auto', minWidth: '100px' }} />
+              ))}
+            </colgroup>
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
                 {["曲名", "アーティスト", "ジャンル", "タグ", "YouTube", "歌唱回数", "熟練度", "備考", "操作"].map((header, index) => (
-                  <th 
-                    key={header} 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" 
-                    style={{ 
-                      minWidth: index === 0 || index === 1 ? "200px" : ["110px", "100px", "120px", "120px", "110px", "100px", "120px"][index - 2] 
-                    }} 
-                    onClick={() => requestSort(["title", "artist", "tags", "genres", "youtubeUrl", "singingCount", "skillLevel", "memo", ""][index])}
+                  <th
+                    ref={el => headerRefs.current[index] = el}
+                    key={header}
+                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative ${index < 8 ? 'border-r' : ''}`}
                   >
                     <span className="cursor-pointer">
                       {header}
                       <FontAwesomeIcon icon={faSort} className="ml-2" />
                     </span>
+                    <div
+                      className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize"
+                      onMouseDown={(e) => handleMouseDown(e, index)}
+                    />
                   </th>
                 ))}
               </tr>
@@ -127,8 +175,12 @@ function MainTable({
                   <td className="px-6 py-4 whitespace-nowrap max-w-xs">
                     <div className="truncate">{song.artist}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.genre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{song.tags.join(", ")}</td>
+                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                    <div className="truncate">{song.genre}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap max-w-xs">
+                    <div className="truncate">{song.tags.join(", ")}</div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {song.youtubeUrl ? (
                       <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:text-red-700">
@@ -161,7 +213,6 @@ function MainTable({
           ))}
         </div>
       </div>
-
 
       {modalState.editSong && <SongFieldModal onClose={() => setModalState({ ...modalState, editSong: false })} onSongUpdated={refreshSongs} isOpen={modalState.editSong} song={modalState.currentSong} />}
 
