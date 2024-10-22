@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
@@ -30,8 +30,9 @@ function MainTable({
   const [contextMenu, setContextMenu] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   const [columnWidths, setColumnWidths] = useState({});
+  const [headerMinWidths, setHeaderMinWidths] = useState({});
   const tableRef = useRef(null);
-  const headerRefs = useRef([]);
+  const headerRefs = useRef({});
   const [resizing, setResizing] = useState({ isResizing: false, index: null, startX: 0, startWidth: 0 });
   const [visibleColumns, setVisibleColumns] = useState({
     title: { label: '曲名', visible: true, removable: true },
@@ -77,26 +78,42 @@ function MainTable({
     }));
   };
 
-  const handleMouseDown = (e, index) => {
+  const handleMouseDown = (e, key) => {
     e.preventDefault(); // テキスト選択を防止
     const startX = e.pageX;
-    const headerCell = headerRefs.current[index];
+    const headerCell = headerRefs.current[key];
     const startWidth = headerCell.offsetWidth;
 
     setResizing({
       isResizing: true,
-      index,
+      index: key,
       startX,
       startWidth,
     });
   };
+
+  useLayoutEffect(() => {
+    const newHeaderMinWidths = {};
+    Object.keys(visibleColumns).forEach((key) => {
+      const headerCell = headerRefs.current[key];
+      if (headerCell) {
+        const headerContent = headerCell.querySelector('.header-content');
+        if (headerContent) {
+          const minWidth = headerContent.offsetWidth + 20; // パディング分を追加
+          newHeaderMinWidths[key] = minWidth;
+        }
+      }
+    });
+    setHeaderMinWidths(newHeaderMinWidths);
+  }, [visibleColumns]);
 
   useEffect(() => {
     if (!resizing.isResizing) return;
 
     const handleMouseMove = (e) => {
       const deltaX = e.pageX - resizing.startX;
-      const newWidth = Math.max(resizing.startWidth + deltaX, 50); // 最小幅を50pxに設定
+      const minWidth = headerMinWidths[resizing.index] || 50;
+      const newWidth = Math.max(resizing.startWidth + deltaX, minWidth);
       setColumnWidths(prev => ({
         ...prev,
         [resizing.index]: `${newWidth}px`,
@@ -114,7 +131,7 @@ function MainTable({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [resizing]);
+  }, [resizing, headerMinWidths]);
 
   const toggleColumnVisibility = (columnKey) => {
     if (visibleColumns[columnKey].removable) {
@@ -140,7 +157,9 @@ function MainTable({
             <colgroup>
               <col style={{ width: '50px' }} />
               {Object.entries(visibleColumns).map(([key, { visible }]) =>
-                visible && <col key={key} style={{ width: columnWidths[key] || 'auto', minWidth: '100px' }} />
+                visible && (
+                  <col key={key} style={{ width: columnWidths[key] || 'auto', minWidth: `${headerMinWidths[key] || 100}px` }} />
+                )
               )}
             </colgroup>
             <thead className="bg-gray-50">
@@ -148,13 +167,14 @@ function MainTable({
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
-                {Object.entries(visibleColumns).map(([key, { label, visible }]) => 
+                {Object.entries(visibleColumns).map(([key, { label, visible }]) =>
                   visible && (
                     <th
+                      ref={el => { headerRefs.current[key] = el; }}
                       key={key}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative border-r"
                     >
-                      <div className="flex items-center cursor-pointer" onClick={() => requestSort(key)}>
+                      <div className="flex items-center cursor-pointer header-content" onClick={() => requestSort(key)}>
                         <span>{label}</span>
                         <FontAwesomeIcon
                           icon={
