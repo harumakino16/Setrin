@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faYoutube } from '@fortawesome/free-brands-svg-icons';
+import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import SongFieldModal from './SongFieldModal';
 import { useSongs } from '../context/SongsContext';
 import ContextMenu from './ContextMenu';
@@ -17,7 +18,8 @@ function MainTable({
   setModalState,
   modalState,
   refreshSongs,
-  onAddToSetlist
+  onAddToSetlist,
+  sortConfig
 }) {
   const { songs } = useSongs();
 
@@ -146,17 +148,25 @@ function MainTable({
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
-                {Object.entries(visibleColumns).map(([key, { label, visible }]) =>
+                {Object.entries(visibleColumns).map(([key, { label, visible }]) => 
                   visible && (
                     <th
                       key={key}
-                      ref={el => headerRefs.current[key] = el}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative border-r"
                     >
-                      <span className="cursor-pointer">
-                        {label}
-                        <FontAwesomeIcon icon={faSort} className="ml-2" />
-                      </span>
+                      <div className="flex items-center cursor-pointer" onClick={() => requestSort(key)}>
+                        <span>{label}</span>
+                        <FontAwesomeIcon
+                          icon={
+                            sortConfig.key === key
+                              ? sortConfig.direction === 'ascending'
+                                ? faSortUp
+                                : faSortDown
+                              : faSort
+                          }
+                          className="ml-2"
+                        />
+                      </div>
                       <div
                         className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize"
                         onMouseDown={(e) => handleMouseDown(e, key)}

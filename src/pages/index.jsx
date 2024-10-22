@@ -225,6 +225,7 @@ export default function Home() {
           modalState={modalState}
           tableData={tableData}
           onAddToSetlist={handleAddToSetlist}
+          sortConfig={sortConfig}
         />
 
         {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
