@@ -23,6 +23,6 @@ export const formatSongData = (song) => {
         singingCount: parseInt(song.singingCount, 10) || 0,
         skillLevel: parseInt(song.skillLevel, 10) || 0,
         memo: song.memo || '',
-        furigana: song.furigana || song.title, // フリガナが入力されていない場合のみ曲名を使用
+        furigana: song.furigana != null ? song.furigana : song.title, // 修正ポイント
     };
 };

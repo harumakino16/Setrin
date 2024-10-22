@@ -8,7 +8,7 @@ import { formatSongData } from '../utils/songUtils';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 const isKatakana = (str) => {
-  return /^[ァ-ヶー　]*$/.test(str);
+  return /^[ァ-ヶー　]*$/.test(str || '');
 };
 
 function SongModal({ isOpen, onClose, song }) {
@@ -21,17 +21,21 @@ function SongModal({ isOpen, onClose, song }) {
   const [singingCount, setSingingCount] = useState(isNewSong ? 0 : song.singingCount);
   const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel);
   const [memo, setMemo] = useState(isNewSong ? '' : song.memo);
-  const [furigana, setFurigana] = useState(isNewSong ? '' : song.furigana);
+  const [furigana, setFurigana] = useState(isNewSong ? '' : (song.furigana || ''));
   const [showDetails, setShowDetails] = useState(!isNewSong);
   const authContext = useContext(AuthContext);
   const { currentUser } = authContext || {};
   const { setMessageInfo } = useMessage();
+  const [furiganaError, setFuriganaError] = useState(false);
 
   const handleSaveSong = async () => {
-    if (!isKatakana(furigana)) {
+    if (furigana && !isKatakana(furigana)) {
+      setFuriganaError(true);
       setMessageInfo({ message: 'フリガナはカタカナのみで入力してください。', type: 'error' });
       return;
     }
+
+    setFuriganaError(false);
 
     try {
       const songData = formatSongData({
@@ -94,11 +98,12 @@ function SongModal({ isOpen, onClose, song }) {
                   onChange={(e) => {
                     const newValue = e.target.value;
                     setFurigana(newValue);
+                    setFuriganaError(newValue && !isKatakana(newValue));
                   }}
                   placeholder="曲名フリガナ（カタカナのみ）"
-                  className={`input bg-gray-100 p-3 rounded ${!isKatakana(furigana) && furigana !== '' ? 'border-red-500' : ''}`}
+                  className={`input bg-gray-100 p-3 w-full rounded ${furiganaError ? 'border-red-500' : ''}`}
                 />
-                {!isKatakana(furigana) && furigana !== '' && (
+                {furiganaError && (
                   <p className="text-red-500 text-sm mt-1">フリガナはカタカナのみで入力してください</p>
                 )}
               </div>
