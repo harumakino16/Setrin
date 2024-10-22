@@ -73,7 +73,7 @@ function SongModal({ isOpen, onClose, song }) {
 
   return (
     <Container isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col space-y-3">
+      <div className="flex flex-col space-y-3 md:w-[500px]">
         <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
         <div className="flex flex-col space-y-3">
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
