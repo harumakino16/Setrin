@@ -7,6 +7,10 @@ import { useMessage } from '../context/MessageContext';
 import { formatSongData } from '../utils/songUtils';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
+const isKatakana = (str) => {
+  return /^[ァ-ヶー　]*$/.test(str);
+};
+
 function SongModal({ isOpen, onClose, song }) {
   const isNewSong = !song;
   const [title, setTitle] = useState(isNewSong ? '' : song.title);
@@ -24,6 +28,11 @@ function SongModal({ isOpen, onClose, song }) {
   const { setMessageInfo } = useMessage();
 
   const handleSaveSong = async () => {
+    if (!isKatakana(furigana)) {
+      setMessageInfo({ message: 'フリガナはカタカナのみで入力してください。', type: 'error' });
+      return;
+    }
+
     try {
       const songData = formatSongData({
         title,
@@ -78,7 +87,21 @@ function SongModal({ isOpen, onClose, song }) {
           )}
           {(!isNewSong || showDetails) && (
             <>
-              <input type="text" value={furigana} onChange={(e) => setFurigana(e.target.value)} placeholder="曲名フリガナ（オプション）" className="input bg-gray-100 p-3 rounded" />
+              <div>
+                <input
+                  type="text"
+                  value={furigana}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setFurigana(newValue);
+                  }}
+                  placeholder="曲名フリガナ（カタカナのみ）"
+                  className={`input bg-gray-100 p-3 rounded ${!isKatakana(furigana) && furigana !== '' ? 'border-red-500' : ''}`}
+                />
+                {!isKatakana(furigana) && furigana !== '' && (
+                  <p className="text-red-500 text-sm mt-1">フリガナはカタカナのみで入力してください</p>
+                )}
+              </div>
               <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="タグ (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
               <input type="text" value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="ジャンル" className="input bg-gray-100 p-3 rounded" />
               <div>歌唱回数</div>

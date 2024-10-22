@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { GoChevronDown, GoChevronUp } from 'react-icons/go'; // ReactIconのインポート
 import { useSongs } from '../context/SongsContext';
+import { convertKanaToHira, convertHiraToKana } from '../utils/stringUtils';
 
 const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearchCriteria, isRandomSetlist }) => {
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -12,14 +13,15 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
         if (searchCriteria.freeKeyword) {
             const keywordLower = searchCriteria.freeKeyword.toLowerCase();
+            const keywordHira = convertKanaToHira(keywordLower);
             songsData = songsData.filter(song =>
                 song.title.toLowerCase().includes(keywordLower) ||
                 song.artist.toLowerCase().includes(keywordLower) ||
-                song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) || // タグの検索を修正
+                song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) ||
                 song.genre.toLowerCase().includes(keywordLower) ||
                 song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
-                song.memo.toLowerCase().includes(keywordLower) ||
-                song.furigana.toLowerCase().includes(keywordLower)
+                (song.memo && song.memo.toLowerCase().includes(keywordLower)) ||
+                (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
         }
 
