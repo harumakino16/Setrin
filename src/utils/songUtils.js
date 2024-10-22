@@ -1,4 +1,4 @@
-export const formatSongData = (song) => {
+export const formatSongData = (song, isNewSong = false) => {
     if (!song.title || song.title.trim() === '') {
         throw new Error('曲名は必須です。');
     }
@@ -23,6 +23,8 @@ export const formatSongData = (song) => {
         singingCount: parseInt(song.singingCount, 10) || 0,
         skillLevel: parseInt(song.skillLevel, 10) || 0,
         memo: song.memo || '',
-        furigana: song.furigana != null ? song.furigana : song.title, // 修正ポイント
+        furigana: song.furigana != null ? song.furigana : song.title,
+        createdAt: isNewSong ? new Date() : song.createdAt,
+        updatedAt: new Date(),
     };
 };

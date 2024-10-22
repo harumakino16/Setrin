@@ -47,8 +47,9 @@ function SongModal({ isOpen, onClose, song }) {
         singingCount,
         skillLevel,
         memo,
-        furigana
-      });
+        furigana,
+        createdAt: isNewSong ? new Date() : song.createdAt,
+      }, isNewSong);
 
       try {
         if (isNewSong) {
