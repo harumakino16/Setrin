@@ -18,7 +18,8 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                 song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) || // タグの検索を修正
                 song.genre.toLowerCase().includes(keywordLower) ||
                 song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
-                song.memo.toLowerCase().includes(keywordLower)
+                song.memo.toLowerCase().includes(keywordLower) ||
+                song.furigana.toLowerCase().includes(keywordLower)
             );
         }
 

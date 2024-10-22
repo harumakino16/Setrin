@@ -16,13 +16,13 @@ export const formatSongData = (song) => {
 
     return {
         title: song.title,
-        artist: song.artist || '未設定', // デフォルト値を設定
+        artist: song.artist || '未設定',
         tags: tags,
         genre: song.genre,
         youtubeUrl: song.youtubeUrl,
         singingCount: parseInt(song.singingCount, 10) || 0,
         skillLevel: parseInt(song.skillLevel, 10) || 0,
-        memo: song.memo || ''
+        memo: song.memo || '',
+        furigana: song.furigana || song.title, // フリガナが入力されていない場合のみ曲名を使用
     };
 };
-

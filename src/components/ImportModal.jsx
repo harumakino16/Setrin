@@ -11,6 +11,7 @@ const ImportModal = ({ onClose }) => {
     const [file, setFile] = useState(null);
     const [importMode, setImportMode] = useState('replace');
     const { currentUser } = useContext(AuthContext);
+    const [fileName, setFileName] = useState('');
 
     const { setMessageInfo } = useMessage();
 
@@ -19,20 +20,24 @@ const ImportModal = ({ onClose }) => {
         const selectedFile = event.target.files[0];
         if (selectedFile && selectedFile.type === "text/csv") {
             setFile(selectedFile);
+            setFileName(selectedFile.name);
             document.getElementById('drop-zone-text').textContent = 'ファイルが選択されました: ' + selectedFile.name;
+            event.target.style.display = 'none'; // ファイル選択ボタンを非表示にする
         } else {
-            alert('CSVファイルのみが許可されています。');
+            setMessageInfo({ message: 'CSVファイルのみが許可されています。', type: 'error' });
         }
     };
 
     const handleDrop = (event) => {
         event.preventDefault();
-        const droppedFile = event.dataTransfer.items[0].getAsFile();
+        const droppedFile = event.dataTransfer.files[0];
         if (droppedFile && droppedFile.type === "text/csv") {
             setFile(droppedFile);
+            setFileName(droppedFile.name);
             document.getElementById('drop-zone-text').textContent = 'ファイルがドロップされました: ' + droppedFile.name;
+            document.querySelector('input[type="file"]').style.display = 'none'; // ファイル選択ボタンを非表示にする
         } else {
-            alert('CSVファイルのみが許可されています。');
+            setMessageInfo({ message: 'CSVファイルのみが許可されています。', type: 'error' });
         }
     };
 
@@ -41,8 +46,8 @@ const ImportModal = ({ onClose }) => {
     };
 
     const csvSchema = {
-        headers: ["曲名", "アーティスト", "ジャンル", "タグ1", "タグ2", "タグ3", "カラオケ音源のYoutubeURL", "歌った回数", "熟練度", "備考"],
-        templateData: '曲名,アーティスト,ジャンル,タグ1,タグ2,タグ3,カラオケ音源のYoutubeURL,歌った回数,熟練度,備考\nサンプルです。,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
+        headers: ["曲名", "フリガナ", "アーティスト", "ジャンル", "タグ1", "タグ2", "タグ3", "カラオケ音源のYoutubeURL", "歌った回数", "熟練度", "備考"],
+        templateData: '曲名,フリガナ,アーティスト,ジャンル,タグ1,タグ2,タグ3,カラオケ音源のYoutubeURL,歌った回数,熟練度,備考\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
     };
 
     const updateDatabase = async (data, mode) => {
@@ -60,6 +65,7 @@ const ImportModal = ({ onClose }) => {
             const docRef = doc(songsRef);
             const songData = {
                 title: song['曲名'],
+                furigana: song['フリガナ'] || '',
                 artist: song['アーティスト'],
                 genre: song['ジャンル'],
                 tags: [song['タグ1'], song['タグ2'], song['タグ3']].filter(tag => tag.trim() !== ''), // 空のタグを除外
@@ -151,4 +157,3 @@ const ImportModal = ({ onClose }) => {
 };
 
 export default ImportModal;
-

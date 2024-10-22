@@ -138,7 +138,9 @@ export default function Home() {
       if (aIsNumber && bIsNumber) {
         return direction === 'ascending' ? aValue - bValue : bValue - aValue;
       }
-      return direction === 'ascending' ? String(aValue).localeCompare(String(bValue)) : String(bValue).localeCompare(String(aValue));
+      return direction === 'ascending' 
+        ? String(a.furigana || a.title).localeCompare(String(b.furigana || b.title))
+        : String(b.furigana || b.title).localeCompare(String(a.furigana || a.title));
     });
   };
 
@@ -154,6 +156,7 @@ export default function Home() {
 
   const headers = [
     { label: "曲名", key: "title" },
+    { label: "フリガナ", key: "furigana" },
     { label: "アーティスト", key: "artist" },
     { label: "YouTube", key: "youtubeUrl" },
     { label: "ジャンル", key: "genre" },
@@ -170,6 +173,7 @@ export default function Home() {
     headers: headers,
     data: tableData.map(song => ({
       ...song,
+      furigana: song.furigana || '',
       tag1: song.tags[0] || '',
       tag2: song.tags[1] || '',
       tag3: song.tags[2] || ''

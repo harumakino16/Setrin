@@ -17,6 +17,7 @@ function SongModal({ isOpen, onClose, song }) {
   const [singingCount, setsingingCount] = useState(isNewSong ? 0 : song.singingCount);
   const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel); // 熟練度の状態を追加
   const [memo, setMemo] = useState(isNewSong ? '' : song.memo); // 備考の状態を追加
+  const [furigana, setFurigana] = useState(isNewSong ? '' : song.furigana);
   const authContext = useContext(AuthContext);
   const { currentUser } = authContext || {};
   const { setMessageInfo } = useMessage();
@@ -32,7 +33,8 @@ function SongModal({ isOpen, onClose, song }) {
         youtubeUrl,
         singingCount,
         skillLevel,
-        memo
+        memo,
+        furigana
       });
 
 
@@ -76,6 +78,7 @@ function SongModal({ isOpen, onClose, song }) {
           <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" />
           <div>備考</div>
           <textarea value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="備考" className="input bg-gray-100 p-3 rounded"></textarea>
+          <input type="text" value={furigana} onChange={(e) => setFurigana(e.target.value)} placeholder="曲名フリガナ（オプション）" className="input bg-gray-100 p-3 rounded" />
         </div>
         <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
       </div>
