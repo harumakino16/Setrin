@@ -1,32 +1,30 @@
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 
-const updateSongDates = async (userId) => {
-  const songsRef = collection(db, 'users', userId, 'Songs');
-  const snapshot = await getDocs(songsRef);
-
-  const batch = writeBatch(db);
-
-  snapshot.forEach((doc) => {
-    const songRef = doc.ref;
-    const songData = doc.data();
-
-    if (!songData.createdAt) {
-      batch.update(songRef, {
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-    } else if (!songData.updatedAt) {
-      batch.update(songRef, {
-        updatedAt: serverTimestamp()
-      });
+export default async function updateSongDates(userId) {
+  try {
+    const response = await fetch('../api/updateSongDates', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update song dates');
     }
-  });
-
-  await batch.commit();
-  console.log('全ての曲のデータが更新されました。');
-};
+    const result = await response.json();
+    console.log(result.message);
+    return result;
+  } catch (error) {
+    console.error('曲のデータの更新に失敗しました。', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
+    throw error;
+  }
+}
 
 // 使用例
 // updateSongDates('ユーザーID');
-
