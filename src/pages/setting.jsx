@@ -96,9 +96,9 @@ function Settings() {
                 displayName: displayName,
                 theme: selectedTheme, // 追加
             });
-            setMessageInfo({ message: 'プロファイルが更新��れました。', type: 'success' });
+            setMessageInfo({ message: '設定が更新されました。', type: 'success' });
         } catch (error) {
-            setMessageInfo({ message: 'プロファイルの更新に失敗しました。', type: 'error' });
+            setMessageInfo({ message: '設定の更新に失敗しました。', type: 'error' });
         }
     };
 
