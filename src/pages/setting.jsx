@@ -9,7 +9,7 @@ import youtubeIcon from '../../public/images/youtube_social_icon_red.png';
 import { useMessage } from '@/context/MessageContext';
 import Loading from '@/components/loading';
 import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider } from 'firebase/auth';
-
+import { useTheme } from '@/context/ThemeContext';
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
@@ -18,7 +18,7 @@ function Settings() {
     const [selectedTheme, setSelectedTheme] = useState(currentUser?.theme || 'pink');
     const router = useRouter();
     const { setMessageInfo } = useMessage();
-
+    const { theme } = useTheme();
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_YOUTUBE_SCOPE}&response_type=code&prompt=consent&access_type=offline`;
 
     useEffect(() => {
@@ -175,7 +175,7 @@ function Settings() {
                         <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                     </div>
                     <div className="mb-6">
-                        <label className="block mb-2 textwhite">テーマカラー:</label>
+                        <label className="block mb-2 text-gray-700">テーマカラー:</label>
                         <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
                             {[
                                 { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
@@ -230,7 +230,7 @@ function Settings() {
                         )}
                     </div>
                 </div>
-                <button onClick={handleUpdateProfile} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
                     更新
                 </button>
                 <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
