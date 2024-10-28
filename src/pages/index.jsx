@@ -15,7 +15,7 @@ import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフッ
 import AddSongModal from '@/components/AddSongModal'; // 新しいコンポーネントをインポート
 import LoginFormModal from "@/components/LoginFormModal";
 import { FaPen } from 'react-icons/fa';
-
+import { useTheme } from '@/context/ThemeContext';
 export default function Home() {
   const [modalState, setModalState] = useState({
     addSong: false,
@@ -34,6 +34,7 @@ export default function Home() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const { setMessageInfo } = useMessage();
   const [tableData, setTableData] = useState([]);
+  const { theme } = useTheme();
 
   // 初期状態では、全曲をテーブルに表示
   useEffect(() => {
@@ -193,7 +194,7 @@ export default function Home() {
           {selectedSongs.length > 0 ? (
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
               <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
-              <button onClick={() => toggleModal('addSongsInSetlist', true)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+              <button onClick={() => toggleModal('addSongsInSetlist', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
                 <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
               </button>
               <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
@@ -202,7 +203,7 @@ export default function Home() {
             </div>
           ) : (<div></div>)}
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <button onClick={() => toggleModal('addSong', true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow inline-flex items-center">
+            <button onClick={() => toggleModal('addSong', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}>
               <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -210,7 +211,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => setModalState(prev => ({ ...prev, columnSettings: true }))}
-              className="text-gray-500 py-2 px-4 rounded flex items-center"
+              className="text-gray-500 py-2 px-4 text-sm rounded flex items-center"
             >
               <FaPen className="mr-2" />
               列の表示

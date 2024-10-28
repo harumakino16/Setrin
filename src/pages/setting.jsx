@@ -15,6 +15,7 @@ function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
+    const [selectedTheme, setSelectedTheme] = useState(currentUser?.theme || 'pink');
     const router = useRouter();
     const { setMessageInfo } = useMessage();
 
@@ -93,11 +94,11 @@ function Settings() {
             await updateDoc(userRef, {
                 email: email,
                 displayName: displayName,
+                theme: selectedTheme, // 追加
             });
-            alert('プロファイルが更新されました。');
+            setMessageInfo({ message: 'プロファイルが更新��れました。', type: 'success' });
         } catch (error) {
-            
-            alert('プロファイルの更新に失敗しました。');
+            setMessageInfo({ message: 'プロファイルの更新に失敗しました。', type: 'error' });
         }
     };
 
@@ -173,9 +174,32 @@ function Settings() {
                         <label className="block mb-2 text-gray-700">表示名:</label>
                         <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                     </div>
+                    <div className="mb-6">
+                        <label className="block mb-2 textwhite">テーマカラー:</label>
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                            {[
+                                { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
+                                { name: 'blue', label: '水色', color: 'bg-customTheme-blue-primary' },
+                                { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
+                                { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
+                                { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
+                                { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' }
+                            ].map((theme) => (
+                                <button
+                                    key={theme.name}
+                                    onClick={() => setSelectedTheme(theme.name)}
+                                    className={`h-20 rounded-lg transition-transform ${theme.color} ${
+                                        selectedTheme === theme.name ? 'ring-4 ring-offset-2 ring-blue-500 scale-105' : ''
+                                    }`}
+                                >
+                                    <span className="block text-center text-sm mt-2 text-white">{theme.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                     <label className="block mb-2 text-gray-700">Youtubeとの連携:</label>
-                    <div className="bg-white shadow-md rounded px-5 py-3 flex justify-between items-center">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-white shadow-md rounded px-5 py-3 flex flex-col md:flex-row justify-between items-center">
+                        <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
                             <div className="flex items-center gap-4">
                                 <Image src={youtubeIcon} alt="Youtubeに接続" width={50} />
                                 <div className="flex flex-col">
@@ -189,18 +213,18 @@ function Settings() {
                                     ) : (
                                         <label className="text-red-500">未連携</label>
                                     )}
-                                    <div className=" text-gray-700 text-sm">
+                                    <div className="text-gray-700 text-sm">
                                         Youtubeと連携することで作成したセットリストをYoutubeの再生リストに追加することができます。
                                     </div>
                                 </div>
                             </div>
                         </div>
                         {currentUser.youtubeRefreshToken ? (
-                            <button onClick={handleUnlinkYoutube} className="mt-4 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            <button onClick={handleUnlinkYoutube} className="mt-4 md:mt-0 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                 解除する
                             </button>
                         ) : (
-                            <a href={authUrl} className="mt-4 block text-center">
+                            <a href={authUrl} className="mt-4 md:mt-0 block text-center">
                                 <Image src={googleIcon} alt="Youtubeに接続" width={180} />
                             </a>
                         )}

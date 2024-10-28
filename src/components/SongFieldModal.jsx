@@ -4,6 +4,7 @@ import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import Modal from './modal';
 import { useMessage } from '../context/MessageContext';
+import { useTheme } from '../context/ThemeContext';
 import { formatSongData } from '../utils/songUtils';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
@@ -26,6 +27,7 @@ function SongModal({ isOpen, onClose, song }) {
   const authContext = useContext(AuthContext);
   const { currentUser } = authContext || {};
   const { setMessageInfo } = useMessage();
+  const { theme } = useTheme();
   const [furiganaError, setFuriganaError] = useState(false);
 
   const handleSaveSong = async () => {
@@ -119,7 +121,7 @@ function SongModal({ isOpen, onClose, song }) {
             </>
           )}
         </div>
-        <button onClick={handleSaveSong} className="button bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded mt-3">{isNewSong ? '曲を追加する' : '編集完了'}</button>
+        <button onClick={handleSaveSong} className={`button bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold p-3 rounded mt-3`}>{isNewSong ? '曲を追加する' : '編集完了'}</button>
       </div>
     </Container>
   );

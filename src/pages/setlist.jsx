@@ -7,14 +7,14 @@ import Modal from '@/components/modal';
 import useSetlists from '@/hooks/fetchSetlists';
 import { db } from '../../firebaseConfig';
 import Loading from '@/components/loading';
-
+import { useTheme } from '@/context/ThemeContext';
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedSetlist, setSelectedSetlist] = useState(null);
   const { setlists, loading } = useSetlists();
-
+  const { theme } = useTheme();
   const router = useRouter();
 
   const handleOpenModal = () => setIsOpen(true);
@@ -56,7 +56,7 @@ export default function Setlist() {
       <div className="flex-grow p-4 md:p-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">セットリスト</h1>
-          <button onClick={handleOpenModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center mb-4 md:mb-0">
+          <button onClick={handleOpenModal} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center mb-4 md:mb-0`}>
             <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -69,7 +69,7 @@ export default function Setlist() {
           ) : setlists.length === 0 ? (
             <div className="text-center">
               <p className="text-gray-500">まだセットリストがありません</p>
-              <button onClick={handleOpenModal} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              <button onClick={handleOpenModal} className={`mt-4 bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
                 新しいセットリストを追加
               </button>
             </div>

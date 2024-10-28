@@ -6,6 +6,7 @@ import { db } from '../../firebaseConfig';
 import { collection, doc, writeBatch, getDocs } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
+import { useTheme } from '@/context/ThemeContext';
 
 const ImportModal = ({ onClose }) => {
     const [file, setFile] = useState(null);
@@ -14,7 +15,7 @@ const ImportModal = ({ onClose }) => {
     const [fileName, setFileName] = useState('');
 
     const { setMessageInfo } = useMessage();
-
+    const { theme } = useTheme();
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
@@ -122,7 +123,7 @@ const ImportModal = ({ onClose }) => {
         <div className="p-4 sm:p-6 lg:p-8">
             <div className="flex flex-col sm:flex-row justify-between items-center px-4 py-2">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4 sm:mb-0">CSVファイルをインポート</h3>
-                <button onClick={handleDownloadTemplate} className="flex items-center bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700">
+                <button onClick={handleDownloadTemplate} className={`flex items-center bg-customTheme-${theme}-primary text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-customTheme-${theme}-accent`}>
                     <FontAwesomeIcon icon={faFileDownload} className="mr-2" />
                     テンプレートファイル
                 </button>
@@ -148,7 +149,7 @@ const ImportModal = ({ onClose }) => {
                         既存の曲リストに追加する
                     </label>
                 </div>
-                <button onClick={handleImport} disabled={!file} className={`px-4 py-2 text-white text-base font-medium rounded-md w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-50 ${file ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-300'}`}>
+                <button onClick={handleImport} disabled={!file} className={`px-4 py-2 text-white text-base font-medium rounded-md w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-customTheme-${theme}-focus ${file ? `bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent` : 'bg-gray-300'}`}>
                     インポート
                 </button>
             </div>

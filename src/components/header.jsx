@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaBars } from 'react-icons/fa'; // ReactIconをインポート
-
+import { useTheme } from '../context/ThemeContext';
 const Header = ({ toggleSidebar }) => {
+    const { theme } = useTheme();
     return (
-        <header className="bg-blue-500 text-white fixed w-full z-50">
+        <header className={`bg-customTheme-${theme}-primary shadow-lg`}>
             <div className="container mx-auto flex justify-between items-center h-[60px]">
                 <Link href="/">
                     <Image
@@ -14,7 +15,7 @@ const Header = ({ toggleSidebar }) => {
                         height={50}
                     />
                 </Link>
-                <button className="md:hidden" onClick={toggleSidebar}>
+                <button className="md:hidden text-white" onClick={toggleSidebar}>
                     <FaBars size={24} />
                 </button>
             </div>

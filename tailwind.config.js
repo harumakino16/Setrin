@@ -52,6 +52,38 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        customTheme: {
+          pink: {
+            primary: '#FFB6C1',
+            secondary: '#FFE5EC',
+            accent: '#FF8DA1'
+          },
+          blue: {
+            primary: '#B6E0FF',
+            secondary: '#E5F3FF',
+            accent: '#8DCAFF'
+          },
+          yellow: {
+            primary: '#FFE5B6',
+            secondary: '#FFF8E5',
+            accent: '#FFD28D'
+          },
+          green: {
+            primary: '#B6FFBE',
+            secondary: '#E5FFE8',
+            accent: '#8DFF98'
+          },
+          orange: {
+            primary: '#FFCBB6',
+            secondary: '#FFE8E5',
+            accent: '#FFAD8D'
+          },
+          purple: {
+            primary: '#E6B6FF',
+            secondary: '#F5E5FF',
+            accent: '#D18DFF'
+          }
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -75,4 +107,10 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  safelist: [
+    {
+      pattern: /^(bg|border|text)-customTheme-(pink|blue|yellow|green|orange|purple)-(primary|secondary|accent)$/,
+      variants: ['hover'],
+    }
+  ],
 }

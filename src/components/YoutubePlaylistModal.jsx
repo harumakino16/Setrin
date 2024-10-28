@@ -6,6 +6,7 @@ import { AuthContext } from '@/context/AuthContext';
 import { formatSongData } from '../utils/songUtils';
 import Link from 'next/link';
 import LoadingIcon from './ui/loadingIcon';
+import { useTheme } from '@/context/ThemeContext';
 
 
 const YoutubePlaylistModal = ({ onClose }) => {
@@ -22,7 +23,7 @@ const YoutubePlaylistModal = ({ onClose }) => {
     const [editedGenre, setEditedGenre] = useState('');
     const [loading, setLoading] = useState(false);
     const [isImporting, setIsImporting] = useState(false);
-
+    const { theme } = useTheme();
 
 
     const handleImport = async () => {
@@ -123,8 +124,8 @@ const YoutubePlaylistModal = ({ onClose }) => {
                     />
                     <button 
                         onClick={handleImport} 
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-                        disabled={isImporting}
+                        className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded w-full ${isImporting || !playlistUrl ? 'bg-gray-300 hover:bg-gray-300 cursor-not-allowed' : ''}`}
+                        disabled={isImporting || !playlistUrl}
                     >
                         {isImporting ? <LoadingIcon /> : 'インポート'}
                     </button>

@@ -5,14 +5,14 @@ import { collection, getDocs, doc, writeBatch, getDoc, addDoc, serverTimestamp }
 import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useMessage } from '../context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
-
+import { useTheme } from '@/context/ThemeContext';
 function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser }) {
 
     const [selectedSetlists, setSelectedSetlists] = useState([]);
     const [newSetlistName, setNewSetlistName] = useState('');
     const { setMessageInfo } = useMessage();
     const { setlists } = fetchUsersSetlists(currentUser);
-
+    const { theme } = useTheme();
     const handleCheckboxChange = (setlistId) => {
         setSelectedSetlists(prev => {
             if (prev.includes(setlistId)) {

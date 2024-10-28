@@ -9,6 +9,7 @@ import Modal from '@/components/modal.jsx';
 import useSearchCriteria from '@/hooks/useSearchCriteria';
 import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useSongs } from '@/context/SongsContext'; // SongsContextからuseSongsをインポート
+import { useTheme } from '@/context/ThemeContext';
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
@@ -20,6 +21,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { setlists: existingSetlists } = fetchUsersSetlists(currentUser);
     const [activeTab, setActiveTab] = useState('random'); // タブの状態を管理
     const { songs } = useSongs(); // 全曲を取得するためにuseSongsを使用
+    const { theme } = useTheme();
 
     useEffect(() => {
         // コンポーネントのマウント時に全曲をsearchResultsに設定
@@ -71,17 +73,17 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
             <div className="flex flex-col gap-2 min-w-[300px] md:min-w-[600px]">
-                <h2 className="text-2xl font-bold text-blue-600 text-center">セトリを作る</h2>
+                <h2 className={`text-2xl font-bold text-customTheme-${theme}-primary text-center`}>セトリを作る</h2>
                 <div className="flex justify-center gap-4 mt-4 border-b">
                     <button
                         onClick={() => setActiveTab('random')}
-                        className={`py-2 px-4 ${activeTab === 'random' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+                        className={`py-2 px-4 ${activeTab === 'random' ? `border-b-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary` : 'text-gray-500'}`}
                     >
                         完全ランダムで作成
                     </button>
                     <button
                         onClick={() => setActiveTab('criteria')}
-                        className={`py-2 px-4 ${activeTab === 'criteria' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+                        className={`py-2 px-4 ${activeTab === 'criteria' ? `border-b-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary` : 'text-gray-500'}`}
                     >
                         条件を指定する
                     </button>
@@ -98,7 +100,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
                                 min="1"
                             />
                         </div>
-                        <button onClick={createRandomSetlist} className="mt-4 text-lg bg-blue-500 hover:bg-blue-700 text-white font-bold py-5 px-4 rounded w-full">
+                        <button onClick={createRandomSetlist} className={`mt-4 text-lg bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-5 px-4 rounded w-full`}>
                             ランダムセットリストを作成
                         </button>
                     </div>
@@ -126,7 +128,7 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
                                 max={searchResults.length}
                             />
                         </div>
-                        <button onClick={createRandomSetlist} className="mt-4 text-lg bg-blue-500 hover:bg-blue-700 text-white font-bold py-5 px-4 rounded">
+                        <button onClick={createRandomSetlist} className={`mt-4 text-lg bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-5 px-4 rounded w-full`}>
                             ランダムセットリストを作成
                         </button>
                     </>

@@ -6,6 +6,7 @@ import SongFieldModal from './SongFieldModal';
 import { useSongs } from '../context/SongsContext';
 import ContextMenu from './ContextMenu';
 import ColumnSettingsModal from './ColumnSettingsModal';
+import { useTheme } from '@/context/ThemeContext';
 
 function MainTable({
   selectAll,
@@ -22,7 +23,7 @@ function MainTable({
   sortConfig
 }) {
   const { songs } = useSongs();
-
+  const { theme } = useTheme();
   const recordsPerPage = 30;
   const [currentPage, setCurrentPage] = useState(1);
   const [currentSongs, setCurrentSongs] = useState([]);
@@ -147,7 +148,7 @@ function MainTable({
       {currentSongs.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-gray-500 mb-4">まだ曲が登録されていません</p>
-          <button onClick={() => setModalState({ ...modalState, addSong: true })} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button onClick={() => setModalState({ ...modalState, addSong: true })} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
             曲を追加する
           </button>
         </div>

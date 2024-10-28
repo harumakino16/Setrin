@@ -5,7 +5,7 @@ import MessageBox from "@/components/MessageBox";
 import { SongsProvider } from "@/context/SongsContext";
 import { Noto_Sans_JP } from "next/font/google";
 import Layout from "./layout";
-
+import { ThemeProvider } from "@/context/ThemeContext";
 const notoSansJP = Noto_Sans_JP({
   weight: ['400', '700'], // 必要なウェイトを指定
   subsets: ['latin'], // 必要なサブセットを指定
@@ -14,16 +14,18 @@ const notoSansJP = Noto_Sans_JP({
 export default function App({ Component, pageProps }) {
   return (
     <AuthProvider>
-      <MessageProvider>
-        <SongsProvider>
-          <div className={notoSansJP.className}>
-            <Layout>
-              <Component {...pageProps} />
-              <MessageBox />
-            </Layout>
-          </div>
-        </SongsProvider>
-      </MessageProvider>
+      <ThemeProvider>
+        <MessageProvider>
+          <SongsProvider>
+            <div className={notoSansJP.className}>
+              <Layout>
+                <Component {...pageProps} />
+                <MessageBox />
+              </Layout>
+            </div>
+          </SongsProvider>
+        </MessageProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -8,6 +8,7 @@ import { AuthContext } from '../context/AuthContext'; // AuthContextをインポ
 import useLogOut from '../hooks/logOut';
 import { useMessage } from '@/context/MessageContext';
 import CreateRandomSetlist from '@/components/CreateRandomSetlist'; // createsetlistをインポート
+import { useTheme } from '@/context/ThemeContext';
 
 
 
@@ -35,7 +36,7 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
     const logOut = useLogOut();
     const { setMessageInfo } = useMessage();
     const [showCreateSetlistModal, setShowCreateSetlistModal] = useState(false);
-
+    const { theme } = useTheme();
     const handleCreateSetlist = () => {
         setShowCreateSetlistModal(true);
     };
@@ -64,7 +65,7 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
                     </ul>
                 </div>
                 <div className="mt-4 px-6">
-                    <button onClick={handleCreateSetlist} className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full">
+                    <button onClick={handleCreateSetlist} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full`}>
                         セトリを作る
                     </button>
                 </div>
