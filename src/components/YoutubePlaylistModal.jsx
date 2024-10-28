@@ -37,15 +37,27 @@ const YoutubePlaylistModal = ({ onClose }) => {
                 body: JSON.stringify({ playlistUrl, currentUser }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error('再生リストのインポートに失敗しました');
+                if (data.error === 'invalid_grant') {
+                    setMessageInfo({ 
+                        message: 'YouTube連携の再認証が必要です。設定画面から一度連携を解除してから再度連携を行ってください。', 
+                        type: 'error' 
+                    });
+                    onClose(); // モーダルを閉じる
+                    return;
+                }
+                throw new Error(data.message || '再生リストのインポートに失敗しました');
             }
 
-            const data = await response.json();
             setImportedSongs(data.items);
             setMessageInfo({ message: '再生リストがインポートされました', type: 'success' });
         } catch (error) {
-            setMessageInfo({ message: '再生リストのインポートに失敗しました', type: 'error' });
+            setMessageInfo({ 
+                message: error.message || '再生リストのインポートに失敗しました', 
+                type: 'error' 
+            });
         } finally {
             setLoading(false);
             setIsImporting(false);
@@ -59,12 +71,10 @@ const YoutubePlaylistModal = ({ onClose }) => {
 
     const handleAddToSongs = async () => {
         try {
-
             const batch = writeBatch(db);
             
             importedSongs.forEach(song => {
-                const songData = formatSongData(song);
-                
+                const songData = formatSongData(song, true); // trueを渡してisNewSongフラグを設定
                 
                 const songRef = doc(db, 'users', currentUser.uid, 'Songs', encodeURIComponent(song.youtubeUrl).replace(/\./g, '%2E'));
                 batch.set(songRef, songData);
@@ -73,7 +83,6 @@ const YoutubePlaylistModal = ({ onClose }) => {
             setMessageInfo({ message: '曲が追加されました', type: 'success' });
             onClose();
         } catch (error) {
-            
             setMessageInfo({ message: error.message, type: 'error' });
         }
     };
