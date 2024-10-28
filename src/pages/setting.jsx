@@ -15,7 +15,7 @@ function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
-    const [selectedTheme, setSelectedTheme] = useState(currentUser?.theme || 'pink');
+    const [selectedTheme, setSelectedTheme] = useState(currentUser?.theme || 'blue');
     const router = useRouter();
     const { setMessageInfo } = useMessage();
     const { theme } = useTheme();
@@ -178,8 +178,8 @@ function Settings() {
                         <label className="block mb-2 text-gray-700">テーマカラー:</label>
                         <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
                             {[
-                                { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
                                 { name: 'blue', label: '水色', color: 'bg-customTheme-blue-primary' },
+                                { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
                                 { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
                                 { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
                                 { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
