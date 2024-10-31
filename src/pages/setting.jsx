@@ -328,65 +328,7 @@ function Settings() {
                             </a>
                         )}
                     </div>
-                    <div className="mt-8">
-                        <label className="block mb-2 text-gray-700">持ち歌リストの公開設定:</label>
-                        <div className="bg-white shadow-md rounded px-5 py-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <Switch
-                                        checked={publicPageSettings.enabled}
-                                        onChange={(checked) => handlePublicPageSettingChange('enabled', checked)}
-                                    />
-                                    <span>持ち歌リストを公開する</span>
-                                </div>
-                            </div>
-
-                            {publicPageSettings.enabled && (
-                                <div className="mt-4 space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium">表示名</label>
-                                        <input
-                                            type="text"
-                                            value={publicPageSettings.displayName}
-                                            onChange={(e) => handlePublicPageSettingChange('displayName', e.target.value)}
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium">公開する情報</label>
-                                        {Object.entries(publicPageSettings.visibleColumns).map(([key, value]) => (
-                                            <div key={key} className="flex items-center mt-2">
-                                                <Switch
-                                                    checked={value}
-                                                    onChange={(checked) => handleColumnVisibilityChange(key, checked)}
-                                                />
-                                                <span className="ml-2">{columnLabels[key]}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium">公開ページURL</label>
-                                        <div className="flex mt-1">
-                                            <input
-                                                type="text"
-                                                value={`${window.location.origin}/public/${publicPageSettings.pageId}`}
-                                                readOnly
-                                                className="block w-full rounded-l-md border-gray-300 shadow-sm"
-                                            />
-                                            <button
-                                                onClick={copyToClipboard}
-                                                className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0"
-                                            >
-                                                コピー
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    
                 </div>
                 <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
                     更新
