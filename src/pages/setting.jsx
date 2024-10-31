@@ -8,7 +8,7 @@ import googleIcon from '../../public/images/web_light_rd_SI@4x.png';
 import youtubeIcon from '../../public/images/youtube_social_icon_red.png';
 import { useMessage } from '@/context/MessageContext';
 import Loading from '@/components/loading';
-import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { useTheme } from '@/context/ThemeContext';
 import Switch from '@/components/Switch';
 
@@ -81,8 +81,6 @@ function Settings() {
     if (!currentUser) {
         return <div className="text-center py-10">ログインが必要です。ログインページへのリンクを表示するなどの処理をここに追加。</div>;
     }
-
-
 
     async function handleCodeExchangeAndSave(code) {
         try {
@@ -252,6 +250,17 @@ function Settings() {
         setMessageInfo({ message: 'URLをコピーしました', type: 'success' });
     };
 
+    const handleLogout = async () => {
+        const auth = getAuth();
+        try {
+            await signOut(auth);
+            router.push('/login');
+        } catch (error) {
+            console.error('ログアウトエラー:', error);
+            setMessageInfo({ message: 'ログアウトに失敗しました。', type: 'error' });
+        }
+    };
+
     return (
         <div className="flex">
             <div className="flex-grow p-8">
@@ -384,6 +393,9 @@ function Settings() {
                 </button>
                 <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                     アカウントを削除
+                </button>
+                <button onClick={handleLogout} className="mt-4 float-right bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                    ログアウト
                 </button>
             </div>
         </div>
