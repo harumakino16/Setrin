@@ -2,8 +2,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaBars } from 'react-icons/fa'; // ReactIconをインポート
 import { useTheme } from '../context/ThemeContext';
+import { useRouter } from 'next/router';
+
 const Header = ({ toggleSidebar }) => {
     const { theme } = useTheme();
+    const router = useRouter();
+
+    // Determine if the current page is a listener's page
+    const isListenerPage = router.pathname.startsWith('/public');
+
     return (
         <header className={`bg-customTheme-${theme}-primary shadow-lg`}>
             <div className="container mx-auto flex justify-between items-center h-[60px]">
@@ -15,9 +22,11 @@ const Header = ({ toggleSidebar }) => {
                         height={50}
                     />
                 </Link>
-                <button className="md:hidden text-white" onClick={toggleSidebar}>
-                    <FaBars size={24} />
-                </button>
+                {!isListenerPage && ( // toggleSidebarが存在する場合のみボタンを表示
+                    <button className="md:hidden text-white" onClick={toggleSidebar}>
+                        <FaBars size={24} />
+                    </button>
+                )}
             </div>
         </header>
     );
