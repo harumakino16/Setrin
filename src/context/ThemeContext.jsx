@@ -7,13 +7,13 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
     const { currentUser } = useContext(AuthContext);
-    const [theme, setTheme] = useState('pink');
+    const [theme, setTheme] = useState('blue');
 
     useEffect(() => {
         if (currentUser) {
             const unsubscribe = onSnapshot(doc(db, 'users', currentUser.uid), (doc) => {
                 if (doc.exists()) {
-                    setTheme(doc.data().theme || 'pink');
+                    setTheme(doc.data().theme || 'blue');
                 }
             });
             return () => unsubscribe();
