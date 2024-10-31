@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, collectionGroup } from 'firebase/firestore';
 import PublicSongTable from '@/components/PublicSongTable';
 
 export default function PublicSongList() {
@@ -16,25 +16,32 @@ export default function PublicSongList() {
       if (!id) return;
       
       try {
-        // ユーザー情報の取得
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('publicPage.pageId', '==', id));
-        const userSnapshot = await getDocs(q);
+        // 公開設定の取得
+        const publicPagesSnapshot = await getDocs(
+          query(
+            collectionGroup(db, 'publicPages'),
+            where('pageId', '==', id),
+            where('enabled', '==', true)
+          )
+        );
         
-        if (userSnapshot.empty || !userSnapshot.docs[0].data().publicPage.enabled) {
+        if (publicPagesSnapshot.empty) {
           router.push('/404');
           return;
         }
 
-        const userData = userSnapshot.docs[0].data();
+        const publicPageDoc = publicPagesSnapshot.docs[0];
+        const userId = publicPageDoc.ref.parent.parent.id;
+        const publicPageData = publicPageDoc.data();
+
         setUserInfo({
-          displayName: userData.publicPage.displayName,
-          description: userData.publicPage.description,
-          visibleColumns: userData.publicPage.visibleColumns
+          displayName: publicPageData.displayName,
+          description: publicPageData.description,
+          visibleColumns: publicPageData.visibleColumns
         });
 
         // 曲情報の取得
-        const songsRef = collection(db, 'users', userSnapshot.docs[0].id, 'Songs');
+        const songsRef = collection(db, 'users', userId, 'Songs');
         const songsSnapshot = await getDocs(songsRef);
         const songsData = songsSnapshot.docs.map(doc => ({
           id: doc.id,
@@ -56,11 +63,14 @@ export default function PublicSongList() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">{userInfo?.displayName}の持ち歌リスト</h1>
+      <h1 className="text-3xl font-bold mb-4">{userInfo?.displayName || '名称未設定...'}</h1>
       {userInfo?.description && (
         <p className="mb-8">{userInfo.description}</p>
       )}
-      <PublicSongTable songs={songs} visibleColumns={userInfo?.visibleColumns} />
+      <PublicSongTable
+        songs={songs}
+        visibleColumns={userInfo?.visibleColumns}
+      />
     </div>
   );
 }

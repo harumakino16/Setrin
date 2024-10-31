@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { db } from '../../firebaseConfig';
-import { updateDoc, doc, deleteDoc, getDoc } from 'firebase/firestore';
+import { updateDoc, doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import googleIcon from '../../public/images/web_light_rd_SI@4x.png';
@@ -11,6 +11,8 @@ import Loading from '@/components/loading';
 import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { useTheme } from '@/context/ThemeContext';
 import Switch from '@/components/Switch';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
 
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
@@ -21,15 +23,15 @@ function Settings() {
     const { setMessageInfo } = useMessage();
     const { theme } = useTheme();
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_YOUTUBE_SCOPE}&response_type=code&prompt=consent&access_type=offline`;
-    const columnLabels = {
-        title: '曲名',
-        artist: 'アーティスト',
-        genre: 'ジャンル',
-        youtube: 'YouTubeリンク',
-        tags: 'タグ',
-        singingCount: '歌唱回数',
-        skillLevel: '熟練度'
-    };
+    const columnLabels = [
+        { key: 'title', label: '曲名' },
+        { key: 'artist', label: 'アーティスト' },
+        { key: 'genre', label: 'ジャンル' },
+        { key: 'youtubeUrl', label: 'YouTubeリンク' },
+        { key: 'tags', label: 'タグ' },
+        { key: 'singingCount', label: '歌唱回数' },
+        { key: 'skillLevel', label: '熟練度' }
+    ];
     const [publicPageSettings, setPublicPageSettings] = useState({
         enabled: false,
         pageId: '',
@@ -39,7 +41,7 @@ function Settings() {
             title: true,
             artist: true,
             genre: true,
-            youtube: true,
+            youtubeUrl: true,
             tags: true,
             singingCount: false,
             skillLevel: false
@@ -58,18 +60,15 @@ function Settings() {
         if (currentUser) {
             setEmail(currentUser.email || '');
             setDisplayName(currentUser.displayName || '');
-            
+
             const fetchPublicPageSettings = async () => {
-                const userRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.publicPage) {
-                        setPublicPageSettings(userData.publicPage);
-                    }
+                const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', 'settings');
+                const publicPageDoc = await getDoc(publicPageRef);
+                if (publicPageDoc.exists()) {
+                    setPublicPageSettings(publicPageDoc.data());
                 }
             };
-            
+
             fetchPublicPageSettings();
         }
     }, [currentUser]);
@@ -210,10 +209,8 @@ function Settings() {
         setPublicPageSettings(newSettings);
 
         try {
-            const userRef = doc(db, 'users', currentUser.uid);
-            await updateDoc(userRef, {
-                publicPage: newSettings
-            });
+            const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', 'settings');
+            await setDoc(publicPageRef, newSettings);
             setMessageInfo({ message: '公開設定を更新しました', type: 'success' });
         } catch (error) {
             console.error('公開設定の更新エラー:', error);
@@ -233,10 +230,8 @@ function Settings() {
         setPublicPageSettings(newSettings);
 
         try {
-            const userRef = doc(db, 'users', currentUser.uid);
-            await updateDoc(userRef, {
-                publicPage: newSettings
-            });
+            const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', 'settings');
+            await setDoc(publicPageRef, newSettings);
             setMessageInfo({ message: '表示設定を更新しました', type: 'success' });
         } catch (error) {
             console.error('表示設定の更新エラー:', error);
@@ -328,7 +323,66 @@ function Settings() {
                             </a>
                         )}
                     </div>
-                    
+
+                </div>
+                <div className="mt-8 mb-8">
+                    <label className="block mb-2 text-gray-700">持ち歌リストの公開設定:</label>
+                    <div className="bg-white shadow-md rounded px-5 py-3">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <Switch
+                                    checked={publicPageSettings.enabled}
+                                    onChange={(checked) => handlePublicPageSettingChange('enabled', checked)}
+                                />
+                                <span>持ち歌リストを公開する</span>
+                            </div>
+                        </div>
+
+                        {publicPageSettings.enabled && (
+                            <div className="mt-4 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium">表示名</label>
+                                    <input
+                                        type="text"
+                                        value={publicPageSettings.displayName}
+                                        onChange={(e) => handlePublicPageSettingChange('displayName', e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm py-2 px-3"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium">公開する情報</label>
+                                    {columnLabels.map(({ key, label }) => (
+                                        <div key={key} className="flex items-center mt-2">
+                                            <Switch
+                                                checked={publicPageSettings.visibleColumns[key] || false}
+                                                onChange={(checked) => handleColumnVisibilityChange(key, checked)}
+                                            />
+                                            <span className="ml-2">{label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium">公開ページURL</label>
+                                    <div className="flex mt-1">
+                                        <input
+                                            type="text"
+                                            value={`${window.location.origin}/public/${publicPageSettings.pageId}`}
+                                            readOnly
+                                            className="block w-full rounded-l-md border-gray-300 shadow-sm"
+                                        />
+                                        <button
+                                            onClick={copyToClipboard}
+                                            className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0"
+                                        >
+                                            <FontAwesomeIcon icon={faCopy} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
                     更新
