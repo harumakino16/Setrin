@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faYoutube } from '@fortawesome/free-brands-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { convertKanaToHira } from '../utils/stringUtils';
 
 const PublicSongTable = ({ songs, visibleColumns }) => {
@@ -34,13 +34,18 @@ const PublicSongTable = ({ songs, visibleColumns }) => {
   return (
     <div>
       <div className="mb-4">
-        <input
-          type="text"
-          placeholder="曲名、アーティスト、ジャンル、タグで検索..."
-          className="w-full p-4 border rounded-lg"
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-        />
+        <div className="relative">
+          <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <FontAwesomeIcon icon={faSearch} className="text-gray-500" />
+          </span>
+          <input
+            type="text"
+            placeholder="曲名、アーティスト、ジャンル、タグで検索..."
+            className="w-full p-4 pl-10 border rounded-lg"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+          />
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full whitespace-nowrap divide-y divide-gray-200" style={{ tableLayout: 'fixed' }}>
