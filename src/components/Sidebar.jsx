@@ -1,6 +1,6 @@
 import { faMusic } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHistory, faTools } from "@fortawesome/free-solid-svg-icons";
+import { faHistory, faTools, faUserShield } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
@@ -32,7 +32,7 @@ const MENU = [
 
 export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
     const router = useRouter();
-    const { currentUser } = useContext(AuthContext); // currentUserを取���
+    const { currentUser, isAdmin } = useContext(AuthContext); // currentUserを取り、isAdminを取得
     const logOut = useLogOut();
     const { setMessageInfo } = useMessage();
     const [showCreateSetlistModal, setShowCreateSetlistModal] = useState(false);
@@ -44,6 +44,8 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
     const handleCloseModal = () => {
         setShowCreateSetlistModal(false);
     };
+
+    console.log(isAdmin);
 
     return (
         <div className="sidebar w-64 min-w-[256px] flex flex-col justify-between">
@@ -62,6 +64,13 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
                                 </Link>
                             )
                         })}
+                        {isAdmin && ( // 管理者の場合のみ表示
+                            <Link href="/admin/dashboard" onClick={onLinkClick}>
+                                <li className="flex items-center text-gray-700 text-sm font-medium py-2 px-6 hover:bg-gray-200 cursor-pointer gap-2">
+                                    <FontAwesomeIcon icon={faUserShield} />管理者ページ
+                                </li>
+                            </Link>
+                        )}
                     </ul>
                 </div>
                 <div className="mt-4 px-6">

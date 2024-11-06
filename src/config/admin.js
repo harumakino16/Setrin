@@ -1,0 +1,1 @@
+export const adminUUID = process.env.NEXT_PUBLIC_ADMIN_UUID; 

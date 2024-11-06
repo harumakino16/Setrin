@@ -3,40 +3,49 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig, db } from '../../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
-import Loading from '@/components/loading'; // Loading コンポーネントをインポート
-
+import Loading from '@/components/loading';
+import { adminUUID } from '@/config/admin'; // 追加
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);  // ローディング状態の追加
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false); // 管理者フラグの追加
   const auth = getAuth(initializeApp(firebaseConfig));
 
   useEffect(() => {
-    
     const unsubscribeAuth = onAuthStateChanged(auth, user => {
       if (user) {
         const userRef = doc(db, 'users', user.uid);
         const unsubscribeDoc = onSnapshot(userRef, (doc) => {
           const userData = doc.data();
           setCurrentUser({ ...user, ...userData });
-          setLoading(false);  // データが読み込まれたらローディングを終了
+
+          // 管理者かどうかを判定
+          if (user.uid === adminUUID) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+
+          setLoading(false);
         });
-        return () => unsubscribeDoc();  // Firestore の監視を解除
+        return () => unsubscribeDoc();
       } else {
         setCurrentUser(null);
-        setLoading(false);  // ユーザーがいない場合もローディングを終了
+        setIsAdmin(false); // ユーザーがいない場合は管理者フラグをfalseに
+        setLoading(false);
       }
     });
 
     return () => {
-      unsubscribeAuth(); // Auth の監視を解除
+      unsubscribeAuth();
     };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, setCurrentUser }}>
+    <AuthContext.Provider value={{ currentUser, loading, setCurrentUser, isAdmin }}>
       {loading ? <Loading /> : children}
     </AuthContext.Provider>
   );
