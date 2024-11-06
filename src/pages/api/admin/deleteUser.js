@@ -1,6 +1,6 @@
 import { isAdmin } from '@/middleware/adminAuth';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { db } from '@/firebaseConfig';
+import { db } from '../../../../firebaseConfig';
 
 export default async function handler(req, res) {
   await isAdmin(req, res, () => {});
