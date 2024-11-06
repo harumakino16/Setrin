@@ -65,6 +65,7 @@ function SongModal({ isOpen, onClose, song }) {
         }
         onClose();
       } catch (error) {
+        console.error('曲の更新に失敗しました', error);
         setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
       }
     } catch (error) {
