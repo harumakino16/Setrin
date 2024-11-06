@@ -249,7 +249,7 @@ function Settings() {
         const auth = getAuth();
         try {
             await signOut(auth);
-            router.push('/login');
+            router.push('/');
         } catch (error) {
             console.error('ログアウトエラー:', error);
             setMessageInfo({ message: 'ログアウトに失敗しました。', type: 'error' });
