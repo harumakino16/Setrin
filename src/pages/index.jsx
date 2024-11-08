@@ -131,17 +131,24 @@ export default function Home() {
 
   const sortSongs = (songs, key, direction) => {
     return [...songs].sort((a, b) => {
-      const aValue = a[key];
-      const bValue = b[key];
-      const aIsNumber = !isNaN(Number(aValue));
-      const bIsNumber = !isNaN(Number(bValue));
+      let aValue = a[key];
+      let bValue = b[key];
 
-      if (aIsNumber && bIsNumber) {
-        return direction === 'ascending' ? aValue - bValue : bValue - aValue;
+      // 配列の場合（tagsなど）は文字列に変換
+      if (Array.isArray(aValue)) aValue = aValue.join(', ');
+      if (Array.isArray(bValue)) bValue = bValue.join(', ');
+
+      // 数値型の場合
+      if (!isNaN(Number(aValue)) && !isNaN(Number(bValue))) {
+        return direction === 'ascending' 
+          ? Number(aValue) - Number(bValue) 
+          : Number(bValue) - Number(aValue);
       }
-      return direction === 'ascending' 
-        ? String(a.furigana || a.title).localeCompare(String(b.furigana || b.title))
-        : String(b.furigana || b.title).localeCompare(String(a.furigana || a.title));
+
+      // 文字列の場合
+      return direction === 'ascending'
+        ? String(aValue || '').localeCompare(String(bValue || ''))
+        : String(bValue || '').localeCompare(String(aValue || ''));
     });
   };
 
