@@ -9,6 +9,7 @@ export default function Layout({ children }) {
     const [isMobile, setIsMobile] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const router = useRouter();
+    const isLPPage = router.pathname === '/lp';
 
     useEffect(() => {
         const handleResize = () => {
@@ -26,6 +27,10 @@ export default function Layout({ children }) {
     };
 
     const isListenerPage = router.pathname.startsWith('/public');
+
+    if (isLPPage) {
+        return <>{children}</>;
+    }
 
     return (
         <div>

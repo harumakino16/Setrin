@@ -16,6 +16,9 @@ import AddSongModal from '@/components/AddSongModal'; // 新しいコンポー�
 import LoginFormModal from "@/components/LoginFormModal";
 import { FaPen } from 'react-icons/fa';
 import { useTheme } from '@/context/ThemeContext';
+import Link from "next/link";
+import LoginForm from "@/components/LoginForm";
+
 export default function Home() {
   const [modalState, setModalState] = useState({
     addSong: false,
@@ -192,6 +195,17 @@ export default function Home() {
     setSelectedSongs(songIds);
     setModalState(prev => ({ ...prev, addSongsInSetlist: true }));
   };
+
+  // 未ログイン時のデザイン
+if (!currentUser) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">Setlinkへようこそ</h1>
+      <p className="text-xl text-gray-600 mb-8">音楽体験を次のレベルへ</p>
+      <LoginForm />
+    </div>
+  );
+}
 
   return (
     <div className="flex flex-col sm:flex-row w-full">

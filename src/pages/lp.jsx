@@ -127,11 +127,34 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer id="contact" className="bg-blue-600 text-white py-6">
-        <div className="container mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4">お問い合わせ</h2>
-          <p>ご質問やご意見がございましたら、<Link href="/contact" legacyBehavior><a className="text-white underline">お問い合わせページ</a></Link>からご連絡ください。</p>
-          <p className="mt-4">© 2023 Setlink. All rights reserved.</p>
+      <footer id="contact" className="bg-blue-600 text-white py-10">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4">Setlinkについて</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" legacyBehavior><a className="hover:underline">Setlinkとは</a></Link></li>
+                <li><Link href="/how-to-use" legacyBehavior><a className="hover:underline">使い方</a></Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-4">規約・ポリシー</h3>
+              <ul className="space-y-2">
+                <li><Link href="/termsuser" legacyBehavior><a className="hover:underline">利用規約</a></Link></li>
+                <li><Link href="/privacypolicy" legacyBehavior><a className="hover:underline">プライバシーポリシー</a></Link></li>
+                <li><Link href="https://www.youtube.com/t/terms" legacyBehavior><a className="hover:underline">YouTubeの利用規約</a></Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-4">サポート</h3>
+              <ul className="space-y-2">
+                <li><Link href="/contact" legacyBehavior><a className="hover:underline">お問い合わせ</a></Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="text-center pt-8 border-t border-blue-500">
+            <p>© 2023 Setlink. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

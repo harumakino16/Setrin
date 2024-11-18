@@ -47,6 +47,10 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
 
     console.log(isAdmin);
 
+    if (!currentUser) {
+        return null;
+      }
+
     return (
         <div className="sidebar w-64 min-w-[256px] flex flex-col justify-between">
             <div>
