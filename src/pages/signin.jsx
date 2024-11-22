@@ -20,8 +20,9 @@ function Signin() {
   };
 
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center">
+    <NoSidebarLayout>
+      <div>
+        <div className="flex flex-col items-center justify-center">
         <input
           type="email"
           value={email}
@@ -35,8 +36,9 @@ function Signin() {
           placeholder="パスワード"
         />
         <button onClick={handleSignin}>ログイン</button>
+        </div>
       </div>
-    </div>
+    </NoSidebarLayout>
   );
 }
 

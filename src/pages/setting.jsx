@@ -13,7 +13,7 @@ import { useTheme } from '@/context/ThemeContext';
 import Switch from '@/components/Switch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
-
+import Layout from '@/pages/layout';
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
@@ -257,144 +257,146 @@ function Settings() {
     };
 
     return (
-        <div className="flex">
-            <div className="flex-grow p-8">
-                <h1 className="text-2xl font-bold mb-4">設定</h1>
-                <div className='mb-6'>
-                    <div className="mb-6">
-                        <label className="block mb-2 text-gray-700">メールアドレス:</label>
-                        <input type="email" className="border p-2 rounded w-full shadow-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    </div>
-                    <div className="mb-6">
-                        <label className="block mb-2 text-gray-700">表示名:</label>
-                        <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                    </div>
-                    <div className="mb-6">
-                        <label className="block mb-2 text-gray-700">テーマカラー:</label>
-                        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                            {[
-                                { name: 'blue', label: '水色', color: 'bg-customTheme-blue-primary' },
-                                { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
-                                { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
-                                { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
-                                { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
-                                { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' }
-                            ].map((theme) => (
-                                <button
-                                    key={theme.name}
-                                    onClick={() => setSelectedTheme(theme.name)}
-                                    className={`h-20 rounded-lg transition-transform ${theme.color} ${selectedTheme === theme.name ? 'ring-4 ring-offset-2 ring-blue-500 scale-105' : ''
-                                        }`}
-                                >
-                                    <span className="block text-center text-sm mt-2 text-white">{theme.label}</span>
-                                </button>
-                            ))}
+        <Layout>
+            <div className="flex">
+                <div className="flex-grow p-8">
+                    <h1 className="text-2xl font-bold mb-4">設定</h1>
+                    <div className='mb-6'>
+                        <div className="mb-6">
+                            <label className="block mb-2 text-gray-700">メールアドレス:</label>
+                            <input type="email" className="border p-2 rounded w-full shadow-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
-                    </div>
-                    <label className="block mb-2 text-gray-700">Youtubeとの連携:</label>
-                    <div className="bg-white shadow-md rounded px-5 py-3 flex flex-col md:flex-row justify-between items-center">
-                        <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-                            <div className="flex items-center gap-4">
-                                <Image src={youtubeIcon} alt="Youtubeに接続" width={50} />
-                                <div className="flex flex-col">
-                                    {currentUser.youtubeRefreshToken ? (
-                                        <div className="flex items-center">
-                                            <svg className="w-4 h-4 text-green-500 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                            <label className="text-green-500 font-bold">連携中</label>
+                        <div className="mb-6">
+                            <label className="block mb-2 text-gray-700">表示名:</label>
+                            <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                        </div>
+                        <div className="mb-6">
+                            <label className="block mb-2 text-gray-700">テーマカラー:</label>
+                            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                                {[
+                                    { name: 'blue', label: '水色', color: 'bg-customTheme-blue-primary' },
+                                    { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
+                                    { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
+                                    { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
+                                    { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
+                                    { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' }
+                                ].map((theme) => (
+                                    <button
+                                        key={theme.name}
+                                        onClick={() => setSelectedTheme(theme.name)}
+                                        className={`h-20 rounded-lg transition-transform ${theme.color} ${selectedTheme === theme.name ? 'ring-4 ring-offset-2 ring-blue-500 scale-105' : ''
+                                            }`}
+                                    >
+                                        <span className="block text-center text-sm mt-2 text-white">{theme.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <label className="block mb-2 text-gray-700">Youtubeとの連携:</label>
+                        <div className="bg-white shadow-md rounded px-5 py-3 flex flex-col md:flex-row justify-between items-center">
+                            <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
+                                <div className="flex items-center gap-4">
+                                    <Image src={youtubeIcon} alt="Youtubeに接続" width={50} />
+                                    <div className="flex flex-col">
+                                        {currentUser.youtubeRefreshToken ? (
+                                            <div className="flex items-center">
+                                                <svg className="w-4 h-4 text-green-500 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                <label className="text-green-500 font-bold">連携中</label>
+                                            </div>
+                                        ) : (
+                                            <label className="text-red-500">未連携</label>
+                                        )}
+                                        <div className="text-gray-700 text-sm">
+                                            Youtubeと連携することで作成したセットリストをYoutubeの再生リストに追加することができます。
                                         </div>
-                                    ) : (
-                                        <label className="text-red-500">未連携</label>
-                                    )}
-                                    <div className="text-gray-700 text-sm">
-                                        Youtubeと連携することで作成したセットリストをYoutubeの再生リストに追加することができます。
                                     </div>
                                 </div>
                             </div>
+                            {currentUser.youtubeRefreshToken ? (
+                                <button onClick={handleUnlinkYoutube} className="mt-4 md:mt-0 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    解除する
+                                </button>
+                            ) : (
+                                <a href={authUrl} className="mt-4 md:mt-0 block text-center">
+                                    <Image src={googleIcon} alt="Youtubeに接続" width={180} />
+                                </a>
+                            )}
                         </div>
-                        {currentUser.youtubeRefreshToken ? (
-                            <button onClick={handleUnlinkYoutube} className="mt-4 md:mt-0 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                解除する
-                            </button>
-                        ) : (
-                            <a href={authUrl} className="mt-4 md:mt-0 block text-center">
-                                <Image src={googleIcon} alt="Youtubeに接続" width={180} />
-                            </a>
-                        )}
+
                     </div>
-
-                </div>
-                <div className="mt-8 mb-8">
-                    <label className="block mb-2 text-gray-700">持ち歌リストの公開設定:</label>
-                    <div className="bg-white shadow-md rounded px-5 py-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <Switch
-                                    checked={publicPageSettings.enabled}
-                                    onChange={(checked) => handlePublicPageSettingChange('enabled', checked)}
-                                />
-                                <span>持ち歌リストを公開する</span>
-                            </div>
-                        </div>
-
-                        {publicPageSettings.enabled && (
-                            <div className="mt-4 space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium">表示名</label>
-                                    <input
-                                        type="text"
-                                        value={publicPageSettings.displayName}
-                                        onChange={(e) => handlePublicPageSettingChange('displayName', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm py-2 px-3"
+                    <div className="mt-8 mb-8">
+                        <label className="block mb-2 text-gray-700">持ち歌リストの公開設定:</label>
+                        <div className="bg-white shadow-md rounded px-5 py-3">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <Switch
+                                        checked={publicPageSettings.enabled}
+                                        onChange={(checked) => handlePublicPageSettingChange('enabled', checked)}
                                     />
+                                    <span>持ち歌リストを公開する</span>
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium">公開する情報</label>
-                                    {columnLabels.map(({ key, label }) => (
-                                        <div key={key} className="flex items-center mt-2">
-                                            <Switch
-                                                checked={publicPageSettings.visibleColumns[key] || false}
-                                                onChange={(checked) => handleColumnVisibilityChange(key, checked)}
-                                            />
-                                            <span className="ml-2">{label}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium">公開ページURL</label>
-                                    <div className="flex mt-1">
+                            {publicPageSettings.enabled && (
+                                <div className="mt-4 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium">表示名</label>
                                         <input
                                             type="text"
-                                            value={`${window.location.origin}/public/${publicPageSettings.pageId}`}
-                                            readOnly
-                                            className="block w-full rounded-l-md border-gray-300 shadow-sm"
+                                            value={publicPageSettings.displayName}
+                                            onChange={(e) => handlePublicPageSettingChange('displayName', e.target.value)}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm py-2 px-3"
                                         />
-                                        <button
-                                            onClick={copyToClipboard}
-                                            className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0"
-                                        >
-                                            <FontAwesomeIcon icon={faCopy} />
-                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">公開する情報</label>
+                                        {columnLabels.map(({ key, label }) => (
+                                            <div key={key} className="flex items-center mt-2">
+                                                <Switch
+                                                    checked={publicPageSettings.visibleColumns[key] || false}
+                                                    onChange={(checked) => handleColumnVisibilityChange(key, checked)}
+                                                />
+                                                <span className="ml-2">{label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">公開ページURL</label>
+                                        <div className="flex mt-1">
+                                            <input
+                                                type="text"
+                                                value={`${window.location.origin}/public/${publicPageSettings.pageId}`}
+                                                readOnly
+                                                className="block w-full rounded-l-md border-gray-300 shadow-sm"
+                                            />
+                                            <button
+                                                onClick={copyToClipboard}
+                                                className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0"
+                                            >
+                                                <FontAwesomeIcon icon={faCopy} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
+                    <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
+                        更新
+                    </button>
+                    <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        アカウントを削除
+                    </button>
+                    <button onClick={handleLogout} className="mt-4 float-right bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                        ログアウト
+                    </button>
                 </div>
-                <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
-                    更新
-                </button>
-                <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    アカウントを削除
-                </button>
-                <button onClick={handleLogout} className="mt-4 float-right bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    ログアウト
-                </button>
             </div>
-        </div>
+        </Layout>
     );
 }
 

@@ -18,6 +18,7 @@ import { FaPen } from 'react-icons/fa';
 import { useTheme } from '@/context/ThemeContext';
 import Link from "next/link";
 import LoginForm from "@/components/LoginForm";
+import Layout from "@/pages/layout";
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -79,7 +80,7 @@ export default function Home() {
       await batch.commit();
       setMessageInfo({ message: '曲が削除され、セットリストが更新されました。', type: 'success' });
     } catch (error) {
-      
+
       setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
     }
   };
@@ -126,7 +127,7 @@ export default function Home() {
         setSelectedSongs([]);
         setMessageInfo({ message: '選択された曲が削除され、セットリストが更新されました。', type: 'success' });
       } catch (error) {
-        
+
         setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
       }
     }
@@ -143,8 +144,8 @@ export default function Home() {
 
       // 数値型の場合
       if (!isNaN(Number(aValue)) && !isNaN(Number(bValue))) {
-        return direction === 'ascending' 
-          ? Number(aValue) - Number(bValue) 
+        return direction === 'ascending'
+          ? Number(aValue) - Number(bValue)
           : Number(bValue) - Number(aValue);
       }
 
@@ -234,56 +235,58 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row w-full">
-      <div className="flex-grow w-full p-0 sm:p-4">
-        <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-between mb-3">
-          {selectedSongs.length > 0 ? (
+    <Layout>
+      <div className="flex flex-col sm:flex-row w-full">
+        <div className="flex-grow w-full p-0 sm:p-4">
+          <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-between mb-3">
+            {selectedSongs.length > 0 ? (
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
+                <button onClick={() => toggleModal('addSongsInSetlist', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
+                  <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
+                </button>
+                <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" />まとめて削除
+                </button>
+              </div>
+            ) : (<div></div>)}
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-              <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
-              <button onClick={() => toggleModal('addSongsInSetlist', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
-                <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
+              <button onClick={() => toggleModal('addSong', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}>
+                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                曲を追加する
               </button>
-              <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                <FontAwesomeIcon icon={faTrash} className="mr-2" />まとめて削除
+              <button
+                onClick={() => setModalState(prev => ({ ...prev, columnSettings: true }))}
+                className="text-gray-500 py-2 px-4 text-sm rounded flex items-center"
+              >
+                <FaPen className="mr-2" />
+                列の表示
               </button>
             </div>
-          ) : (<div></div>)}
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <button onClick={() => toggleModal('addSong', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}>
-              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              曲を追加する
-            </button>
-            <button
-              onClick={() => setModalState(prev => ({ ...prev, columnSettings: true }))}
-              className="text-gray-500 py-2 px-4 text-sm rounded flex items-center"
-            >
-              <FaPen className="mr-2" />
-              列の表示
-            </button>
           </div>
+
+          <MainTable
+            selectAll={selectAll}
+            handleSelectAll={handleSelectAll}
+            selectedSongs={selectedSongs}
+            handleSelectSong={handleSelectSong}
+            handleDeleteSong={handleDeleteSong}
+            requestSort={requestSort}
+            setModalState={setModalState}
+            modalState={modalState}
+            tableData={tableData}
+            onAddToSetlist={handleAddToSetlist}
+            sortConfig={sortConfig}
+          />
+
+          {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
+          {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
+          {!currentUser && <LoginFormModal isOpen={!currentUser} />}
         </div>
-
-        <MainTable
-          selectAll={selectAll}
-          handleSelectAll={handleSelectAll}
-          selectedSongs={selectedSongs}
-          handleSelectSong={handleSelectSong}
-          handleDeleteSong={handleDeleteSong}
-          requestSort={requestSort}
-          setModalState={setModalState}
-          modalState={modalState}
-          tableData={tableData}
-          onAddToSetlist={handleAddToSetlist}
-          sortConfig={sortConfig}
-        />
-
-        {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
-        {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
-        {!currentUser && <LoginFormModal isOpen={!currentUser} />}
       </div>
-    </div>
+    </Layout>
   );
 }

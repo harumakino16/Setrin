@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import NoSidebarLayout from '@/pages/noSidebarLayout';
 const Contact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,8 +17,9 @@ const Contact = () => {
   };
 
   return (
-    <div className="p-5">
-      <h1 className="text-3xl font-bold mb-4">お問い合わせ</h1>
+    <NoSidebarLayout>
+      <div className="p-5">
+        <h1 className="text-3xl font-bold mb-4">お問い合わせ</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">お名前</label>
@@ -60,7 +61,8 @@ const Contact = () => {
           送信
         </button>
       </form>
-    </div>
+      </div>
+    </NoSidebarLayout>
   );
 };
 
