@@ -4,7 +4,7 @@ import useGoogleSignUpLogin from '@/hooks/googleSignUpLogin';
 const LoginForm = () => {
     const { handleGoogleSignUpLogin } = useGoogleSignUpLogin();
     return (
-        <div className=" w-[600px] mx-auto p-10 pb-5 bg-white rounded-lg">
+        <div className=" w-[600px] mx-auto p-10 pb-5 rounded-lg">
             <h1 className="text-xl font-bold mb-4 text-center">ログイン</h1>
             <div className="flex flex-col space-y-4 mb-5">
                 <button onClick={handleGoogleSignUpLogin} className="bg-white hover:bg-gray-100 text-gray-700 font-semibold py-4 px-4 border border-gray-200 rounded w-full">
