@@ -35,7 +35,7 @@ export default function Layout({ children }) {
     return (
         <div>
             <Header toggleSidebar={toggleSidebar} />
-            <div className="bg-[#efeeea] pt-[80px] min-h-screen">
+            <div className="bg-[#efeeea] min-h-screen">
                 <main className="p-4 w-full flex">
                     {!isListenerPage && !isMobile && <Sidebar className="hidden md:block"/>}
                     <div className={`flex-1 ${!isListenerPage && !isMobile ? 'w-[calc(100%-256px)]' : 'w-full'}`}>

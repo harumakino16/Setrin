@@ -104,7 +104,7 @@ export default function Home() {
       try {
         const batch = writeBatch(db);
 
-        // 選択された曲を削除
+        // 選択され曲を削除
         selectedSongs.forEach(songId => {
           const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
           batch.delete(songRef);
@@ -197,15 +197,41 @@ export default function Home() {
   };
 
   // 未ログイン時のデザイン
-if (!currentUser) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Setlinkへようこそ</h1>
-      <p className="text-xl text-gray-600 mb-8">音楽体験を次のレベルへ</p>
-      <LoginForm />
-    </div>
-  );
-}
+  if (!currentUser) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <div className="flex-grow flex flex-col items-center justify-center p-6">
+          <h1 className="text-5xl font-extrabold mb-6">Setlinkへようこそ</h1>
+          <p className="text-2xl mb-8">Vtuberの歌枠をもっと簡単に</p>
+          <LoginForm />
+        </div>
+        <div className="bg-white bg-opacity-20 rounded-t-3xl p-8 text-left backdrop-filter backdrop-blur-lg">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4">Setlinkとは？</h2>
+            <p className="text-lg mb-6">
+              SetlinkはVtuberのための歌枠管理ツールです。歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、セットリストを共有したりできます。
+            </p>
+            <h2 className="text-3xl font-bold mb-4">特徴</h2>
+            <ul className="list-disc list-inside text-lg mb-6 space-y-2">
+              <li>🎵 <strong>簡単なセットリスト作成：</strong>直感的なインターフェースで、数クリックでカスタムセットリストを作成。</li>
+              <li>🎬 <strong>YouTube連携：</strong>YouTubeと連携して、セットリストをプレイリストとして共有。</li>
+              <li>📁 <strong>詳細な曲管理：</strong>曲名、アーティスト、ジャンル、タグなどで曲を整理。</li>
+              <li>🔀 <strong>ランダムセットリスト作成：</strong>指定した条件でランダムにセットリストを生成。</li>
+              <li>🔒 <strong>セキュリティ：</strong>ユーザー情報は安全に保護され、プライバシーも確保。</li>
+              <li>👂 <strong>歌える曲リスト：</strong>歌える曲リストをリスナーに共有。</li>
+            </ul>
+            <div className="text-center">
+              <Link legacyBehavior href="/lp">
+                <a className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition duration-300">
+                  詳しくはこちら &raquo;
+                </a>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col sm:flex-row w-full">
