@@ -3,7 +3,7 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
-import { deleteDoc, doc, collection, getDocs, writeBatch } from "firebase/firestore";
+import { deleteDoc, doc, collection, getDocs, writeBatch, getCountFromServer } from "firebase/firestore";
 import SearchForm from "@/components/searchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
@@ -195,6 +195,22 @@ export default function Home() {
   const handleAddToSetlist = (songIds) => {
     setSelectedSongs(songIds);
     setModalState(prev => ({ ...prev, addSongsInSetlist: true }));
+  };
+
+  const handleAddSong = async () => {
+    // 現在の曲数を取得
+    const songsRef = collection(db, 'users', currentUser.uid, 'Songs');
+    const snapshot = await getCountFromServer(songsRef);
+    const songCount = snapshot.data().count;
+
+    if (currentUser.plan === 'free' && songCount >= 1000) {
+      if (confirm('無料プランでは1,000曲まで追加できます。有料プランにアップグレードしますか？')) {
+        router.push('/setting');
+      }
+      return;
+    }
+
+    // 曲の追加処理
   };
 
   // 未ログイン時のデザイン
