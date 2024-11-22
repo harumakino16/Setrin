@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
 import { collection, query, where, getDocs, collectionGroup } from 'firebase/firestore';
 import PublicSongTable from '@/components/PublicSongTable';
+import NoSidebarLayout from '../noSidebarLayout';
 
 export default function PublicSongList() {
   const [songs, setSongs] = useState([]);
@@ -14,7 +15,7 @@ export default function PublicSongList() {
   useEffect(() => {
     async function fetchPublicSongs() {
       if (!id) return;
-      
+
       try {
         // 公開設定の取得
         const publicPagesSnapshot = await getDocs(
@@ -24,7 +25,7 @@ export default function PublicSongList() {
             where('enabled', '==', true)
           )
         );
-        
+
         if (publicPagesSnapshot.empty) {
           router.push('/404');
           return;
@@ -47,7 +48,7 @@ export default function PublicSongList() {
           id: doc.id,
           ...doc.data()
         }));
-        
+
         setSongs(songsData);
       } catch (error) {
         console.error('Error fetching public songs:', error);
@@ -62,15 +63,17 @@ export default function PublicSongList() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">{userInfo?.displayName || '名称未設定...'}</h1>
-      {userInfo?.description && (
-        <p className="mb-8">{userInfo.description}</p>
-      )}
-      <PublicSongTable
-        songs={songs}
-        visibleColumns={userInfo?.visibleColumns}
-      />
-    </div>
+    <NoSidebarLayout>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">{userInfo?.displayName || '名称未設定...'}</h1>
+        {userInfo?.description && (
+          <p className="mb-8">{userInfo.description}</p>
+        )}
+        <PublicSongTable
+          songs={songs}
+          visibleColumns={userInfo?.visibleColumns}
+        />
+      </div>
+    </NoSidebarLayout>
   );
 }
