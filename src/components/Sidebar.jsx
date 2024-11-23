@@ -1,6 +1,6 @@
 import { faMusic } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHistory, faTools, faUserShield } from "@fortawesome/free-solid-svg-icons";
+import { faHistory, faTools, faUserShield, faChartLine } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
@@ -17,6 +17,11 @@ const MENU = [
         title: "曲リスト",
         iconName: faMusic,
         path: "/",
+    },
+    {
+        title: "ダッシュボード",
+        iconName: faChartLine,
+        path: "/dashboard",
     },
     {
         title: "セットリスト",
