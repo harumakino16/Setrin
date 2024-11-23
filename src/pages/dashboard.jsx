@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/context/AuthContext';
-import Layout from '@/pages/Layout';
+import Layout from '@/pages/layout';
 import { fetchUserData } from '@/utils/dashboardUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTags, faList } from '@fortawesome/free-solid-svg-icons';
