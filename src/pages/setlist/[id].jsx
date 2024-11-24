@@ -16,7 +16,7 @@ import ColumnSettingsModal from '@/components/ColumnSettingsModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Layout from '@/pages/layout';
-
+import { YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
     const [currentSongs, setCurrentSongs] = useState([]);
@@ -112,8 +112,8 @@ const SetlistDetail = () => {
                 currentUser.playlistCreationCount = 0; // ローカルのデータも更新
             }
 
-            if (currentUser.playlistCreationCount >= 4) {
-                if (confirm('無料プランでは月に4回まで再生リストを作成できます。有料プランにアップグレードしますか？')) {
+            if (currentUser.playlistCreationCount >= YOUTUBE_CREATE_LIST_LIMIT) {
+                if (confirm(`無料プランでは月に${YOUTUBE_CREATE_LIST_LIMIT}回まで再生リストを作成できます。有料プランにアップグレードしますか？`)) {
                     router.push('/setting');
                 }
                 return;
