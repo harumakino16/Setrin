@@ -74,7 +74,7 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
                             )
                         })}
                         {isAdmin && ( // 管理者の場合のみ表示
-                            <Link href="/admin/dashboard" onClick={onLinkClick}>
+                            <Link href="/admin/admin_dashboard" onClick={onLinkClick}>
                                 <li className="flex items-center text-gray-700 text-sm font-medium py-2 px-6 hover:bg-gray-200 cursor-pointer gap-2">
                                     <FontAwesomeIcon icon={faUserShield} />管理者ページ
                                 </li>
