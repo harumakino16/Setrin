@@ -1,7 +1,7 @@
 import withAdminAuth from '@/components/withAdminAuth';
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 
@@ -45,7 +45,16 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
       const usersCollection = collection(db, 'users');
       const usersSnapshot = await getDocs(usersCollection);
-      const usersList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const usersList = await Promise.all(usersSnapshot.docs.map(async doc => {
+        const userData = doc.data();
+        const songsQuery = query(collection(db, 'users', doc.id, 'Songs'));
+        const songsSnapshot = await getDocs(songsQuery);
+        const totalSongs = songsSnapshot.size;
+        console.log('User ID:', doc.id);
+        console.log('Songs Query:', songsQuery);
+        console.log('Songs Snapshot Size:', songsSnapshot.size);
+        return { id: doc.id, ...userData, totalSongs };
+      }));
       setUsers(usersList);
     };
 
@@ -61,6 +70,7 @@ const ManageUsers = () => {
             <th className="py-2">ユーザーID</th>
             <th className="py-2">メールアドレス</th>
             <th className="py-2">表示名</th>
+            <th className="py-2">総曲数</th>
             <th className="py-2">操作</th>
           </tr>
         </thead>
@@ -70,6 +80,7 @@ const ManageUsers = () => {
               <td className="border px-4 py-2">{user.id}</td>
               <td className="border px-4 py-2">{user.email}</td>
               <td className="border px-4 py-2">{user.displayName}</td>
+              <td className="border px-4 py-2">{user.totalSongs}</td>
               <td className="border px-4 py-2">
                 <button
                   onClick={() => handleLoginAsUser(user.id)}
@@ -86,4 +97,4 @@ const ManageUsers = () => {
   );
 };
 
-export default withAdminAuth(ManageUsers); 
+export default withAdminAuth(ManageUsers);

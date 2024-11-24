@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getAuth } from 'firebase/auth';
 import { useMessage } from '@/context/MessageContext';
-
+import Layout from '@/pages/layout';
 const DeleteUser = () => {
   const [userId, setUserId] = useState('');
   const { setMessageInfo } = useMessage();
@@ -38,19 +38,21 @@ const DeleteUser = () => {
   };
 
   return (
-    <div className="p-5">
-      <h2 className="text-2xl font-bold mb-4">ユーザー削除</h2>
-      <input
-        type="text"
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        placeholder="削除するユーザーID"
-        className="border p-2 rounded w-full mb-4"
-      />
-      <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded">
-        ユーザーを削除
-      </button>
-    </div>
+    <Layout>
+      <div className="p-5">
+        <h2 className="text-2xl font-bold mb-4">ユーザー削除</h2>
+        <input
+          type="text"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="削除するユーザーID"
+          className="border p-2 rounded w-full mb-4"
+        />
+        <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded">
+          ユーザーを削除
+        </button>
+      </div>
+    </Layout>
   );
 };
 
