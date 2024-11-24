@@ -1,1 +1,1 @@
-export const FREE_PLAN_LIMIT = 1000;
+export const FREE_PLAN_LIMIT = 500;
