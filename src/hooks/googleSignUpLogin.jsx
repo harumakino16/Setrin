@@ -29,6 +29,7 @@ const useGoogleSignUpLogin = () => {
                     email: user.email,
                     createdAt: serverTimestamp(),
                     displayName: user.displayName,
+                    plan: 'free',
                 });
                 await batch.commit();
 
