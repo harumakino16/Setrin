@@ -104,7 +104,21 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="whitespace-nowrap">タグ:</label>
-                            <input type="text" className="border p-2 rounded" value={searchCriteria.tag} onChange={(e) => handleCriteriaChange('tag', e.target.value)} />
+                            <input 
+                                type="text" 
+                                className="border p-2 rounded" 
+                                value={searchCriteria.tag} 
+                                onChange={(e) => {
+                                    const tags = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+                                    if (tags.length <= 5) {
+                                        handleCriteriaChange('tag', e.target.value);
+                                    }
+                                }} 
+                                placeholder="カンマ区切りで最大5つまで" 
+                            />
+                            {searchCriteria.tag.split(',').filter(tag => tag.trim() !== '').length > 5 && (
+                                <span className="text-red-500 text-sm">タグは最大5つまでです。</span>
+                            )}
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="whitespace-nowrap">アーティスト名:</label>

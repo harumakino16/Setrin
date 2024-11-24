@@ -5,8 +5,8 @@ export const formatSongData = (song, isNewSong = false) => {
 
     const tags = song.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
 
-    if (tags.length > 3) {
-        throw new Error('タグは3つまでです。');
+    if (tags.length > 5) {
+        throw new Error('タグは5つまでです。');
     }
 
     const youtubeUrlPattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
