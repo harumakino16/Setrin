@@ -12,35 +12,35 @@ const TermsOfUse = () => {
             <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
               <tr>
                 <td className="px-6 py-4"><strong>事業者名</strong></td>
-                <td className="px-6 py-4">株式会社セットリンク</td>
+                <td className="px-6 py-4">株式会社PXstudio</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>代表者</strong></td>
-                <td className="px-6 py-4">山田 太郎</td>
+                <td className="px-6 py-4">林 孝洋</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>所在地</strong></td>
-                <td className="px-6 py-4">東京都渋谷区○○町1-2-3</td>
+                <td className="px-6 py-4">東京都港区南青山2-2-15 WIN青山531</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>電話番号</strong></td>
-                <td className="px-6 py-4">03-1234-5678</td>
+                <td className="px-6 py-4">080-7896-9308</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>メールアドレス</strong></td>
-                <td className="px-6 py-4">support@setlink.com</td>
+                <td className="px-6 py-4">support@pxstudio.site</td>
               </tr>
               <tr>
-                <td className="px-6 py-4"><strong>販売価格</strong></td>
-                <td className="px-6 py-4">各商品の詳細ページに記載</td>
+                <td className="px-6 py-4"><strong>利用料金</strong></td>
+                <td className="px-6 py-4">プラン一覧ページに記載</td>
               </tr>
               <tr>
-                <td className="px-6 py-4"><strong>商品以外の必要料金</strong></td>
-                <td className="px-6 py-4">消費税、送料（地域により異なります）</td>
+                <td className="px-6 py-4"><strong>利用料金以外にお客様に発生する料金等</strong></td>
+                <td className="px-6 py-4">インターネット接続料金、通信料金等</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>支払い方法</strong></td>
-                <td className="px-6 py-4">クレジットカード、銀行振込、PayPalなど</td>
+                <td className="px-6 py-4">クレジットカード</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>支払い時期</strong></td>
