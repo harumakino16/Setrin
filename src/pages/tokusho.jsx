@@ -24,7 +24,7 @@ const TermsOfUse = () => {
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>電話番号</strong></td>
-                <td className="px-6 py-4">080-7896-9308</td>
+                <td className="px-6 py-4">下記メールアドレスからご請求いただければ、弊社営業時間内において遅滞なく開示いたします。</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>メールアドレス</strong></td>
@@ -48,19 +48,21 @@ const TermsOfUse = () => {
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>商品の引渡時期</strong></td>
-                <td className="px-6 py-4">支払い確認後、速やかに発送</td>
+                <td className="px-6 py-4">当社所定の手続き終了後、直ちにご利用頂けます。</td>
               </tr>
               <tr>
                 <td className="px-6 py-4"><strong>返品・交換について</strong></td>
-                <td className="px-6 py-4">商品に欠陥がある場合を除き、返品・交換はお受けしておりません。詳細は<Link href="/contact" className="text-blue-500 hover:text-blue-600">お問い合わせページ</Link>までご連絡ください。</td>
+                <td className="px-6 py-4">電子商品としての性質上、返品には応じられません。</td>
               </tr>
               <tr>
-                <td className="px-6 py-4"><strong>販売数量の制限</strong></td>
-                <td className="px-6 py-4">特に制限はありません。</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4"><strong>不良品について</strong></td>
-                <td className="px-6 py-4">商品に不良があった場合は、ご連絡いただければ交換または返金いたします。</td>
+                <td className="px-6 py-4"><strong>解約について</strong></td>
+                <td className="px-6 py-4">
+                  ご解約のお手続きは、原則いつでも可能です。<br />
+                  ただし、更新日の24時間前までに解約手続をご完了頂かないと自動更新される場合があります。<br />
+                  また、予定されたご利用期間の途中において解約手続を行った場合でも、お支払い済みの料金は返金されません（日割計算による返金もいたしかねます）。<br />
+                  ご解約の効力は、利用期間満了時に発生するものとします。<br />
+                  ご解約は弊サービス内表記に従って行うことが可能です。
+                </td>
               </tr>
             </tbody>
           </table>
