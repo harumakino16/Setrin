@@ -36,6 +36,7 @@
     "match-sorter": "^6.3.4",
     "micro": "^10.0.1",
     "next": "^14.2.18",
+    "nodemailer": "^6.9.16",
     "object-path": "^0.11.8",
     "papaparse": "^5.4.1",
     "react": "^18",

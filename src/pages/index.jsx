@@ -175,6 +175,8 @@ export default function Home() {
     { label: "タグ1", key: "tag1" },
     { label: "タグ2", key: "tag2" },
     { label: "タグ3", key: "tag3" },
+    { label: "タグ4", key: "tag4" },
+    { label: "タグ5", key: "tag5" },
     { label: "歌った回数", key: "singingCount" },
     { label: "熟練度", key: "skillLevel" },
     { label: "備考", key: "memo" }
@@ -188,7 +190,9 @@ export default function Home() {
       furigana: song.furigana || '',
       tag1: song.tags[0] || '',
       tag2: song.tags[1] || '',
-      tag3: song.tags[2] || ''
+      tag3: song.tags[2] || '',
+      tag4: song.tags[3] || '',
+      tag5: song.tags[4] || ''
     }))
   };
 

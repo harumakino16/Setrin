@@ -48,8 +48,8 @@ const ImportModal = ({ onClose }) => {
     };
 
     const csvSchema = {
-        headers: ["曲名", "フリガナ", "アーティスト", "ジャンル", "タグ1", "タグ2", "タグ3", "カラオケ音源のYoutubeURL", "歌った回数", "熟練度", "備考"],
-        templateData: '曲名,フリガナ,アーティスト,ジャンル,タグ1,タグ2,タグ3,カラオケ音源のYoutubeURL,歌った回数,熟練度,備考\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
+        headers: ["曲名", "フリガナ", "アーティスト", "ジャンル", "タグ1", "タグ2", "タグ3", "タグ4", "タグ5", "カラオケ音源のYoutubeURL", "歌った回数", "熟練度", "備考"],
+        templateData: '曲名,フリガナ,アーティスト,ジャンル,タグ1,タグ2,タグ3,タグ4,タグ5,カラオケ音源のYoutubeURL,歌った回数,熟練度,備考\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,ロック,バラード,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
     };
 
     const updateDatabase = async (data, mode) => {
@@ -96,7 +96,7 @@ const ImportModal = ({ onClose }) => {
                     furigana: song['フリガナ'] || '',
                     artist: song['アーティスト'],
                     genre: song['ジャンル'],
-                    tags: [song['タグ1'], song['タグ2'], song['タグ3']].filter(tag => tag.trim() !== ''),
+                    tags: [song['タグ1'], song['タグ2'], song['タグ3'],song['タグ4'],song['タグ5']].filter(tag => tag.trim() !== ''),
                     youtubeUrl: song['カラオケ音源のYoutubeURL'],
                     singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
                     skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
@@ -118,27 +118,34 @@ const ImportModal = ({ onClose }) => {
         }
     };
 
-    const handleImport = () => {
+    const handleImport = async () => {
         if (!file) return;
 
-        Papa.parse(file, {
-            complete: async (results) => {
-                const data = results.data;
-                const headers = results.meta.fields;
+        if (importMode === 'replace') {
+            if (!window.confirm("既存の曲がすべて削除され、新しい曲リストに置き換えられます。よろしいですか？")) {
+                return; // キャンセルされたら処理を中断
+            }
+        }
 
-                if (!headers || !csvSchema.headers.every(header => headers.includes(header))) {
-                    alert('CSVファイルの形式が正しくありません。必要なヘッダー: ' + csvSchema.headers.join(', '));
-                    return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const csvData = e.target.result;
+            try {
+                const parsedData = Papa.parse(csvData, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: true
+                });
+                if (parsedData.errors.length > 0) {
+                    // エラー処理
+                } else {
+                    await updateDatabase(parsedData.data, importMode);
                 }
-
-                await updateDatabase(data, importMode);
-            },
-            error: (err) => {
-                
-            },
-            header: true,
-            skipEmptyLines: true
-        });
+            } catch (error) {
+                // エラー処理
+            }
+        };
+        reader.readAsText(file);
     };
 
     const handleDownloadTemplate = () => {
@@ -153,7 +160,6 @@ const ImportModal = ({ onClose }) => {
         document.body.removeChild(link);
     };
 
-    // Modal コンポーネントを使用して UI をレンダリング
     return (
         <div className="p-4 sm:p-6 lg:p-8">
             <div className="flex flex-col sm:flex-row justify-between items-center px-4 py-2">
