@@ -28,6 +28,7 @@ const SetlistDetail = () => {
     const [firstLoad, setFirstLoad] = useState(true);
     const [isEditOpen, setIsEditOpen] = useState(false); // Added state for edit modal
     const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
+    const [showArtist, setShowArtist] = useState(false);
 
     // visibleColumns の初期値をローカルストレージから取得
     const getInitialVisibleColumns = () => {
@@ -263,6 +264,28 @@ const SetlistDetail = () => {
                                                 <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} currentUser={currentUser} setlist={setlist} visibleColumns={visibleColumns} setVisibleColumns={toggleColumnVisibility} />
                                             </DndProvider>
                                         </div>
+                                        {currentSongs.length > 0 && (
+                                            <div className="mt-4">
+                                                <div className="flex justify-between mb-2">
+                                                    <p className="text-lg font-bold">曲名一覧(コピー用)</p>
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="showArtist"
+                                                            className="mr-2"
+                                                            onChange={(e) => setShowArtist(e.target.checked)}
+                                                        />
+                                                        <label htmlFor="showArtist" className="text-sm text-gray-500">アーティスト名も表示</label>
+                                                    </div>
+                                                </div>
+                                                <textarea
+                                                    readOnly
+                                                    className="w-full p-2 border rounded"
+                                                    rows={currentSongs.length}
+                                                    value={currentSongs.map(song => showArtist ? `${song.title} / ${song.artist}` : song.title).join('\n')}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
