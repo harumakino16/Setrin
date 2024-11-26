@@ -28,17 +28,40 @@ const SetlistDetail = () => {
     const [firstLoad, setFirstLoad] = useState(true);
     const [isEditOpen, setIsEditOpen] = useState(false); // Added state for edit modal
     const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
-    const [visibleColumns, setVisibleColumns] = useState({
-        order: { label: '順番', visible: true, removable: false },
-        title: { label: '曲名', visible: true, removable: true },
-        artist: { label: 'アーティスト', visible: true, removable: true },
-        genre: { label: 'ジャンル', visible: true, removable: true },
-        tags: { label: 'タグ', visible: true, removable: true },
-        singingCount: { label: '歌唱回数', visible: true, removable: true },
-        skillLevel: { label: '熟練度', visible: true, removable: true },
-        memo: { label: '備考', visible: true, removable: true },
-        delete: { label: '削除', visible: true, removable: true }
-    });
+
+    // visibleColumns の初期値をローカルストレージから取得
+    const getInitialVisibleColumns = () => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(`visibleColumns_setlist_${router.query.id}`);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (error) {
+                    console.error('Error parsing visibleColumns from localStorage:', error);
+                }
+            }
+        }
+        return {
+            order: { label: '順番', visible: true, removable: false },
+            title: { label: '曲名', visible: true, removable: true },
+            artist: { label: 'アーティスト', visible: true, removable: true },
+            genre: { label: 'ジャンル', visible: true, removable: true },
+            tags: { label: 'タグ', visible: true, removable: true },
+            singingCount: { label: '歌唱回数', visible: true, removable: true },
+            skillLevel: { label: '熟練度', visible: true, removable: true },
+            memo: { label: '備考', visible: true, removable: true },
+            delete: { label: '削除', visible: true, removable: true }
+        };
+    };
+
+    const [visibleColumns, setVisibleColumns] = useState(getInitialVisibleColumns);
+
+    // visibleColumns をローカルストレージに保存
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(`visibleColumns_setlist_${router.query.id}`, JSON.stringify(visibleColumns));
+        }
+    }, [visibleColumns, router.query.id]);
 
     useEffect(() => {
         const setlistRef = doc(db, `users/${currentUser.uid}/Setlists/${router.query.id}`);
