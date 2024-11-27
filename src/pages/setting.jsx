@@ -14,6 +14,7 @@ import Switch from '@/components/Switch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import Layout from '@/pages/layout';
+import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 function Settings() {
     const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
@@ -47,6 +48,7 @@ function Settings() {
             skillLevel: false
         }
     });
+    const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
     useEffect(() => {
         const { code } = router.query;
@@ -158,6 +160,7 @@ function Settings() {
             await deleteUser(auth.currentUser);
 
             alert('アカウントが削除されました。');
+            router.push('/');
         } catch (error) {
 
             alert('アカウントの削除に失敗しました。');
@@ -258,9 +261,15 @@ function Settings() {
 
     return (
         <Layout>
+            <div className="flex justify-between items-center p-8">
+                <h1 className="text-2xl font-bold">設定</h1>
+                <button onClick={handleLogout} className="text-red-500 hover:text-red-700 py-2 px-4 rounded inline-flex items-center">
+                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                    ログアウト
+                </button>
+            </div>
             <div className="flex">
                 <div className="flex-grow p-8">
-                    <h1 className="text-2xl font-bold mb-4">設定</h1>
                     <div className='mb-6'>
                         <div className="mb-6">
                             <label className="block mb-2 text-gray-700">メールアドレス:</label>
@@ -385,15 +394,26 @@ function Settings() {
                             )}
                         </div>
                     </div>
-                    <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
-                        更新
-                    </button>
-                    <button onClick={handleDeleteAccount} className="mt-4 float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        アカウントを削除
-                    </button>
-                    <button onClick={handleLogout} className="mt-4 float-right bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                        ログアウト
-                    </button>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <button onClick={() => setIsAccordionOpen(!isAccordionOpen)} className="text-black py-2 px-4 rounded text-sm flex items-center">
+                                <FontAwesomeIcon icon={isAccordionOpen ? faChevronUp : faChevronDown} className="mr-2" />
+                                その他の機能
+                            </button>
+                            {isAccordionOpen && (
+                                <div className="mt-2">
+                                    <button onClick={handleDeleteAccount} className="text-red-500 hover:text-red-700 py-2 px-4 rounded">
+                                        アカウントを削除
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
+                                更新
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </Layout>

@@ -72,7 +72,7 @@ export default function LandingPage() {
               <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary">お問い合わせ</Link></li>
             </ul>
           </nav>
-          <Link href="/" className="bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">今すぐ始める</Link>
+          <Link href="/" className="bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">今すぐ無料で始める</Link>
         </div>
       </header>
 
@@ -86,7 +86,7 @@ export default function LandingPage() {
             Setlinkは、セトリ作成からYouTubeの再生リスト自動作成まで、歌枠活動をスムーズにする全てを提供します。
           </p>
           <Link href="/" className="bg-customTheme-blue-primary text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors">
-            今すぐ始める
+            今すぐ無料で始める
           </Link>
         </div>
       </section>
@@ -105,14 +105,14 @@ export default function LandingPage() {
             <Feature
               number="1"
               imageSrc="/images/songlist_icon.svg"
-              title="簡単なセットリスト作成"
-              description="直感的なインターフェースで、数クリックでカスタムセットリストを作成。曲の追加や削除も簡単に行えます。"
+              title="簡単なセトリ作成"
+              description="直感的なインターフェースで、数クリックでセトリを作成。曲の追加や削除も簡単に行えます。"
             />
             <Feature
               number="2"
               imageSrc="/images/youtube_icon.svg"
               title="YouTube連携"
-              description="YouTubeと連携して、作成したセットリストを簡単にプレイリストとして共有。さらに、YouTubeの再生リストをアプリに取り込むことも可能です。"
+              description="YouTubeと連携して、作成したセトリで再生リストを作成。さらに、YouTubeの再生リストからアプリに取り込むことも可能です。"
             />
             <Feature
               number="3"
