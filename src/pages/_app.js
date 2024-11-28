@@ -1,27 +1,27 @@
 import { AuthProvider } from "@/context/AuthContext";
 import "@/styles/globals.css";
-import { MessageProvider, useMessage } from "@/context/MessageContext";
+import { MessageProvider } from "@/context/MessageContext";
 import MessageBox from "@/components/MessageBox";
 import { SongsProvider } from "@/context/SongsContext";
 import { Noto_Sans_JP } from "next/font/google";
-import Layout from "./layout";
 import { ThemeProvider } from "@/context/ThemeContext";
+
 const notoSansJP = Noto_Sans_JP({
-  weight: ['400', '700'], // 必要なウェイトを指定
-  subsets: ['latin'], // 必要なサブセットを指定
+  weight: ['400', '700'],
+  subsets: ['latin'],
 });
 
 export default function App({ Component, pageProps }) {
+  const getLayout = Component.getLayout || ((page) => page);
+
   return (
     <AuthProvider>
       <ThemeProvider>
         <MessageProvider>
           <SongsProvider>
             <div className={notoSansJP.className}>
-              <Layout>
-                <Component {...pageProps} />
-                <MessageBox />
-              </Layout>
+              {getLayout(<Component {...pageProps} />)}
+              <MessageBox />
             </div>
           </SongsProvider>
         </MessageProvider>

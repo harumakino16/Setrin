@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import React from 'react';
+import NoSidebarLayout from './noSidebarLayout';
 
 const PrivacyPolicy = () => {
   return (
-    <div className="p-5">
-      <h1 className="text-3xl font-bold mb-4">プライバシー ポリシー</h1>
+    <NoSidebarLayout>
+      <div className="p-5">
+        <h1 className="text-3xl font-bold mb-4">プライバシー ポリシー</h1>
       <p className="mb-4">このプライバシー ポリシーは、Setlink(以下、「本サービス」といいます。)がユーザーの情報をどのように収集、使用、保護するかについて説明します。</p>
       <h2 className="text-2xl font-bold mt-4">1. 収集する情報</h2>
       <ul className="list-disc pl-5">
@@ -57,7 +59,8 @@ const PrivacyPolicy = () => {
       <h2 className="text-2xl font-bold mt-4">9. お問い合わせ</h2>
       <p className="mb-4">プライバシー ポリシーに関するご質問や懸念がある場合は、<Link href="/contact" className="text-blue-500 hover:text-blue-600">お問い合わせページ</Link>からご連絡ください。</p>
       <p className="mb-4">このプライバシー ポリシーは、ユーザーが安心して本サービスを利用できるよう努めています。</p>
-    </div>
+      </div>
+    </NoSidebarLayout>
   );
 };
 

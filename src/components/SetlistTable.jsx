@@ -15,20 +15,20 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
   const headerRefs = useRef([]);
   const [resizing, setResizing] = useState({
     isResizing: false,
-    index: null,
+    key: null,
     startX: 0,
     startWidth: 0,
   });
 
   // headerRefsの初期化
   useEffect(() => {
-    headerRefs.current = headerRefs.current.slice(0, 10);
-  }, []);
+    headerRefs.current = headerRefs.current.slice(0, Object.keys(visibleColumns).length + 2);
+  }, [visibleColumns]);
 
-  const handleColumnResize = (index, newWidth) => {
+  const handleColumnResize = (key, newWidth) => {
     setColumnWidths((prev) => ({
       ...prev,
-      [index]: newWidth,
+      [key]: newWidth,
     }));
   };
 
@@ -202,17 +202,17 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
     );
   };
 
-  const handleMouseDown = (e, index) => {
+  const handleMouseDown = (e, key) => {
     e.preventDefault();
-    const headerCell = headerRefs.current[index];
-    if (!headerCell) return; // headerCellが存在しない場合は処理を中断
+    const headerCell = headerRefs.current[key];
+    if (!headerCell) return;
 
-    const startX = e.clientX; // マウスの位置を取得
+    const startX = e.clientX;
     const startWidth = headerCell.offsetWidth;
 
     setResizing({
       isResizing: true,
-      index,
+      key,
       startX,
       startWidth,
     });
@@ -226,12 +226,12 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
       const newWidth = Math.max(resizing.startWidth + deltaX, 100);
       setColumnWidths((prev) => ({
         ...prev,
-        [resizing.index]: `${newWidth}px`,
+        [resizing.key]: `${newWidth}px`,
       }));
     };
 
     const handleMouseUp = () => {
-      setResizing({ isResizing: false, index: null, startX: 0, startWidth: 0 });
+      setResizing({ isResizing: false, key: null, startX: 0, startWidth: 0 });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -247,47 +247,60 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
     <div className="overflow-x-auto w-full">
       <table
         ref={tableRef}
-        className="whitespace-nowrap w-full table-fixed"
+        className="whitespace-nowrap w-full table-auto"
       >
         <colgroup>
           <col style={{ width: '30px' }} />
-          <col style={{ width: '40px' }} />
-          {[...Array(8)].map((_, index) => (
-            <col key={index} style={{ width: columnWidths[index + 2] || 'auto' }} />
+          {visibleColumns.order.visible && <col style={{ width: '40px' }} />}
+          {Object.entries(visibleColumns).map(([key, { visible }]) => (
+            visible && <col key={key} style={{ width: columnWidths[key] || 'auto' }} />
           ))}
         </colgroup>
         <thead className="bg-gray-200">
           <tr>
-            {[
-              '',
-              '順番',
-              '曲名',
-              'アーティスト',
-              'ジャンル',
-              'タグ',
-              '歌唱回数',
-              '熟練度',
-              '備考',
-              '削除',
-            ].map((header, index) => (
+            {/* ドラッグハンドル列 */}
+            <th
+              className="px-4 py-2 relative border-r border-white"
+              style={{ width: '30px' }}
+            >
+              {/* ここにドラッグハンドルのアイコン等を追加可能 */}
+            </th>
+            {/* 順番列 */}
+            {visibleColumns.order.visible && (
               <th
-                key={header}
-                ref={(el) => (headerRefs.current[index] = el)}
-                className="px-4 py-2 relative border-r border-white last:border-r-0"
-                style={{
-                  width: index < 2 ? '40px' : (columnWidths[index] || (index === 2 || index === 3 ? '200px' : '100px')),
-                  minWidth: index < 2 ? '40px' : '50px',
-                }}
+                ref={(el) => (headerRefs.current['order'] = el)}
+                className="px-4 py-2 relative border-r border-white"
+                style={{ width: '40px' }}
               >
-                {header}
-                {index >= 2 && (
+                順番
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-2 cursor-col-resize"
+                  onMouseDown={(e) => handleMouseDown(e, 'order')}
+                />
+              </th>
+            )}
+            {/* その他の列 */}
+            {Object.entries(visibleColumns).map(([key, { label, visible }]) => {
+              if (key === 'order') return null; // 既に処理済み
+              if (!visible) return null;
+              return (
+                <th
+                  key={key}
+                  ref={(el) => (headerRefs.current[key] = el)}
+                  className="px-4 py-2 relative border-r border-white last:border-r-0"
+                  style={{
+                    width: columnWidths[key] || 'auto',
+                    minWidth: '50px',
+                  }}
+                >
+                  {label}
                   <div
                     className="absolute top-0 right-0 bottom-0 w-2 cursor-col-resize"
-                    onMouseDown={(e) => handleMouseDown(e, index)}
+                    onMouseDown={(e) => handleMouseDown(e, key)}
                   />
-                )}
-              </th>
-            ))}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>

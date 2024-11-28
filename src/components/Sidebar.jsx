@@ -1,6 +1,6 @@
 import { faMusic } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHistory, faTools, faUserShield } from "@fortawesome/free-solid-svg-icons";
+import { faHistory, faTools, faUserShield, faChartLine } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
@@ -17,6 +17,11 @@ const MENU = [
         title: "曲リスト",
         iconName: faMusic,
         path: "/",
+    },
+    {
+        title: "ダッシュボード",
+        iconName: faChartLine,
+        path: "/dashboard",
     },
     {
         title: "セットリスト",
@@ -47,6 +52,10 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
 
     console.log(isAdmin);
 
+    if (!currentUser) {
+        return null;
+      }
+
     return (
         <div className="sidebar w-64 min-w-[256px] flex flex-col justify-between">
             <div>
@@ -65,7 +74,7 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
                             )
                         })}
                         {isAdmin && ( // 管理者の場合のみ表示
-                            <Link href="/admin/dashboard" onClick={onLinkClick}>
+                            <Link href="/admin/admin_dashboard" onClick={onLinkClick}>
                                 <li className="flex items-center text-gray-700 text-sm font-medium py-2 px-6 hover:bg-gray-200 cursor-pointer gap-2">
                                     <FontAwesomeIcon icon={faUserShield} />管理者ページ
                                 </li>

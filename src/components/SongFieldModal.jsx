@@ -7,6 +7,8 @@ import { useMessage } from '../context/MessageContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatSongData } from '../utils/songUtils';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FREE_PLAN_LIMIT } from '@/constants';
+import { useSongs } from '../context/SongsContext';
 
 const isKatakana = (str) => {
   return /^[ァ-ヶー　]*$/.test(str || '');
@@ -29,11 +31,17 @@ function SongModal({ isOpen, onClose, song }) {
   const { setMessageInfo } = useMessage();
   const { theme } = useTheme();
   const [furiganaError, setFuriganaError] = useState(false);
+  const { songs } = useSongs();
 
   const handleSaveSong = async () => {
     if (furigana && !isKatakana(furigana)) {
       setFuriganaError(true);
       setMessageInfo({ message: 'フリガナはカタカナのみで入力してください。', type: 'error' });
+      return;
+    }
+
+    if (isNewSong && songs.length >= FREE_PLAN_LIMIT) {
+      setMessageInfo({ message: `曲の追加が無料プランの上限(${FREE_PLAN_LIMIT})を超えています。`, type: 'error' });
       return;
     }
 
@@ -122,7 +130,9 @@ function SongModal({ isOpen, onClose, song }) {
             </>
           )}
         </div>
-        <button onClick={handleSaveSong} className={`button bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold p-3 rounded mt-3`}>{isNewSong ? '曲を追加する' : '編集完了'}</button>
+        <button onClick={handleSaveSong} className={`button bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold p-3 rounded mt-3`}>
+          {isNewSong ? '曲を追加する' : '編集完了'}
+        </button>
       </div>
     </Container>
   );

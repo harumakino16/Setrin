@@ -23,4 +23,9 @@ interface User {
   
   // 新規追加
   publicPage: PublicPageSettings;
+
+  // プラン情報を追加
+  plan: 'free' | 'premium'; // ユーザーのプラン
+  playlistCreationCount?: number; // 今月の再生リスト作成回数
+  planUpdatedAt?: Date; // プランの最終更新日時
 } 
