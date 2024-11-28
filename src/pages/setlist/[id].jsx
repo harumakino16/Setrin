@@ -17,6 +17,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Layout from '@/pages/layout';
 import { YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
+import { useTheme } from '@/context/ThemeContext';
+
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
     const [currentSongs, setCurrentSongs] = useState([]);
@@ -29,6 +31,8 @@ const SetlistDetail = () => {
     const [isEditOpen, setIsEditOpen] = useState(false); // Added state for edit modal
     const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
     const [showArtist, setShowArtist] = useState(false);
+    const { theme } = useTheme();
+
 
     // visibleColumns の初期値をローカルストレージから取得
     const getInitialVisibleColumns = () => {
@@ -230,7 +234,7 @@ const SetlistDetail = () => {
                                         <p>このセットリストに曲はありません。</p>
                                         <button
                                             onClick={() => router.push('/')}
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out"
+                                            className={`bg-customTheme-${theme}-primary text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out`}
                                         >
                                             曲を追加する
                                         </button>
