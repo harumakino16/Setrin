@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { db } from '../../firebaseConfig';
-import { updateDoc, doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
+import { updateDoc, doc, deleteDoc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import googleIcon from '../../public/images/web_light_rd_SI@4x.png';
@@ -15,8 +15,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import Layout from '@/pages/layout';
 import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { loadStripe } from '@stripe/stripe-js';
+
 function Settings() {
-    const { currentUser, loading } = useContext(AuthContext);
+    const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [selectedTheme, setSelectedTheme] = useState(currentUser?.theme || 'blue');
@@ -49,6 +51,8 @@ function Settings() {
         }
     });
     const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+    const { upgrade_success } = router.query;
+    const [cancelAt, setCancelAt] = useState(null);
 
     useEffect(() => {
         const { code } = router.query;
@@ -75,12 +79,45 @@ function Settings() {
         }
     }, [currentUser]);
 
+    useEffect(() => {
+        if (upgrade_success) {
+            setMessageInfo({ message: 'プランをアップグレードしました', type: 'success' });
+            router.replace('/setting', undefined, { shallow: true });
+        }
+    }, [upgrade_success, router]);
+
+    useEffect(() => {
+        const fetchSubscriptionStatus = async () => {
+            try {
+                const response = await fetch('/api/get-subscription-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ uid: currentUser.uid }),
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.cancelAt) {
+                        setCancelAt(data.cancelAt);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching subscription status:', error);
+            }
+        };
+
+        if (currentUser && currentUser.plan === 'premium') {
+            fetchSubscriptionStatus();
+        }
+    }, [currentUser]);
+
     if (loading) {
         return <Loading />;
     }
 
     if (!currentUser) {
-        return <div className="text-center py-10">ログインが必要です。ログインページへのリンクを表示するなどの処理をここに追加。</div>;
+        return <div className="text-center py-10">ログインが必要です。ログインページへのンクを表示するなどの処理をここに追加。</div>;
     }
 
     async function handleCodeExchangeAndSave(code) {
@@ -194,7 +231,7 @@ function Settings() {
 
             setMessageInfo({ message: 'YouTubeとの連携が解除されました。', type: 'success' });
         } catch (error) {
-            console.error('YouTube連携解除エラー:', error);
+            console.error('YouTube連携解エラー:', error);
             setMessageInfo({ message: `エラー: ${error.message}`, type: 'error' });
         }
     };
@@ -259,6 +296,50 @@ function Settings() {
         }
     };
 
+    const handleUpgradePlan = async () => {
+        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+
+        const response = await fetch('/api/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ uid: currentUser.uid }),
+        });
+
+        const session = await response.json();
+
+        await stripe.redirectToCheckout({ sessionId: session.id });
+    };
+
+    const handleCancelPlan = async () => {
+        if (window.confirm(`本当にプレミアムプランをキャンセルしますか？\n(プランをキャンセルしても${new Date(currentUser.planUpdatedAt.toDate().getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}までは利用できます。)`)) {
+            try {
+                const response = await fetch('/api/cancel-subscription', {
+                    method: 'POST',
+                    body: JSON.stringify({ uid: currentUser.uid }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'サブスクリプションのキャンセルに失敗しました。');
+                }
+
+                const data = await response.json();
+                setCancelAt(data.cancelAt);
+
+                setMessageInfo({ message: data.message, type: 'success' });
+
+            } catch (error) {
+                setMessageInfo({ message: error.message, type: 'error' });
+                console.error("Error cancelling subscription:", error);
+            }
+        }
+    };
+
     return (
         <Layout>
             <div className="flex justify-between items-center p-8">
@@ -271,6 +352,34 @@ function Settings() {
             <div className="flex">
                 <div className="flex-grow p-8">
                     <div className='mb-6'>
+                        <div className="mt-8 mb-8">
+                            <label className="block mb-2 text-gray-700">プラン設定:</label>
+                            <div className="bg-white shadow-md rounded px-5 py-3 flex justify-between items-center">
+                                <p className="mr-4">現在のプラン: {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}</p>
+                                {currentUser.plan === 'free' ? (
+                                    <button
+                                        onClick={handleUpgradePlan}
+                                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                    >
+                                        プレミアムプランにアップグレード
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center">
+                                        {cancelAt ? (
+                                            <p className="mr-4">プレミアムプランは {new Date(cancelAt).toLocaleDateString()} に自動解約されます</p>
+                                        ) : (
+                                            <p className="mr-4"></p>
+                                        )}
+                                        <button
+                                            onClick={handleCancelPlan}
+                                            className="text-red-500 hover:text-red-700 py-2 px-4 rounded"
+                                        >
+                                            プレミアムプランをキャンセル
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <div className="mb-6">
                             <label className="block mb-2 text-gray-700">メールアドレス:</label>
                             <input type="email" className="border p-2 rounded w-full shadow-sm" value={email} onChange={(e) => setEmail(e.target.value)} />

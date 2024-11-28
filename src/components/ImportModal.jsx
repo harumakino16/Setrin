@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileCsv, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import Papa from 'papaparse';
 import { db } from '../../firebaseConfig';
-import { collection, doc, writeBatch, getDocs } from 'firebase/firestore';
+import { collection, doc, writeBatch, getDocs, serverTimestamp } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
+import { FREE_PLAN_LIMIT } from '@/constants';
 
 const ImportModal = ({ onClose }) => {
     const [file, setFile] = useState(null);
@@ -62,25 +63,59 @@ const ImportModal = ({ onClose }) => {
             });
         }
 
-        data.forEach(song => {
-            const docRef = doc(songsRef);
-            const songData = {
-                title: song['曲名'],
-                furigana: song['フリガナ'] || '',
-                artist: song['アーティスト'],
-                genre: song['ジャンル'],
-                tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']].filter(tag => tag.trim() !== ''),
-                youtubeUrl: song['カラオケ音源のYoutubeURL'],
-                singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
-                skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
-                memo: song['備考']
-            };
-            batch.set(docRef, songData);
-        });
+        if (mode === 'append' && currentUser.plan === 'free') {
+            const querySnapshot = await getDocs(songsRef);
+            const currentSongCount = querySnapshot.size; // 現在の曲数を取得
 
-        await batch.commit();
-        setMessageInfo('success', 'インポートが完了しました');
-        onClose();
+            if (currentSongCount + data.length > FREE_PLAN_LIMIT) {
+                setMessageInfo({ message: `無料プランでは${FREE_PLAN_LIMIT}曲までしか保存できません。現在の曲数は${currentSongCount}曲です。`, type: 'error' });
+                onClose(); // モーダルを閉じる
+                return;
+            }
+        }
+
+        if (mode === 'append') {
+            // 有料プランの場合、または無料プランで制限内の場合の処理
+            if (currentUser.plan === 'free') {
+                // 無料プランの場合、既存の曲数を取得して制限を確認
+                const querySnapshot = await getDocs(songsRef);
+                const currentSongCount = querySnapshot.size;
+
+                if (currentSongCount + data.length > FREE_PLAN_LIMIT) {
+                    setMessageInfo({ message: `無料プランでは${FREE_PLAN_LIMIT}曲までしか保存できません。現在の曲数は${currentSongCount}曲です。`, type: 'error' });
+                    onClose(); // モーダルを閉じる
+                    return;
+                }
+            }
+
+            // 曲を追加する処理
+            data.forEach(song => {
+                const docRef = doc(songsRef);
+                const songData = {
+                    title: song['曲名'],
+                    furigana: song['フリガナ'] || '',
+                    artist: song['アーティスト'],
+                    genre: song['ジャンル'],
+                    tags: [song['タグ1'], song['タグ2'], song['タグ3'],song['タグ4'],song['タグ5']].filter(tag => tag.trim() !== ''),
+                    youtubeUrl: song['カラオケ音源のYoutubeURL'],
+                    singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
+                    skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
+                    memo: song['備考'] || '',
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                };
+                batch.set(docRef, songData);
+            });
+        }
+
+        try {
+            await batch.commit();
+            setMessageInfo({ message: 'インポートが完了しました', type: 'success' });
+            onClose(); // モーダルを閉じる
+        } catch (error) {
+            setMessageInfo({ message: 'インポート中にエラーが発生しました', type: 'error' });
+            console.error('インポートエラー:', error);
+        }
     };
 
     const handleImport = async () => {
