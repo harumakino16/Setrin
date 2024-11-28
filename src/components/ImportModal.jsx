@@ -8,6 +8,7 @@ import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
 import { FREE_PLAN_LIMIT } from '@/constants';
+import { CSV_HEADERS } from '../constants/csvHeaders'; // ヘッダー情報をインポート
 
 const ImportModal = ({ onClose }) => {
     const [file, setFile] = useState(null);
@@ -48,8 +49,8 @@ const ImportModal = ({ onClose }) => {
     };
 
     const csvSchema = {
-        headers: ["曲名", "フリガナ", "アーティスト", "ジャンル", "タグ1", "タグ2", "タグ3", "タグ4", "タグ5", "カラオケ音源のYoutubeURL", "歌った回数", "熟練度", "備考"],
-        templateData: '曲名,フリガナ,アーティスト,ジャンル,タグ1,タグ2,タグ3,タグ4,タグ5,カラオケ音源のYoutubeURL,歌った回数,熟練度,備考\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,ロック,バラード,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
+        headers: CSV_HEADERS,
+        templateData: CSV_HEADERS.join(',') + '\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,ロック,バラード,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
     };
 
     const updateDatabase = async (data, mode) => {

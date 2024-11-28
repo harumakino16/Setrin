@@ -8,7 +8,7 @@ import SearchForm from "@/components/searchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faFolderPlus, faTrash, faFileExport } from "@fortawesome/free-solid-svg-icons";
 import { useMessage } from "@/context/MessageContext";
 import { useSongs } from '../context/SongsContext';
 import useSearchCriteria from '@/hooks/useSearchCriteria'; // カスタムフックをインポート
@@ -20,6 +20,46 @@ import Link from "next/link";
 import LoginForm from "@/components/LoginForm";
 import Layout from "@/pages/layout";
 import NoSidebarLayout from "./noSidebarLayout";
+import { saveAs } from 'file-saver';
+import { CSV_HEADERS } from '../constants/csvHeaders'; // ヘッダー情報をインポート
+
+// CSVファイルを生成する関数
+const exportToCSV = (data) => {
+  const csvRows = [];
+  csvRows.push(CSV_HEADERS.join(','));
+
+  data.forEach(song => {
+    const values = [
+      song.title || '',
+      song.furigana || '',
+      song.artist || '',
+      song.genre || '',
+      (song.tags && song.tags[0]) || '',
+      (song.tags && song.tags[1]) || '',
+      (song.tags && song.tags[2]) || '',
+      (song.tags && song.tags[3]) || '',
+      (song.tags && song.tags[4]) || '',
+      song.youtubeUrl || '',
+      song.singingCount || 0,
+      song.skillLevel || 0,
+      song.memo || ''
+    ].map(value => {
+      const escaped = ('' + value).replace(/"/g, '""');
+      return `"${escaped}"`;
+    });
+    csvRows.push(values.join(','));
+  });
+
+  const csvString = csvRows.join('\n');
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+  // 現在の日付を取得してファイル名に追加
+  const date = new Date();
+  const formattedDate = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+  const filename = `Setlink_曲リスト_${formattedDate}.csv`;
+
+  saveAs(blob, filename);
+};
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -236,7 +276,7 @@ export default function Home() {
               </p>
               <h2 className="text-3xl font-bold mb-4">特徴</h2>
               <ul className="list-disc list-inside text-lg mb-6 space-y-2">
-                <li>🎵 <strong>簡単なセトリ作成：</strong>直感的なインターフェースで、数クリックで自由にセトリを作成</li>
+                <li>🎵 <strong>簡単なセトリ作成：</strong>直感的なインター��ェスで、数クリックで自由にセトリを作成</li>
                 <li>🎬 <strong>YouTube連携：</strong>YouTubeと連携して、再生リストを作成</li>
                 <li>📁 <strong>詳細な曲管理：</strong>曲名、アーティスト、ジャンル、タグなどで曲を整理</li>
                 <li>🔀 <strong>ランダムセトリ作成：</strong>指定した条件でランダムにセトリを生成</li>
@@ -287,7 +327,18 @@ export default function Home() {
                 <FaPen className="mr-2" />
                 列の表示
               </button>
+              <button
+                onClick={() => exportToCSV(tableData)}
+                className={`flex items-center bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}
+              >
+                <FontAwesomeIcon icon={faFileExport} className="mr-2" />
+                エクスポート
+              </button>
             </div>
+          </div>
+
+          <div className="flex justify-end mb-4">
+            
           </div>
 
           <MainTable

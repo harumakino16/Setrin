@@ -281,7 +281,7 @@ function MainTable({
                     <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>
                   )}
                   {visibleColumns.memo.visible && (
-                    <td className="px-6 py-4 whitespace-nowrap">{song.memo}</td>
+                    <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.memo}</td>
                   )}
                   {visibleColumns.actions.visible && (
                     <td className="px-6 py-4 whitespace-nowrap">
