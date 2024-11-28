@@ -244,7 +244,7 @@ const SetlistDetail = () => {
                                                 className={`text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken || currentSongs.length === 0 ? ' bg-gray-400 hover:bg-gray-400 cursor-not-allowed disabled' : 'bg-red-500 hover:bg-red-700'}`}
                                             >
                                                 <FontAwesomeIcon icon={faYoutube} className="mr-2" />
-                                                YouTubeの再生リストに追加
+                                                YouTubeに再生リストを作成
                                             </button>
                                             <button
                                                 onClick={() => setIsColumnSettingsOpen(true)}
