@@ -7,14 +7,25 @@ import Layout from '@/pages/layout';
 
 const AdminDashboard = () => {
   const [recentActivities, setRecentActivities] = useState([]);
-
-
+  const [userCount, setUserCount] = useState(0); // ユーザー数の状態を追加
 
   const fetchRecentActivities = async () => {
     // 最近のアクティビティを取得するロジックを追加
   };
 
-  fetchRecentActivities();
+  const fetchUserCount = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      setUserCount(querySnapshot.size); // ユーザー数を設定
+    } catch (error) {
+      console.error("Error fetching user count: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentActivities();
+    fetchUserCount(); // ユーザー数を取得
+  }, []);
 
   return (
     <Layout>
@@ -43,6 +54,7 @@ const AdminDashboard = () => {
           <div className="bg-white shadow-md rounded p-4">
             <h2 className="text-xl font-semibold mb-2">統計情報</h2>
             <p>総セットリスト数: </p>
+            <p>ユーザー数: {userCount}</p> {/* ユーザー数を表示 */}
             {/* 他の統計情報を追加 */}
           </div>
         </div>
