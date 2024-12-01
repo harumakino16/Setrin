@@ -264,19 +264,19 @@ export default function Home() {
       <NoSidebarLayout>
         <div className="flex flex-col min-h-screen">
           <div className="flex-grow flex flex-col items-center justify-center p-6">
-            <h1 className="text-5xl font-extrabold mb-6">Setlinkへようこそ</h1>
-            <p className="text-2xl mb-8">Vtuberの歌枠をもっと簡単に</p>
+            <h1 className="text-3xl md:text-5xl font-extrabold mb-6">Setlinkへようこそ</h1>
+            <p className="text-xl mb-8 text-center md:text-left">Vtuberの歌枠をもっと簡単に</p>
             <LoginForm />
           </div>
           <div className="bg-white bg-opacity-20 rounded-t-3xl p-8 text-left backdrop-filter backdrop-blur-lg">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold mb-4">Setlinkとは？</h2>
               <p className="text-lg mb-6">
-                SetlinkはVtuberのための無料歌枠管理ツールです。歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を取り込んだりできます。
+                SetlinkはVtuberのための無料歌枠管理ツールです。<br />歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を取り込んだりできます。
               </p>
               <h2 className="text-3xl font-bold mb-4">特徴</h2>
               <ul className="list-disc list-inside text-lg mb-6 space-y-2">
-                <li>🎵 <strong>簡単なセトリ作成：</strong>直感的なインター��ェスで、数クリックで自由にセトリを作成</li>
+                <li>🎵 <strong>簡単なセトリ作成：</strong>直感的なインターフェースで、数クリックで自由にセトリを作成</li>
                 <li>🎬 <strong>YouTube連携：</strong>YouTubeと連携して、再生リストを作成</li>
                 <li>📁 <strong>詳細な曲管理：</strong>曲名、アーティスト、ジャンル、タグなどで曲を整理</li>
                 <li>🔀 <strong>ランダムセトリ作成：</strong>指定した条件でランダムにセトリを生成</li>
