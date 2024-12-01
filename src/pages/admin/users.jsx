@@ -52,11 +52,15 @@ const ManageUsers = () => {
           const songsCollection = collection(db, 'users', doc.id, 'Songs');
           const songsSnapshot = await getCountFromServer(songsCollection);
           const totalSongs = songsSnapshot.data().count;
-          console.log('User ID:', doc.id);
-          console.log('Total Songs:', totalSongs);
-          return { id: doc.id, ...userData, totalSongs };
+
+          const createdAt = userData.createdAt ? userData.createdAt.toDate() : null;
+
+          return { id: doc.id, ...userData, totalSongs, createdAt };
         })
       );
+
+      usersList.sort((a, b) => b.createdAt - a.createdAt);
+
       setUsers(usersList);
     };
 
@@ -74,6 +78,7 @@ const ManageUsers = () => {
               <th className="py-2">メールアドレス</th>
               <th className="py-2">表示名</th>
               <th className="py-2">総曲数</th>
+              <th className="py-2">登録日時</th>
               <th className="py-2">操作</th>
             </tr>
           </thead>
@@ -84,6 +89,9 @@ const ManageUsers = () => {
                 <td className="border px-4 py-2">{user.email}</td>
                 <td className="border px-4 py-2">{user.displayName}</td>
                 <td className="border px-4 py-2">{user.totalSongs}</td>
+                <td className="border px-4 py-2">
+                  {user.createdAt ? user.createdAt.toLocaleString() : 'N/A'}
+                </td>
                 <td className="border px-4 py-2">
                   <button
                     onClick={() => handleLoginAsUser(user.id)}
