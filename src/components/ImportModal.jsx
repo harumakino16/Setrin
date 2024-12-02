@@ -70,7 +70,8 @@ const ImportModal = ({ onClose }) => {
                     furigana: song['フリガナ'] || '',
                     artist: song['アーティスト'],
                     genre: song['ジャンル'],
-                    tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']].filter(tag => tag.trim() !== ''),
+                    tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']]
+                        .filter(tag => tag && tag.trim() !== ''),
                     youtubeUrl: song['カラオケ音源のYoutubeURL'],
                     singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
                     skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
@@ -101,7 +102,8 @@ const ImportModal = ({ onClose }) => {
                     furigana: song['フリガナ'] || '',
                     artist: song['アーティスト'],
                     genre: song['ジャンル'],
-                    tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']].filter(tag => tag.trim() !== ''),
+                    tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']]
+                        .filter(tag => tag && tag.trim() !== ''),
                     youtubeUrl: song['カラオケ音源のYoutubeURL'],
                     singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
                     skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
