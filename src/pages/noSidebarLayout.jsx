@@ -6,7 +6,7 @@ export default function NoSidebarLayout({ children }) {
     <div>
       <Header />
       <div className="bg-[#efeeea] min-h-screen">
-        <main className="p-4 w-full">
+        <main className="md:p-4 p-2 w-full">
           {children}
         </main>
       </div>

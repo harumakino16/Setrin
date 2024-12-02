@@ -64,8 +64,8 @@ export default function PublicSongList() {
 
   return (
     <NoSidebarLayout>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-4">{userInfo?.displayName || '名称未設定...'}</h1>
+      <div className="py-8">
+        <h1 className="md:text-3xl text-2xl font-bold mb-4">{userInfo?.displayName || '名称未設定...'}</h1>
         {userInfo?.description && (
           <p className="mb-8">{userInfo.description}</p>
         )}
