@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { convertKanaToHira } from '../utils/stringUtils';
 
 const PublicSongTable = ({ songs, visibleColumns }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   
   const columnLabels = [
     { key: 'title', label: '曲名' },
@@ -30,6 +31,30 @@ const PublicSongTable = ({ songs, visibleColumns }) => {
       (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
     );
   });
+
+  const sortedSongs = useMemo(() => {
+    let sortableSongs = [...filteredSongs];
+    if (sortConfig.key) {
+      sortableSongs.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableSongs;
+  }, [filteredSongs, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
 
   return (
     <div>
@@ -63,17 +88,23 @@ const PublicSongTable = ({ songs, visibleColumns }) => {
                   <th
                     key={key}
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                     style={{ maxWidth: '250px' }}
+                    onClick={() => requestSort(key)}
                   >
                     {label}
+                    <span>
+                      {sortConfig.key === key ? (
+                        sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'
+                      ) : ' ⇅'}
+                    </span>
                   </th>
                 )
               )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredSongs.map((song, index) => (
+            {sortedSongs.map((song, index) => (
               <tr key={song.id || index}>
                 {columnLabels.map(({ key }) => 
                   visibleColumns?.[key] && (
