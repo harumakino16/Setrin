@@ -101,6 +101,7 @@ export default async function handler(req, res) {
                         genre: '',
                         singingCount: 0,
                         skillLevel: 0,
+                        furigana: ''
                     }));
 
                     return res.status(200).json({ 
