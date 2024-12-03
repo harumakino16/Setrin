@@ -71,7 +71,7 @@ export default function Home() {
   });
 
   const { currentUser } = useContext(AuthContext);
-  const { songs } = useSongs();
+  const { songs, setSongs } = useSongs();
   const [searchPerformed, setSearchPerformed] = useState(false);
   const { searchCriteria, setSearchCriteria } = useSearchCriteria({}); // カスタムフックを使用
   const [selectAll, setSelectAll] = useState(false);
@@ -258,6 +258,22 @@ export default function Home() {
     // 曲の追加処理
   };
 
+  const handleIncreaseSingingCount = (songId) => {
+    setSongs(prevSongs =>
+      prevSongs.map(song =>
+        song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
+      )
+    );
+  };
+
+  const handleDecreaseSingingCount = (songId) => {
+    setSongs(prevSongs =>
+      prevSongs.map(song =>
+        song.id === songId ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) } : song
+      )
+    );
+  };
+
   // 未ログイン時のデザイン
   if (!currentUser) {
     return (
@@ -353,6 +369,8 @@ export default function Home() {
             tableData={tableData}
             onAddToSetlist={handleAddToSetlist}
             sortConfig={sortConfig}
+            handleIncreaseSingingCount={handleIncreaseSingingCount}
+            handleDecreaseSingingCount={handleDecreaseSingingCount}
           />
 
           {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
