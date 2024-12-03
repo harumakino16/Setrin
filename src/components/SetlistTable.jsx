@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { db } from '../../firebaseConfig';
-import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, writeBatch, increment } from 'firebase/firestore';
 import { useMessage } from "@/context/MessageContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
@@ -108,32 +108,84 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
     setSaveTrigger(true); // 保存トリガーを設定
   };
 
-  const handleIncreaseSingingCount = (songId) => {
-    setCurrentSongs(prevSongs =>
-      prevSongs.map(song =>
-        song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
-      )
-    );
+  const handleIncreaseSingingCount = async (songId) => {
+    try {
+      // ローカルの状態を更新
+      setCurrentSongs(prevSongs =>
+        prevSongs.map(song =>
+          song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
+        )
+      );
+      
+      // Firestoreのsongドキュメントを更新
+      const songDocRef = doc(db, `users/${currentUser.uid}/Songs/${songId}`);
+      await updateDoc(songDocRef, {
+        singingCount: increment(1)
+      });
+    } catch (error) {
+      // エラーハンドリング
+      setMessageInfo({ message: '歌唱回数の更新に失敗しました', type: 'error' });
+    }
   };
 
-  const handleDecreaseSingingCount = (songId) => {
-    setCurrentSongs(prevSongs =>
-      prevSongs.map(song =>
-        song.id === songId ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) } : song
-      )
-    );
+  const handleDecreaseSingingCount = async (songId) => {
+    try {
+      // ローカルの状態を更新
+      setCurrentSongs(prevSongs =>
+        prevSongs.map(song =>
+          song.id === songId ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) } : song
+        )
+      );
+      
+      // Firestoreのsongドキュメントを更新
+      const songDocRef = doc(db, `users/${currentUser.uid}/Songs/${songId}`);
+      await updateDoc(songDocRef, {
+        singingCount: increment(-1)
+      });
+    } catch (error) {
+      // エラーハンドリング
+      setMessageInfo({ message: '歌唱回数の更新に失敗しました', type: 'error' });
+    }
   };
 
-  const increaseAllSingingCounts = () => {
-    setCurrentSongs(prevSongs =>
-      prevSongs.map(song => ({ ...song, singingCount: song.singingCount + 1 }))
-    );
+  const increaseAllSingingCounts = async () => {
+    try {
+      // ローカルの状態を更新
+      setCurrentSongs(prevSongs =>
+        prevSongs.map(song => ({ ...song, singingCount: song.singingCount + 1 }))
+      );
+      
+      // Firestoreのsongドキュメントをバッチ更新
+      const batch = writeBatch(db);
+      currentSongs.forEach(song => {
+        const songDocRef = doc(db, `users/${currentUser.uid}/Songs/${song.id}`);
+        batch.update(songDocRef, { singingCount: increment(1) });
+      });
+      await batch.commit();
+    } catch (error) {
+      // エラーハンドリング
+      setMessageInfo({ message: '歌唱回数の一括更新に失敗しました', type: 'error' });
+    }
   };
 
-  const decreaseAllSingingCounts = () => {
-    setCurrentSongs(prevSongs =>
-      prevSongs.map(song => ({ ...song, singingCount: Math.max(song.singingCount - 1, 0) }))
-    );
+  const decreaseAllSingingCounts = async () => {
+    try {
+      // ローカルの状態を更新
+      setCurrentSongs(prevSongs =>
+        prevSongs.map(song => ({ ...song, singingCount: Math.max(song.singingCount - 1, 0) }))
+      );
+      
+      // Firestoreのsongドキュメントをバッチ更新
+      const batch = writeBatch(db);
+      currentSongs.forEach(song => {
+        const songDocRef = doc(db, `users/${currentUser.uid}/Songs/${song.id}`);
+        batch.update(songDocRef, { singingCount: increment(-1) });
+      });
+      await batch.commit();
+    } catch (error) {
+      // エラーハンドリング
+      setMessageInfo({ message: '歌唱回数の一括更新に失敗しました', type: 'error' });
+    }
   };
 
   const Row = ({ song, index }) => {
