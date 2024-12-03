@@ -108,6 +108,34 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
     setSaveTrigger(true); // 保存トリガーを設定
   };
 
+  const handleIncreaseSingingCount = (songId) => {
+    setCurrentSongs(prevSongs =>
+      prevSongs.map(song =>
+        song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
+      )
+    );
+  };
+
+  const handleDecreaseSingingCount = (songId) => {
+    setCurrentSongs(prevSongs =>
+      prevSongs.map(song =>
+        song.id === songId ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) } : song
+      )
+    );
+  };
+
+  const increaseAllSingingCounts = () => {
+    setCurrentSongs(prevSongs =>
+      prevSongs.map(song => ({ ...song, singingCount: song.singingCount + 1 }))
+    );
+  };
+
+  const decreaseAllSingingCounts = () => {
+    setCurrentSongs(prevSongs =>
+      prevSongs.map(song => ({ ...song, singingCount: Math.max(song.singingCount - 1, 0) }))
+    );
+  };
+
   const Row = ({ song, index }) => {
     const ref = useRef(null);
     const [, drop] = useDrop({
@@ -180,7 +208,27 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
           </td>
         )}
         {visibleColumns.singingCount.visible && (
-          <td className="border px-4 py-2">{song.singingCount}</td>
+          <td className="border px-4 py-2">
+            <div className="flex items-center gap-2">
+              <span>{song.singingCount}</span>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => handleIncreaseSingingCount(song.id)}
+                  className="text-gray-500 hover:text-gray-700 p-0 m-0 mt-1"
+                  style={{ fontSize: '0.5rem' }}
+                >
+                  ▲
+                </button>
+                <button
+                  onClick={() => handleDecreaseSingingCount(song.id)}
+                  className="text-gray-500 hover:text-gray-700 p-0 m-0"
+                  style={{ fontSize: '0.5rem' }}
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+          </td>
         )}
         {visibleColumns.skillLevel.visible && (
           <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
@@ -293,7 +341,27 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
                     minWidth: '50px',
                   }}
                 >
+                  <div className="flex items-center justify-center">
                   {label}
+                  {key === 'singingCount' && (
+                    <div className="flex flex-col items-center ml-2">
+                      <button
+                        onClick={increaseAllSingingCounts}
+                        className="text-gray-500 hover:text-gray-700 p-0 m-0 mt-1"
+                        style={{ fontSize: '0.5rem' }}
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={decreaseAllSingingCounts}
+                        className="text-gray-500 hover:text-gray-700 p-0 m-0"
+                        style={{ fontSize: '0.5rem' }}
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  )}
+                  </div>
                   <div
                     className="absolute top-0 right-0 bottom-0 w-2 cursor-col-resize"
                     onMouseDown={(e) => handleMouseDown(e, key)}
