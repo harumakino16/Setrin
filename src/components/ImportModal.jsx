@@ -66,9 +66,9 @@ const ImportModal = ({ onClose }) => {
             data.forEach(song => {
                 const docRef = doc(songsRef);
                 const songData = {
-                    title: song['曲名'],
+                    title: String(song['曲名']),
                     furigana: song['フリガナ'] || '',
-                    artist: song['アーティスト'],
+                    artist: String(song['アーティスト']),
                     genre: song['ジャンル'],
                     tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']]
                         .filter(tag => tag && tag.trim() !== ''),
@@ -98,9 +98,9 @@ const ImportModal = ({ onClose }) => {
             data.forEach(song => {
                 const docRef = doc(songsRef);
                 const songData = {
-                    title: song['曲名'],
+                    title: String(song['曲名']),
                     furigana: song['フリガナ'] || '',
-                    artist: song['アーティスト'],
+                    artist: String(song['アーティスト']),
                     genre: song['ジャンル'],
                     tags: [song['タグ1'], song['タグ2'], song['タグ3'], song['タグ4'], song['タグ5']]
                         .filter(tag => tag && tag.trim() !== ''),
