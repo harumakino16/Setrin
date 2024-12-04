@@ -277,23 +277,25 @@ function MainTable({
                     </td>
                   )}
                   {visibleColumns.singingCount.visible && (
-                    <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
-                      <span>{song.singingCount}</span>
-                      <div className="flex flex-col items-center">
-                        <button
-                          onClick={() => handleIncreaseSingingCount(song.id)}
-                          className="text-gray-500 hover:text-gray-700 p-0 m-0 mt-1"
-                          style={{ fontSize: '0.5rem' }}
-                        >
-                          ▲
-                        </button>
-                        <button
-                          onClick={() => handleDecreaseSingingCount(song.id)}
-                          className="text-gray-500 hover:text-gray-700 p-0 m-0"
-                          style={{ fontSize: '0.5rem' }}
-                        >
-                          ▼
-                        </button>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span>{song.singingCount}</span>
+                        <div className="flex flex-col items-center">
+                          <button
+                            onClick={() => handleIncreaseSingingCount(song.id)}
+                            className="text-gray-500 hover:text-gray-700 p-0 m-0 mt-1"
+                            style={{ fontSize: '0.5rem' }}
+                          >
+                            ▲
+                          </button>
+                          <button
+                            onClick={() => handleDecreaseSingingCount(song.id)}
+                            className="text-gray-500 hover:text-gray-700 p-0 m-0"
+                            style={{ fontSize: '0.5rem' }}
+                          >
+                            ▼
+                          </button>
+                        </div>
                       </div>
                     </td>
                   )}
