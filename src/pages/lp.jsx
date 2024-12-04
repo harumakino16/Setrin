@@ -28,12 +28,15 @@ export default function LandingPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
     // ここにフォーム送信のロジックを追加
     console.log('Form submitted:', { name, email, message })
   }
+
+  const closeMenu = () => setMenuOpen(false);
 
   function PricingCard({ title, description, price, features }) {
     return (
@@ -64,15 +67,27 @@ export default function LandingPage() {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/"><Image src="/images/SetLink_trance (1000 x 300 px).png" alt="Setlink" width={150} height={30} /></Link>
-          <nav>
-            <ul className="flex space-x-6">
-              <li><Link href="#features" className="text-gray-500 hover:text-customTheme-blue-primary">特徴</Link></li>
-              <li><Link href="#pricing" className="text-gray-500 hover:text-customTheme-blue-primary">料金</Link></li>
-              <li><Link href="#faq" className="text-gray-500 hover:text-customTheme-blue-primary">FAQ</Link></li>
-              <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary">お問い合わせ</Link></li>
+          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
+          <nav className={`fixed top-0 right-0 h-full bg-white shadow-lg transform ${menuOpen ? 'translate-x-0' : 'translate-x-full'} z-50 transition-transform duration-300 ease-in-out md:static md:transform-none md:flex md:space-x-6`}>
+            <div className="flex justify-end p-4">
+              <button onClick={closeMenu}>
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 p-4 md:p-0">
+              <li><Link href="#features" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>特徴</Link></li>
+              <li><Link href="#pricing" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>料金</Link></li>
+              <li><Link href="#faq" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>FAQ</Link></li>
+              <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>お問い合わせ</Link></li>
             </ul>
           </nav>
-          <Link href="/" className="bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">今すぐ無料で始める</Link>
+          <Link href="/" className="hidden md:block bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">今すぐ無料で始める</Link>
         </div>
       </header>
 
