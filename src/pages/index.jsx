@@ -179,6 +179,12 @@ export default function Home() {
       let aValue = a[key];
       let bValue = b[key];
 
+      // フリガナが存在する場合はフリガナを優先して使用
+      if (key === 'title') {
+        aValue = a.furigana || a.title;
+        bValue = b.furigana || b.title;
+      }
+
       // 配列の場合（tagsなど）は文字列に変換
       if (Array.isArray(aValue)) aValue = aValue.join(', ');
       if (Array.isArray(bValue)) bValue = bValue.join(', ');

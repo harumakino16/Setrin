@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileCsv, faFileDownload } from '@fortawesome/free-solid-svg-icons';
+import { faFileCsv, faFileDownload, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import Papa from 'papaparse';
 import { db } from '../../firebaseConfig';
 import { collection, doc, writeBatch, getDocs, serverTimestamp } from 'firebase/firestore';
@@ -37,7 +37,7 @@ const ImportModal = ({ onClose }) => {
         if (droppedFile && droppedFile.type === "text/csv") {
             setFile(droppedFile);
             setFileName(droppedFile.name);
-            document.getElementById('drop-zone-text').textContent = 'ファイルがドロップされました: ' + droppedFile.name;
+            document.getElementById('drop-zone-text').textContent = 'ファルがドロップされました: ' + droppedFile.name;
             document.querySelector('input[type="file"]').style.display = 'none'; // ファイル選択ボタンを非表示にする
         } else {
             setMessageInfo({ message: 'CSVファイルのみが許可されています。', type: 'error' });
@@ -120,7 +120,7 @@ const ImportModal = ({ onClose }) => {
             setMessageInfo({ message: 'インポートが完了しました', type: 'success' });
             onClose(); // モーダルを閉じる
         } catch (error) {
-            setMessageInfo({ message: 'インポート中にエラーが発生しました', type: 'error' });
+            setMessageInfo({ message: 'インポート中にエラーが発しました', type: 'error' });
             console.error('インポートエラー:', error);
         }
     };
@@ -171,10 +171,21 @@ const ImportModal = ({ onClose }) => {
         <div className="p-4 sm:p-6 lg:p-8">
             <div className="flex flex-col sm:flex-row justify-between items-center px-4 py-2">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4 sm:mb-0">CSVファイルをインポート</h3>
+
                 <button onClick={handleDownloadTemplate} className={`flex items-center bg-customTheme-${theme}-primary text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-customTheme-${theme}-accent`}>
                     <FontAwesomeIcon icon={faFileDownload} className="mr-2" />
                     テンプレートファイル
                 </button>
+                <div className="relative group">
+                    <FontAwesomeIcon
+                        icon={faQuestionCircle}
+                        className="text-customTheme-blue-primary cursor-pointer"
+                        onClick={() => window.open('https://shiny-spy-2b8.notion.site/CSV-15207c79fa79805584ffee47c26c6a3f', '_blank')}
+                    />
+                    <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                        CSVファイルからインポートする方法
+                    </div>
+                </div>
             </div>
             <div className="mt-2 px-7 py-3">
                 <div className="border-dashed border-2 border-gray-400 rounded-lg p-10 hover:bg-gray-100"
