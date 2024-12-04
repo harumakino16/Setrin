@@ -166,6 +166,10 @@ function MainTable({
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1); // 検索時にページを1にリセット
+  }, [tableData]);
+
   return (
     <div>
       {currentSongs.length === 0 ? (
