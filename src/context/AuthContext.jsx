@@ -4,7 +4,7 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig, db } from '../../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Loading from '@/components/loading';
-import { adminUUID } from '@/config/admin'; // 追加
+import { adminUUIDs } from '@/config/admin'; // 追加
 
 export const AuthContext = createContext(null);
 
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
           setCurrentUser({ ...user, ...userData });
 
           // 管理者かどうかを判定
-          if (user.uid === adminUUID) {
+          if (adminUUIDs.includes(user.uid)) {
             setIsAdmin(true);
           } else {
             setIsAdmin(false);

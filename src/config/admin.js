@@ -1,1 +1,1 @@
-export const adminUUID = process.env.NEXT_PUBLIC_ADMIN_UUID; 
+export const adminUUIDs = process.env.NEXT_PUBLIC_ADMIN_UUIDS.split(','); 

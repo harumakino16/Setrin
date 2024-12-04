@@ -1,4 +1,4 @@
-import { adminUUID } from '@/config/admin';
+import { adminUUIDs } from '@/config/admin';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { firebaseAdminConfig } from '@/lib/firebaseAdmin'; // firebaseAdminConfigを適切に設定
@@ -20,7 +20,7 @@ export const isAdmin = async (req, res, next) => {
 
   try {
     const decodedToken = await getAuth().verifyIdToken(idToken);
-    if (decodedToken.uid !== adminUUID) {
+    if (!adminUUIDs.includes(decodedToken.uid)) {
       return res.status(403).json({ message: '管理者権限がありません。' });
     }
     req.user = decodedToken;
