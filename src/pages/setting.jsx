@@ -397,7 +397,8 @@ function Settings() {
                                     { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
                                     { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
                                     { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
-                                    { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' }
+                                    { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' },
+                                    { name: 'black', label: '黒', color: 'bg-customTheme-black-primary' }
                                 ].map((theme) => (
                                     <button
                                         key={theme.name}

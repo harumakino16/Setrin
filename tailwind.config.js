@@ -82,6 +82,11 @@ module.exports = {
             primary: '#E6B6FF',
             secondary: '#F5E5FF',
             accent: '#D18DFF'
+          },
+          black: {
+            primary: '#1D2129',
+            secondary: '#333333',
+            accent: '#666666'
           }
         }
       },
