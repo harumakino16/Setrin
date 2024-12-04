@@ -320,25 +320,25 @@ function MainTable({
         <div className="flex space-x-1">
           {Array.from({ length: Math.ceil(tableData.length / recordsPerPage) }, (_, i) => i + 1).length > 10 ? (
             <>
-              <button onClick={() => paginate(1)} className={`px-4 py-2 ${currentPage === 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'} border rounded`}>
+              <button onClick={() => paginate(1)} className={`px-4 py-2 ${currentPage === 1 ? `bg-customTheme-${theme}-primary text-white` : `bg-white text-customTheme-${theme}-primary`} border rounded`}>
                 1
               </button>
               {currentPage > 3 && <span className="px-2 py-2">...</span>}
               {Array.from({ length: 5 }, (_, i) => currentPage - 2 + i)
                 .filter(page => page > 1 && page < Math.ceil(tableData.length / recordsPerPage))
                 .map(page => (
-                  <button key={page} onClick={() => paginate(page)} className={`px-4 py-2 ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'} border rounded`}>
+                  <button key={page} onClick={() => paginate(page)} className={`px-4 py-2 ${currentPage === page ? `bg-customTheme-${theme}-primary text-white` : `bg-white text-customTheme-${theme}-primary`} border rounded`}>
                     {page}
                   </button>
                 ))}
               {currentPage < Math.ceil(tableData.length / recordsPerPage) - 2 && <span className="px-2 py-2">...</span>}
-              <button onClick={() => paginate(Math.ceil(tableData.length / recordsPerPage))} className={`px-4 py-2 ${currentPage === Math.ceil(tableData.length / recordsPerPage) ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'} border rounded`}>
+              <button onClick={() => paginate(Math.ceil(tableData.length / recordsPerPage))} className={`px-4 py-2 ${currentPage === Math.ceil(tableData.length / recordsPerPage) ? `bg-customTheme-${theme}-primary text-white` : `bg-white text-customTheme-${theme}-primary`} border rounded`}>
                 {Math.ceil(tableData.length / recordsPerPage)}
               </button>
             </>
           ) : (
             Array.from({ length: Math.ceil(tableData.length / recordsPerPage) }, (_, i) => i + 1).map(page => (
-              <button key={page} onClick={() => paginate(page)} className={`px-4 py-2 ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'} border rounded`}>
+              <button key={page} onClick={() => paginate(page)} className={`px-4 py-2 ${currentPage === page ? `bg-customTheme-${theme}-primary text-white` : `bg-white text-customTheme-${theme}-primary`} border rounded`}>
                 {page}
               </button>
             ))
