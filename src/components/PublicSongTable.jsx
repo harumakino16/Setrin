@@ -36,10 +36,18 @@ const PublicSongTable = ({ songs, visibleColumns }) => {
     let sortableSongs = [...filteredSongs];
     if (sortConfig.key) {
       sortableSongs.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+        
+        if (sortConfig.key === 'title') {
+          aValue = a.furigana || a.title;
+          bValue = b.furigana || b.title;
+        }
+        
+        if (aValue < bValue) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (aValue > bValue) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
