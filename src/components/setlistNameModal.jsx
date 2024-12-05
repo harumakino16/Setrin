@@ -5,11 +5,15 @@ import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/fires
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
+import fetchUsersSetlists from '@/hooks/fetchSetlists';
+import { SETLIST_LIMIT } from '@/constants';
+
 const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const [inputValue, setInputValue] = useState('');
     const { currentUser } = useContext(AuthContext);
     const { setMessageInfo } = useMessage();
     const { theme } = useTheme();
+    const { setlists } = fetchUsersSetlists(currentUser);
 
     // デフォルトのセットリスト名を設定
     useEffect(() => {
@@ -20,6 +24,13 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
 
     const handleSubmit = async () => {
         if (currentUser) {
+            // 無料プランかどうか、セットリストの数をチェック
+            console.log(setlists.length);
+            if (currentUser.plan === 'free' && setlists.length >= SETLIST_LIMIT) {
+                setMessageInfo({ type: 'error', message: `無料プランでは最大${SETLIST_LIMIT}個のセットリストまで保存できます。` });
+                return;
+            }
+
             const setlistRef = collection(db, 'users', currentUser.uid, 'Setlists');
             await addDoc(setlistRef, {
                 name: inputValue,

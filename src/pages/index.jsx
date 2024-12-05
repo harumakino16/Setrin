@@ -47,6 +47,15 @@ export default function Home() {
     setTableData(songs);
   }, []);
 
+  useEffect(() => {
+    // 曲データまたはソート設定が変更されたときに tableData を更新
+    let sortedSongs = songs;
+    if (sortConfig.key) {
+      sortedSongs = sortSongs(songs, sortConfig.key, sortConfig.direction);
+    }
+    setTableData(sortedSongs);
+  }, [songs, sortConfig]); // <- 依存配列に songs と sortConfig を追加
+
   const handleSearchResults = (results) => {
     setTableData(results);
     setSearchPerformed(true);
@@ -114,9 +123,11 @@ export default function Home() {
 
         setlistsSnapshot.forEach((setlistDoc) => {
           const setlistData = setlistDoc.data();
-          const updatedSongIds = setlistData.songIds.filter(id => !selectedSongs.includes(id));
-          if (updatedSongIds.length !== setlistData.songIds.length) {
-            batch.update(setlistDoc.ref, { songIds: updatedSongIds });
+          if (setlistData.songIds) {
+            const updatedSongIds = setlistData.songIds.filter(id => !selectedSongs.includes(id));
+            if (updatedSongIds.length !== setlistData.songIds.length) {
+              batch.update(setlistDoc.ref, { songIds: updatedSongIds });
+            }
           }
         });
 
@@ -124,8 +135,8 @@ export default function Home() {
         setSelectedSongs([]);
         setMessageInfo({ message: '選択された曲が削除され、セットリストが更新されました。', type: 'success' });
       } catch (error) {
-
         setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
+        console.error(error);
       }
     }
   };
