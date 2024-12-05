@@ -47,6 +47,15 @@ export default function Home() {
     setTableData(songs);
   }, []);
 
+  useEffect(() => {
+    // 曲データまたはソート設定が変更されたときに tableData を更新
+    let sortedSongs = songs;
+    if (sortConfig.key) {
+      sortedSongs = sortSongs(songs, sortConfig.key, sortConfig.direction);
+    }
+    setTableData(sortedSongs);
+  }, [songs, sortConfig]); // <- 依存配列に songs と sortConfig を追加
+
   const handleSearchResults = (results) => {
     setTableData(results);
     setSearchPerformed(true);
