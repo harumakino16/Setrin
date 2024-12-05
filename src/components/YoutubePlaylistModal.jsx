@@ -1,12 +1,13 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { db } from '../../firebaseConfig';
-import { writeBatch, doc } from 'firebase/firestore';
+import { writeBatch, doc, collection, getCountFromServer, query } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
 import { formatSongData } from '../utils/songUtils';
 import Link from 'next/link';
 import LoadingIcon from './ui/loadingIcon';
 import { useTheme } from '@/context/ThemeContext';
+import { FREE_PLAN_LIMIT } from '@/constants';
 
 
 const YoutubePlaylistModal = ({ onClose }) => {
@@ -24,7 +25,26 @@ const YoutubePlaylistModal = ({ onClose }) => {
     const [loading, setLoading] = useState(false);
     const [isImporting, setIsImporting] = useState(false);
     const { theme } = useTheme();
+    const [totalSongCount, setTotalSongCount] = useState(0);
 
+    useEffect(() => {
+        const fetchTotalSongCount = async () => {
+            try {
+                const userSongsRef = collection(db, 'users', currentUser.uid, 'Songs');
+                const snapshot = await getCountFromServer(query(userSongsRef));
+                setTotalSongCount(snapshot.data().count);
+            } catch (error) {
+                console.error('総曲数の取得に失敗しました:', error);
+            }
+        };
+
+        fetchTotalSongCount();
+        
+    }, [currentUser.uid]);
+
+    const SONG_LIMIT = currentUser.plan === 'free' ? FREE_PLAN_LIMIT : Infinity;
+
+    const isOverLimit = (totalSongCount + importedSongs.length) > SONG_LIMIT;
 
     const handleImport = async () => {
         try {
@@ -242,8 +262,16 @@ const YoutubePlaylistModal = ({ onClose }) => {
                             </tbody>
                         </table>
                     </div>
-                    <button onClick={handleAddToSongs} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-full">
-                        曲リストに追加
+                    <button 
+                        onClick={handleAddToSongs} 
+                        className={`font-bold py-2 px-4 rounded mt-4 w-full ${
+                            isOverLimit 
+                                ? 'bg-gray-300 cursor-not-allowed' 
+                                : 'bg-green-500 hover:bg-green-700 text-white'
+                        }`}
+                        disabled={isOverLimit}
+                    >
+                        {isOverLimit ? '現在のプランの上限を超えています' : '曲リストに追加'}
                     </button>
                 </div>
             )}

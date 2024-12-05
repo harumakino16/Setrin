@@ -179,7 +179,7 @@ const ImportModal = ({ onClose }) => {
                 <div className="relative group">
                     <FontAwesomeIcon
                         icon={faQuestionCircle}
-                        className="text-customTheme-blue-primary cursor-pointer"
+                        className={`text-customTheme-${theme}-primary cursor-pointer`}
                         onClick={() => window.open('https://shiny-spy-2b8.notion.site/CSV-15207c79fa79805584ffee47c26c6a3f', '_blank')}
                     />
                     <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
