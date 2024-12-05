@@ -6,7 +6,7 @@ import { fetchUserData } from '@/utils/dashboardUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTags, faList } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
-import { FREE_PLAN_LIMIT, SETLIST_LIMIT, PLAYLIST_LIMIT } from '@/constants';
+import { FREE_PLAN_LIMIT, SETLIST_LIMIT, YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
 
 // カードコンポーネント
 const DashboardCard = ({ icon, title, value, limit, children }) => {
@@ -59,7 +59,7 @@ const Dashboard = () => {
             <ul className="mt-2">
               <li className="text-gray-600">曲数: {userData.totalSongs}/{currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}</li>
               <li className="text-gray-600">セットリスト数: {userData.totalSetlists}/{currentUser.plan === 'free' ? SETLIST_LIMIT : '制限なし'}</li>
-              <li className="text-gray-600">再生リスト作成回数: {userData.totalPlaylists}/{currentUser.plan === 'free' ? PLAYLIST_LIMIT : '制限なし'}</li>
+              <li className="text-gray-600">再生リスト作成回数: {userData.playlistCreationCount}/{currentUser.plan === 'free' ? YOUTUBE_CREATE_LIST_LIMIT : '制限なし'}</li>
             </ul>
           </DashboardCard>
           <DashboardCard icon={faTags} title="タグ">

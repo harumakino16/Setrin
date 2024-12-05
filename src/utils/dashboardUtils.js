@@ -1,5 +1,5 @@
 import { db } from '../../firebaseConfig';
-import { collection, getDocs, getCountFromServer } from 'firebase/firestore';
+import { collection, getDocs, getCountFromServer, doc, getDoc } from 'firebase/firestore';
 
 export const fetchUserData = async (userId) => {
   try {
@@ -9,6 +9,9 @@ export const fetchUserData = async (userId) => {
     const setlistsRef = collection(db, `users/${userId}/Setlists`);
     const snapshot_setlists = await getCountFromServer(setlistsRef);
 
+    const currentUserRef = doc(db, `users/${userId}`);
+    const snapshot_currentUser = await getDoc(currentUserRef)
+    
     const songs = [];
     const tags = {};
     const genres = {};
@@ -31,14 +34,15 @@ export const fetchUserData = async (userId) => {
       tags,
       genres,
       totalSetlists: snapshot_setlists.data().count,
+      playlistCreationCount: snapshot_currentUser.data().playlistCreationCount
     };
   } catch (error) {
     console.error("Error fetching user data:", error);
     return {
-      totalSongs: 0,
+      totalSongs: "error",
       tags: {},
       genres: {},
-      totalSetlists: 0,
+      totalSetlists: "error",
     };
   }
 };

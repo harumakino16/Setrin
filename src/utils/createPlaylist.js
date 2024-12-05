@@ -41,12 +41,6 @@ export async function createPlaylist(songs, setlistName, currentUser, setMessage
             }
             return;
         }
-
-        // 作成回数をインクリメント
-        await updateDoc(doc(db, 'users', currentUser.uid), {
-            playlistCreationCount: increment(1),
-        });
-        currentUser.playlistCreationCount += 1; // ローカルのデータも更新
     }
 
     try {
@@ -88,6 +82,14 @@ export async function createPlaylist(songs, setlistName, currentUser, setMessage
         const data = await response.json();
 
         setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
+
+        // プレイリスト作成成功時にカウントをインクリメント
+        if (currentUser.plan === 'free') {
+            await updateDoc(doc(db, 'users', currentUser.uid), {
+                playlistCreationCount: increment(1),
+            });
+            currentUser.playlistCreationCount += 1; // ローカルのデータも更新
+        }
     } catch (error) {
         setMessageInfo({ message: error.message, type: 'error' });
     } finally {
