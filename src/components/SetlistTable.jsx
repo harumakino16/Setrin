@@ -289,10 +289,10 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
           <td className="border px-4 py-2">{song.memo}</td>
         )}
         {visibleColumns.delete.visible && (
-          <td className="border px-4 py-2">
+          <td className="border px-4 py-2 flex justify-center">
             <button
               onClick={() => onDelete(song.id)}
-              className="text-red-500 hover:text-red-700"
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
             >
               削除
             </button>
