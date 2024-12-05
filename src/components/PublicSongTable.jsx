@@ -2,10 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { convertKanaToHira } from '../utils/stringUtils';
+import RequestModal from './RequestModal';
 
-const PublicSongTable = ({ songs, visibleColumns }) => {
+const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [selectedSong, setSelectedSong] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   
   const columnLabels = [
     { key: 'title', label: '曲名' },
@@ -62,6 +65,11 @@ const PublicSongTable = ({ songs, visibleColumns }) => {
       direction = 'descending';
     }
     setSortConfig({ key, direction });
+  };
+
+  const handleRequestClick = (song) => {
+    setSelectedSong(song);
+    setShowModal(true);
   };
 
   return (
@@ -151,11 +159,26 @@ const PublicSongTable = ({ songs, visibleColumns }) => {
                     </td>
                   )
                 )}
+                {isSessionActive && (
+                  <td>
+                    <button onClick={() => handleRequestClick(song)}>
+                      リクエスト
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {showModal && (
+        <RequestModal
+          song={selectedSong}
+          onClose={() => setShowModal(false)}
+          sessionPath={sessionPath}
+        />
+      )}
     </div>
   );
 };

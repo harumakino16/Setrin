@@ -19,6 +19,11 @@ const MENU = [
         path: "/",
     },
     {
+        title: "リクエスト歌枠",
+        iconName: faMusic,
+        path: "/request-session",
+    },
+    {
         title: "ダッシュボード",
         iconName: faChartLine,
         path: "/dashboard",

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { collection, query, where, getDocs, collectionGroup } from 'firebase/firestore';
+import { collection, query, where, getDocs, collectionGroup, doc, onSnapshot } from 'firebase/firestore';
 import PublicSongTable from '@/components/PublicSongTable';
 import NoSidebarLayout from '../noSidebarLayout';
 
@@ -9,6 +9,8 @@ export default function PublicSongList() {
   const [songs, setSongs] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [sessionPath, setSessionPath] = useState(null);
   const router = useRouter();
   const { id } = router.query;
 
@@ -36,6 +38,7 @@ export default function PublicSongList() {
         const publicPageData = publicPageDoc.data();
 
         setUserInfo({
+          userId: userId,
           displayName: publicPageData.displayName,
           description: publicPageData.description,
           visibleColumns: publicPageData.visibleColumns
@@ -50,6 +53,21 @@ export default function PublicSongList() {
         }));
 
         setSongs(songsData);
+
+        // アクティブなセッションを取得
+        const sessionsRef = collection(db, 'users', userId, 'RequestSession');
+        const sessionsSnapshot = await getDocs(
+          query(sessionsRef, where('isActive', '==', true))
+        );
+
+        if (!sessionsSnapshot.empty) {
+          const activeSession = sessionsSnapshot.docs[0];
+          setIsSessionActive(true);
+          setSessionPath(`/users/${userId}/RequestSession/${activeSession.id}/requests`);
+        } else {
+          setIsSessionActive(false);
+          setSessionPath(null);
+        }
       } catch (error) {
         console.error('Error fetching public songs:', error);
       } finally {
@@ -72,6 +90,8 @@ export default function PublicSongList() {
         <PublicSongTable
           songs={songs}
           visibleColumns={userInfo?.visibleColumns}
+          isSessionActive={isSessionActive}
+          sessionPath={sessionPath}
         />
       </div>
     </NoSidebarLayout>
