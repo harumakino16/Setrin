@@ -48,7 +48,7 @@ const SetlistDetail = () => {
             }
         }
         return {
-            order: { label: '順���', visible: true, removable: false },
+            order: { label: '順番', visible: true, removable: false },
             title: { label: '曲名', visible: true, removable: true },
             artist: { label: 'アーティスト', visible: true, removable: true },
             genre: { label: 'ジャンル', visible: true, removable: true },
