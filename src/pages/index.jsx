@@ -123,9 +123,11 @@ export default function Home() {
 
         setlistsSnapshot.forEach((setlistDoc) => {
           const setlistData = setlistDoc.data();
-          const updatedSongIds = setlistData.songIds.filter(id => !selectedSongs.includes(id));
-          if (updatedSongIds.length !== setlistData.songIds.length) {
-            batch.update(setlistDoc.ref, { songIds: updatedSongIds });
+          if (setlistData.songIds) {
+            const updatedSongIds = setlistData.songIds.filter(id => !selectedSongs.includes(id));
+            if (updatedSongIds.length !== setlistData.songIds.length) {
+              batch.update(setlistDoc.ref, { songIds: updatedSongIds });
+            }
           }
         });
 
@@ -133,8 +135,8 @@ export default function Home() {
         setSelectedSongs([]);
         setMessageInfo({ message: '選択された曲が削除され、セットリストが更新されました。', type: 'success' });
       } catch (error) {
-
         setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
+        console.error(error);
       }
     }
   };
