@@ -10,6 +10,7 @@ import useSearchCriteria from '@/hooks/useSearchCriteria';
 import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useSongs } from '@/context/SongsContext'; // SongsContextからuseSongsをインポート
 import { useTheme } from '@/context/ThemeContext';
+import { SETLIST_LIMIT } from '@/constants';
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
@@ -42,6 +43,11 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     };
 
     const createRandomSetlist = async () => {
+        if (currentUser.plan === 'free' && existingSetlists.length >= SETLIST_LIMIT) {
+            setMessageInfo({ type: 'error', message: `無料プランでは最大${SETLIST_LIMIT}個のセットリストまで保存できます。` });
+            return;
+        }
+
         if (searchResults.length === 0) {
             setMessageInfo({ type: 'error', message: '検索結果がありません。' });
             return;

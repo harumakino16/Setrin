@@ -6,7 +6,7 @@ import { fetchUserData } from '@/utils/dashboardUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTags, faList } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
-import { FREE_PLAN_LIMIT } from '@/constants';
+import { FREE_PLAN_LIMIT, SETLIST_LIMIT, PLAYLIST_LIMIT } from '@/constants';
 
 // カードコンポーネント
 const DashboardCard = ({ icon, title, value, limit, children }) => {
@@ -17,12 +17,6 @@ const DashboardCard = ({ icon, title, value, limit, children }) => {
         <FontAwesomeIcon icon={icon} className={`text-2xl text-customTheme-${theme}-primary mr-2`} />
         <h2 className="text-xl font-semibold">{title}</h2>
       </div>
-      {value !== undefined && (
-        <p className="text-3xl font-bold mb-2">
-          {value}
-          {limit ? ` / ${limit}` : ''}
-        </p>
-      )}
       {children}
     </div>
   );
@@ -58,10 +52,16 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={faMusic}
-            title="総曲数"
+            title="容量"
             value={userData.totalSongs}
             limit={currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}
-          />
+          >
+            <ul className="mt-2">
+              <li className="text-gray-600">曲数: {userData.totalSongs}/{currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}</li>
+              <li className="text-gray-600">セットリスト数: {userData.totalSetlists}/{currentUser.plan === 'free' ? SETLIST_LIMIT : '制限なし'}</li>
+              <li className="text-gray-600">再生リスト作成回数: {userData.totalPlaylists}/{currentUser.plan === 'free' ? PLAYLIST_LIMIT : '制限なし'}</li>
+            </ul>
+          </DashboardCard>
           <DashboardCard icon={faTags} title="タグ">
             <ul className="mt-2">
               {userData.tags && Object.entries(userData.tags).map(([tag, count]) => (
