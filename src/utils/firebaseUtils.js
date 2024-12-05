@@ -1,4 +1,4 @@
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 
 export const registerUserInFirestore = async (user) => {
@@ -7,6 +7,7 @@ export const registerUserInFirestore = async (user) => {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        createdAt: new Date()
+        createdAt: serverTimestamp(),
+        plan: 'free'
     }, { merge: true });
 };

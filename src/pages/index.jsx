@@ -20,46 +20,7 @@ import Link from "next/link";
 import LoginForm from "@/components/LoginForm";
 import Layout from "@/pages/layout";
 import NoSidebarLayout from "./noSidebarLayout";
-import { saveAs } from 'file-saver';
-import { CSV_HEADERS } from '../constants/csvHeaders'; // ヘッダー情報をインポート
-
-// CSVファイルを生成する関数
-const exportToCSV = (data) => {
-  const csvRows = [];
-  csvRows.push(CSV_HEADERS.join(','));
-
-  data.forEach(song => {
-    const values = [
-      song.title || '',
-      song.furigana || '',
-      song.artist || '',
-      song.genre || '',
-      (song.tags && song.tags[0]) || '',
-      (song.tags && song.tags[1]) || '',
-      (song.tags && song.tags[2]) || '',
-      (song.tags && song.tags[3]) || '',
-      (song.tags && song.tags[4]) || '',
-      song.youtubeUrl || '',
-      song.singingCount || 0,
-      song.skillLevel || 0,
-      song.memo || ''
-    ].map(value => {
-      const escaped = ('' + value).replace(/"/g, '""');
-      return `"${escaped}"`;
-    });
-    csvRows.push(values.join(','));
-  });
-
-  const csvString = csvRows.join('\n');
-  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-
-  // 現在の日付を取得してファイル名に追加
-  const date = new Date();
-  const formattedDate = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-  const filename = `Setlink_曲リスト_${formattedDate}.csv`;
-
-  saveAs(blob, filename);
-};
+import { exportToCSV } from '../utils/csvUtils'; // 新しいファイルからインポート
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -85,11 +46,6 @@ export default function Home() {
   useEffect(() => {
     setTableData(songs);
   }, []);
-
-  // この useEffect を削除またはコメントアウトします
-  // useEffect(() => {
-  //   setTableData(songs);
-  // }, [songs]);
 
   const handleSearchResults = (results) => {
     setTableData(results);
@@ -228,20 +184,6 @@ export default function Home() {
     { label: "熟練度", key: "skillLevel" },
     { label: "備考", key: "memo" }
   ];
-
-  const csvReport = {
-    filename: 'SongList.csv',
-    headers: headers,
-    data: tableData.map(song => ({
-      ...song,
-      furigana: song.furigana || '',
-      tag1: song.tags[0] || '',
-      tag2: song.tags[1] || '',
-      tag3: song.tags[2] || '',
-      tag4: song.tags[3] || '',
-      tag5: song.tags[4] || ''
-    }))
-  };
 
   const handleAddToSetlist = (songIds) => {
     setSelectedSongs(songIds);

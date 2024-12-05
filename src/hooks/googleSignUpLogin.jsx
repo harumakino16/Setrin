@@ -24,15 +24,6 @@ const useGoogleSignUpLogin = () => {
 
             if (!userDoc.exists()) {
                 // 新規ユーザーの場合
-                const batch = writeBatch(db);
-                batch.set(userRef, {
-                    email: user.email,
-                    createdAt: serverTimestamp(),
-                    displayName: user.displayName,
-                    plan: 'free',
-                });
-                await batch.commit();
-
                 await registerUserInFirestore(user);
                 setMessageInfo({ message: 'アカウントが作成されました', type: 'success' });
             } else {
