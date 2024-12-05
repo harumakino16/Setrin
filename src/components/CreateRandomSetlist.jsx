@@ -72,18 +72,18 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
-            <div className="flex flex-col gap-2 min-w-[300px] md:min-w-[600px]">
+            <div className="flex flex-col gap-2 min-w-[300px] md:min-w-[600px] md:max-w-[75vw]">
                 <h2 className={`text-2xl font-bold text-customTheme-${theme}-primary text-center`}>セトリを作る</h2>
                 <div className="flex justify-center gap-4 mt-4 border-b">
                     <button
                         onClick={() => setActiveTab('random')}
-                        className={`py-2 px-4 ${activeTab === 'random' ? `border-b-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary` : 'text-gray-500'}`}
+                        className={`py-2 px-4 text-xs md:text-base ${activeTab === 'random' ? `border-b-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary` : 'text-gray-500'}`}
                     >
                         完全ランダムで作成
                     </button>
                     <button
                         onClick={() => setActiveTab('criteria')}
-                        className={`py-2 px-4 ${activeTab === 'criteria' ? `border-b-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary` : 'text-gray-500'}`}
+                        className={`py-2 px-4 text-xs md:text-base ${activeTab === 'criteria' ? `border-b-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary` : 'text-gray-500'}`}
                     >
                         条件を指定する
                     </button>

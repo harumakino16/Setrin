@@ -16,8 +16,8 @@ const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
     }, []);
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center" onClick={handleBackgroundClick}>
-            <div className="bg-white p-8 rounded-lg shadow-lg relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4" onClick={handleBackgroundClick}>
+            <div className="bg-white p-8 rounded-lg shadow-lg relative max-h-full overflow-y-auto">
                 {showCloseButton && (
                     <button onClick={onClose} className="absolute top-3 right-3 text-gray-600 hover:text-gray-800">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">

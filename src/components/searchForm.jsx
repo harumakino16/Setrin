@@ -61,6 +61,20 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             songsData = songsData.filter(song => song.memo.toLowerCase().includes(memoLower));
         }
 
+        if (searchCriteria.excludedTags) {
+            const excludedTags = searchCriteria.excludedTags.split(',').map(tag => tag.trim().toLowerCase());
+            songsData = songsData.filter(song => 
+                !song.tags.some(tag => excludedTags.includes(tag.toLowerCase()))
+            );
+        }
+
+        if (searchCriteria.excludedGenres) {
+            const excludedGenres = searchCriteria.excludedGenres.split(',').map(genre => genre.trim().toLowerCase());
+            songsData = songsData.filter(song => 
+                !excludedGenres.includes(song.genre.toLowerCase())
+            );
+        }
+
         handleSearchResults(songsData);
     };
 
@@ -91,56 +105,89 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                 </div>
                 {showAdvancedSearch && (
                     <div className="flex flex-wrap gap-8">
-                        {/* Advanced Search Options */}
-                        <div className="flex flex-col gap-2">
-                            <label className="whitespace-nowrap">歌唱回数:</label>
-                            <input type="number" className="border p-2 rounded" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
-                            <div className="flex gap-2 radio02">
-                                <input type="radio" id="maxSungOptionBelow" name="maxSungOption" value="以下" checked={searchCriteria.maxSungOption === '以下'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} />
-                                <label htmlFor="maxSungOptionBelow">以下</label>
-                                <input type="radio" id="maxSungOptionAbove" name="maxSungOption" value="以上" checked={searchCriteria.maxSungOption === '以上'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} />
-                                <label htmlFor="maxSungOptionAbove">以上</label>
+                        <div className="w-full">
+                            <div className="p-4 bg-white shadow rounded-lg">
+                                <h3 className="font-bold mb-4">絞り込み</h3>
+                                <div className="flex flex-wrap gap-4">
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">歌唱回数:</label>
+                                        <input type="number" className="border p-2 rounded mb-4" value={searchCriteria.maxSung} onChange={(e) => handleCriteriaChange('maxSung', parseInt(e.target.value, 10))} />
+                                        <div className="flex gap-2 radio02 mb-4">
+                                            <input type="radio" id="maxSungOptionBelow" name="maxSungOption" value="以下" checked={searchCriteria.maxSungOption === '以下'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} />
+                                            <label htmlFor="maxSungOptionBelow">以下</label>
+                                            <input type="radio" id="maxSungOptionAbove" name="maxSungOption" value="以上" checked={searchCriteria.maxSungOption === '以上'} onChange={(e) => handleCriteriaChange('maxSungOption', e.target.value)} />
+                                            <label htmlFor="maxSungOptionAbove">以上</label>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">タグ:</label>
+                                        <input 
+                                            type="text" 
+                                            className="border p-2 rounded mb-4" 
+                                            value={searchCriteria.tag} 
+                                            onChange={(e) => {
+                                                const tags = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+                                                if (tags.length <= 5) {
+                                                    handleCriteriaChange('tag', e.target.value);
+                                                }
+                                            }} 
+                                            placeholder="カンマ区切りで最大5つまで" 
+                                        />
+                                        {searchCriteria.tag.split(',').filter(tag => tag.trim() !== '').length > 5 && (
+                                            <span className="text-red-500 text-sm">タグは最大5つまでです。</span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">アーティスト名:</label>
+                                        <input type="text" className="border p-2 rounded mb-4" value={searchCriteria.artist} onChange={(e) => handleCriteriaChange('artist', e.target.value)} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">ジャンル:</label>
+                                        <input type="text" className="border p-2 rounded mb-4" value={searchCriteria.genre} onChange={(e) => handleCriteriaChange('genre', e.target.value)} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">熟練度:</label>
+                                        <input type="number" className="border p-2 rounded mb-4" value={searchCriteria.skillLevel} onChange={(e) => handleCriteriaChange('skillLevel', parseInt(e.target.value, 10))} />
+                                        <div className="flex gap-2 radio02 mb-4">
+                                            <input type="radio" id="skillLevelOptionBelow" name="skillLevelOption" value="以下" checked={searchCriteria.skillLevelOption === '以下'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} />
+                                            <label htmlFor="skillLevelOptionBelow">以下</label>
+                                            <input type="radio" id="skillLevelOptionAbove" name="skillLevelOption" value="以上" checked={searchCriteria.skillLevelOption === '以上'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} />
+                                            <label htmlFor="skillLevelOptionAbove">以上</label>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">備考:</label>
+                                        <input type="text" className="border p-2 rounded mb-4" value={searchCriteria.memo} onChange={(e) => handleCriteriaChange('memo', e.target.value)} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="whitespace-nowrap">タグ:</label>
-                            <input 
-                                type="text" 
-                                className="border p-2 rounded" 
-                                value={searchCriteria.tag} 
-                                onChange={(e) => {
-                                    const tags = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
-                                    if (tags.length <= 5) {
-                                        handleCriteriaChange('tag', e.target.value);
-                                    }
-                                }} 
-                                placeholder="カンマ区切りで最大5つまで" 
-                            />
-                            {searchCriteria.tag.split(',').filter(tag => tag.trim() !== '').length > 5 && (
-                                <span className="text-red-500 text-sm">タグは最大5つまでです。</span>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="whitespace-nowrap">アーティスト名:</label>
-                            <input type="text" className="border p-2 rounded" value={searchCriteria.artist} onChange={(e) => handleCriteriaChange('artist', e.target.value)} />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="whitespace-nowrap">ジャンル:</label>
-                            <input type="text" className="border p-2 rounded" value={searchCriteria.genre} onChange={(e) => handleCriteriaChange('genre', e.target.value)} />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="whitespace-nowrap">熟練度:</label>
-                            <input type="number" className="border p-2 rounded" value={searchCriteria.skillLevel} onChange={(e) => handleCriteriaChange('skillLevel', parseInt(e.target.value, 10))} />
-                            <div className="flex gap-2 radio02">
-                                <input type="radio" id="skillLevelOptionBelow" name="skillLevelOption" value="以下" checked={searchCriteria.skillLevelOption === '以下'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} />
-                                <label htmlFor="skillLevelOptionBelow">以下</label>
-                                <input type="radio" id="skillLevelOptionAbove" name="skillLevelOption" value="以上" checked={searchCriteria.skillLevelOption === '以上'} onChange={(e) => handleCriteriaChange('skillLevelOption', e.target.value)} />
-                                <label htmlFor="skillLevelOptionAbove">以上</label>
+                        <div className="w-full">
+                            <div className="p-4 bg-white shadow rounded-lg">
+                                <h3 className="font-bold mb-4">除外</h3>
+                                <div className="flex flex-wrap gap-4">
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">除外タグ:</label>
+                                        <input 
+                                            type="text" 
+                                            className="border p-2 rounded mb-4" 
+                                            value={searchCriteria.excludedTags} 
+                                            onChange={(e) => handleCriteriaChange('excludedTags', e.target.value)} 
+                                            placeholder="カンマ区切りでタグを除外"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">除外ジャンル:</label>
+                                        <input 
+                                            type="text" 
+                                            className="border p-2 rounded mb-4" 
+                                            value={searchCriteria.excludedGenres} 
+                                            onChange={(e) => handleCriteriaChange('excludedGenres', e.target.value)} 
+                                            placeholder="カンマ区切りでジャンルを除外"
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="whitespace-nowrap">備考:</label>
-                            <input type="text" className="border p-2 rounded" value={searchCriteria.memo} onChange={(e) => handleCriteriaChange('memo', e.target.value)} />
                         </div>
                     </div>
                 )}
