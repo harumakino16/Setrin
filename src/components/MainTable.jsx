@@ -14,13 +14,11 @@ function MainTable({
   selectedSongs,
   handleSelectSong,
   handleDeleteSong,
-  requestSort,
   tableData,
   setModalState,
   modalState,
   refreshSongs,
   onAddToSetlist,
-  sortConfig,
   handleIncreaseSingingCount,
   handleDecreaseSingingCount
 }) {
@@ -29,6 +27,7 @@ function MainTable({
   const recordsPerPage = 30;
   const [currentPage, setCurrentPage] = useState(1);
   const [currentSongs, setCurrentSongs] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const paginate = pageNumber => setCurrentPage(pageNumber);
   const [contextMenu, setContextMenu] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
@@ -73,7 +72,10 @@ function MainTable({
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-    setCurrentSongs(tableData.slice(indexOfFirstRecord, indexOfLastRecord));
+    const filteredData = tableData.filter(song => {
+      return true;
+    });
+    setCurrentSongs(filteredData.slice(indexOfFirstRecord, indexOfLastRecord));
   }, [tableData, currentPage, recordsPerPage]);
 
   useEffect(() => {
@@ -169,6 +171,26 @@ function MainTable({
   useEffect(() => {
     setCurrentPage(1); // 検索時にページを1にリセット
   }, [tableData]);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+
+    const sortedSongs = [...currentSongs].sort((a, b) => {
+      if (a[key] < b[key]) {
+        return direction === 'ascending' ? -1 : 1;
+      }
+      if (a[key] > b[key]) {
+        return direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    setCurrentSongs(sortedSongs);
+  };
 
   return (
     <div>
