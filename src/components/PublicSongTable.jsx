@@ -1,15 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { convertKanaToHira } from '../utils/stringUtils';
 import RequestModal from './RequestModal';
+import { useTheme } from '@/context/ThemeContext';
 
 const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [selectedSong, setSelectedSong] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  
+  const { theme } = useTheme();
+
   const columnLabels = [
     { key: 'title', label: '曲名' },
     { key: 'artist', label: 'アーティスト' },
@@ -17,15 +19,15 @@ const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }
     { key: 'youtubeUrl', label: 'YouTubeリンク' },
     { key: 'tags', label: 'タグ' },
     { key: 'singingCount', label: '歌唱回数' },
-    { key: 'skillLevel', label: '熟練度' }
+    { key: 'skillLevel', label: '熟練度' },
   ];
 
   const filteredSongs = songs.filter(song => {
     if (!searchKeyword) return true;
-    
+
     const keyword = searchKeyword.toLowerCase();
     const keywordHira = convertKanaToHira(keyword);
-    
+
     return (
       song.title?.toLowerCase().includes(keyword) ||
       song.artist?.toLowerCase().includes(keyword) ||
@@ -41,12 +43,12 @@ const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }
       sortableSongs.sort((a, b) => {
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
-        
+
         if (sortConfig.key === 'title') {
           aValue = a.furigana || a.title;
           bValue = b.furigana || b.title;
         }
-        
+
         if (aValue < bValue) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
@@ -91,7 +93,7 @@ const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }
       <div className="overflow-x-auto">
         <table className="min-w-full whitespace-nowrap divide-y divide-gray-200" style={{ tableLayout: 'fixed' }}>
           <colgroup>
-            {columnLabels.map(({ key }) => 
+            {columnLabels.map(({ key }) =>
               visibleColumns?.[key] && (
                 <col key={key} style={{ width: '250px' }} />
               )
@@ -99,7 +101,7 @@ const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }
           </colgroup>
           <thead className="bg-gray-50">
             <tr>
-              {columnLabels.map(({ key, label }) => 
+              {columnLabels.map(({ key, label }) =>
                 visibleColumns?.[key] && (
                   <th
                     key={key}
@@ -117,12 +119,17 @@ const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }
                   </th>
                 )
               )}
+              {isSessionActive && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  リクエスト
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedSongs.map((song, index) => (
               <tr key={song.id || index}>
-                {columnLabels.map(({ key }) => 
+                {columnLabels.map(({ key }) =>
                   visibleColumns?.[key] && (
                     <td key={key} className="px-6 py-4" style={{ maxWidth: '250px' }}>
                       <div className="truncate">
@@ -161,7 +168,10 @@ const PublicSongTable = ({ songs, visibleColumns, isSessionActive, sessionPath }
                 )}
                 {isSessionActive && (
                   <td>
-                    <button onClick={() => handleRequestClick(song)}>
+                    <button
+                      onClick={() => handleRequestClick(song)}
+                      className={`bg-customTheme-${theme}-primary text-white py-2 px-4 rounded`}
+                    >
                       リクエスト
                     </button>
                   </td>

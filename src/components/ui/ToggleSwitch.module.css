@@ -1,0 +1,49 @@
+.toggle-switch {
+  width: 90px;
+  height: 34px;
+  background-color: #ccc;
+  border-radius: 15px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggle-switch.on {
+  background-color: #4caf50;
+}
+
+.toggle-knob {
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 1px;
+  transition: left 0.3s;
+}
+
+.toggle-switch.on .toggle-knob {
+  left: 59px;
+}
+
+.toggle-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: white;
+  pointer-events: none;
+  font-weight: bold;
+}
+
+.toggle-switch.on .toggle-label {
+  left: 10%;
+  transform: translateY(-50%);
+}
+
+.toggle-switch:not(.on) .toggle-label {
+  /* left: 90%; */
+  transform: translateY(-50%);
+} 
