@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTags, faList } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { FREE_PLAN_LIMIT, SETLIST_LIMIT, YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
+import H1 from '@/components/ui/h1';
 
 // カードコンポーネント
 const DashboardCard = ({ icon, title, value, limit, children }) => {
@@ -48,7 +49,7 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="p-5">
-        <h1 className="text-3xl font-bold mb-4">ダッシュボード</h1>
+        <H1>ダッシュボード</H1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={faMusic}

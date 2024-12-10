@@ -19,6 +19,7 @@ import Layout from '@/pages/layout';
 import { YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
 import { useTheme } from '@/context/ThemeContext';
 import { createPlaylist } from '@/utils/createPlaylist'; // createPlaylist関数をインポート
+import H1 from '@/components/ui/h1';
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
@@ -118,7 +119,7 @@ const SetlistDetail = () => {
             <div className="flex">
                 <div className="flex-grow p-5 w-full">
                     <Link href="/setlist" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
-                    <h1 className="text-3xl font-bold mb-4 text-gray-800">セットリスト詳細</h1>
+                    <H1>セットリスト詳細</H1>
                     {loading && (
                         <Loading />
                     )}

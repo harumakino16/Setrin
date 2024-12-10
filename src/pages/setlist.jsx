@@ -9,6 +9,7 @@ import { db } from '../../firebaseConfig';
 import Loading from '@/components/loading';
 import { useTheme } from '@/context/ThemeContext';
 import Layout from '@/pages/layout';
+import H1 from '@/components/ui/h1';
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
@@ -58,7 +59,7 @@ export default function Setlist() {
       <div className="flex flex-col md:flex-row">
         <div className="flex-grow p-4 md:p-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">セットリスト</h1>
+            <H1>セットリスト</H1>
             <button onClick={handleOpenModal} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center mb-4 md:mb-0`}>
               <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

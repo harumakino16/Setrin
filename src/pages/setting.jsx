@@ -16,6 +16,7 @@ import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import Layout from '@/pages/layout';
 import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { loadStripe } from '@stripe/stripe-js';
+import H1 from '@/components/ui/h1';
 
 function Settings() {
     const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
@@ -342,15 +343,15 @@ function Settings() {
 
     return (
         <Layout>
-            <div className="flex justify-between items-center p-8">
-                <h1 className="text-2xl font-bold">設定</h1>
+            <div className="flex justify-between items-center p-8 pb-0">
+                <H1>設定</H1>
                 <button onClick={handleLogout} className="text-red-500 hover:text-red-700 py-2 px-4 rounded inline-flex items-center">
                     <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
                     ログアウト
                 </button>
             </div>
             <div className="flex">
-                <div className="flex-grow p-8">
+                <div className="flex-grow p-8 pt-0">
                     <div className='mb-6'>
                         <div className="mt-8 mb-8">
                             <label className="block mb-2 text-gray-700">プラン設定:</label>
