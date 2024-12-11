@@ -80,6 +80,7 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
     useEffect(() => {
         searchSongs(searchCriteria); // 現在の検索条件を使用
+
     }, [songs, searchCriteria]);
 
     const handleCriteriaChange = (field, value) => {
@@ -90,12 +91,19 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         });
     };
 
+
     return (
         <div>
             <div className="flex flex-col gap-8 mb-8">
                 <div className="">
                     <label className="whitespace-nowrap">フリーキーワード:</label>
-                    <input type="text" className="border p-2 rounded w-full h-14" placeholder="キーワードで検索" onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)} />
+                    <input
+                        type="text"
+                        className="border p-2 rounded w-full h-14"
+                        placeholder="キーワードで検索"
+                        value={searchCriteria.freeKeyword}
+                        onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)}
+                    />
                 </div>
                 <div onClick={() => setShowAdvancedSearch(!showAdvancedSearch)} className="text-gray-500 py-2 px-4 cursor-pointer flex items-center">
                     <span className="text-gray-500">{isRandomSetlist ? '絞り込み' : '詳細検索'}</span> 
