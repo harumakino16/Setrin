@@ -8,7 +8,7 @@ import Layout from '@/pages/layout';
 import SearchForm from '@/components/SearchForm';
 import PublicSongTable from '@/components/PublicSongTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faEdit, faCheck, faTimes, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faEdit, faCheck, faTimes, faEye, faEyeSlash, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 
@@ -117,7 +117,7 @@ export default function PubPageSettingDetail() {
     if (!currentUser || !id) return;
     try {
       // 現在のsearchCriteriaをsavedSearchCriteriaとしても保存
-      // これにより次回ロード時にはこの条件���デフォルトとして適用される
+      // これにより次回ロード時にはこの条件デフォルトとして適用される
       const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', id);
       await setDoc(publicPageRef, {
         name: editedTitle,
@@ -154,7 +154,7 @@ export default function PubPageSettingDetail() {
       });
     } catch (error) {
       console.error('Failed to copy: ', error);
-      setMessageInfo({ type: 'error', message: 'URLのコピーに失敗���ました' });
+      setMessageInfo({ type: 'error', message: 'URLのコピーに失敗しました' });
     }
   };
 
@@ -189,11 +189,23 @@ export default function PubPageSettingDetail() {
     { key: 'skillLevel', label: '熟練度' }
   ];
 
+  const handleBackToList = () => {
+    router.push('/pubpagesetting');
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <Layout>
       <div className="p-8 space-y-6 mx-auto">
+        {/* 一覧に戻るボタン */}
+        <button
+          onClick={handleBackToList}
+          className="flex items-center text-sm"
+        >
+          <FontAwesomeIcon icon={faChevronLeft} className="mr-2 text-sm item-center" />
+          一覧に戻る
+        </button>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {isEditingTitle ? (
@@ -246,6 +258,7 @@ export default function PubPageSettingDetail() {
           </button>
         </div>
 
+
         {/* 公開URLセクション */}
         <div className="bg-gray-50 p-4 rounded shadow-sm space-y-2">
           <p className="font-semibold">公開ページURL:</p>
@@ -274,7 +287,7 @@ export default function PubPageSettingDetail() {
           <h3 className="text-xl font-bold mb-4">公開する曲を絞り込む</h3>
           <p className="text-sm text-gray-600 mb-4">
             下記の検索フォームで公開時に表示する曲の条件を設定します。  
-            前回保存した検索条件があれば、それが初期値として自動的に適用されています。
+            前回保存した検索条件があれば、それが初値として自動的に適用されています。
           </p>
           <SearchForm
             currentUser={currentUser}

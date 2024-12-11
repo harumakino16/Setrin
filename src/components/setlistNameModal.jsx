@@ -25,7 +25,6 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const handleSubmit = async () => {
         if (currentUser) {
             // 無料プランかどうか、セットリストの数をチェック
-            console.log(setlists.length);
             if (currentUser.plan === 'free' && setlists.length >= SETLIST_LIMIT) {
                 setMessageInfo({ type: 'error', message: `無料プランでは最大${SETLIST_LIMIT}個のセットリストまで保存できます。` });
                 return;

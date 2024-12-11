@@ -104,10 +104,10 @@ export default function PubPageSetting() {
         <Layout>
             <div className="p-8 space-y-6 max-w-4xl mx-auto">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold">持ち歌リストの公開設定</h1>
+                    <h1 className="text-2xl font-bold">歌える曲リスト</h1>
                     <p className="text-gray-700 text-sm">
-                        あなたの持ち歌リストを公開用に設定できます。
-                        公開ページはリスナーに共有可能なURLが発行され、指定した条件で曲を表示できます。
+                        あなたの持ち歌を歌える曲リストとして一般公開できます。<br/>
+                        公開する曲の条件を指定でき、リスナーに共有可能な公開ページURLが発行されます。
                     </p>
                 </div>
 
@@ -140,7 +140,7 @@ export default function PubPageSetting() {
                     {filteredLists.length === 0 && songLists.length === 0 && (
                         <div className="text-gray-600 text-sm p-4 bg-gray-50 border border-gray-200 rounded">
                             まだ公開リストがありません。「新しい公開リストを作成」ボタンを押して、
-                            あなたの持ち歌リストを公開用に作成してみましょう。
+                            あなたの歌える曲リストを公開用に作成してみましょう。
                         </div>
                     )}
 
@@ -165,7 +165,7 @@ export default function PubPageSetting() {
                                     className="bg-white p-4 border border-gray-200 rounded shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
                                 >
                                     <div className="flex items-center justify-between">
-                                        <span className="font-semibold text-gray-700 hover:underline text-lg">
+                                        <span className="font-semibold text-gray-700 text-lg">
                                             {list.name || '名称未設定...'}
                                         </span>
                                         <button 

@@ -40,9 +40,7 @@ const ManageUsers = () => {
         body: JSON.stringify({ userId }),
       });
 
-      console.log('Response status:', response.status);
       const responseData = await response.json();
-      console.log('Response data:', responseData);
 
       if (!response.ok) {
         throw new Error(responseData.message || 'Failed to log in as user.');

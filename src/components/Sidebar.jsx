@@ -34,7 +34,7 @@ const MENU = [
         path: "/setting",
     },
     {
-        title: "持ち歌リストの公開設定",
+        title: "歌える曲リスト",
         iconName: faList,
         path: "/pubpagesetting",
     },
@@ -54,8 +54,6 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
     const handleCloseModal = () => {
         setShowCreateSetlistModal(false);
     };
-
-    console.log(isAdmin);
 
     if (!currentUser) {
         return null;

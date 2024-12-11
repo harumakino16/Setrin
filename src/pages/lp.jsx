@@ -30,12 +30,6 @@ export default function LandingPage() {
   const [message, setMessage] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // ここにフォーム送信のロジックを追加
-    console.log('Form submitted:', { name, email, message })
-  }
-
   const closeMenu = () => setMenuOpen(false);
 
   function PricingCard({ title, description, price, features }) {
