@@ -160,29 +160,31 @@ export default function PubPageSetting() {
                             : '不明な日時';
 
                         return (
-                            <div 
-                                key={list.id} 
-                                className="bg-white p-4 border border-gray-200 rounded shadow-sm hover:shadow-lg transition-shadow"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <Link href={`/pubpagesetting/${list.id}`} legacyBehavior>
-                                        <a className="font-semibold text-blue-600 hover:underline text-lg">
+                            <Link href={`/pubpagesetting/${list.id}`} legacyBehavior key={list.id}>
+                                <div 
+                                    className="bg-white p-4 border border-gray-200 rounded shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-semibold text-gray-700 hover:underline text-lg">
                                             {list.name || '名称未設定...'}
-                                        </a>
-                                    </Link>
-                                    <button 
-                                        onClick={() => handleDeleteList(list.id)}
-                                        className="text-red-500 hover:text-red-700 transition-colors"
-                                        title="このリストを削除"
-                                    >
-                                        <FaTrash />
-                                    </button>
+                                        </span>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // リンクのクリックを防ぐ
+                                                handleDeleteList(list.id);
+                                            }}
+                                            className="text-red-500 hover:text-red-700 transition-colors"
+                                            title="このリストを削除"
+                                        >
+                                            <FaTrash />
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center text-sm text-gray-500 mt-2 space-x-2">
+                                        <FaClock />
+                                        <span>作成日: {formattedDate}</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center text-sm text-gray-500 mt-2 space-x-2">
-                                    <FaClock />
-                                    <span>作成日: {formattedDate}</span>
-                                </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

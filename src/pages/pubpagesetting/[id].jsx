@@ -8,7 +8,7 @@ import Layout from '@/pages/layout';
 import SearchForm from '@/components/SearchForm';
 import PublicSongTable from '@/components/PublicSongTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faEdit, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faEdit, faCheck, faTimes, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 
@@ -78,6 +78,11 @@ export default function PubPageSettingDetail() {
         setEditedTitle('名称未設定...');
       }
 
+      // visibleColumns をデータから設定
+      if (data.visibleColumns) {
+        setVisibleColumns(data.visibleColumns);
+      }
+
       setLoading(false);
     };
     fetchPublicPageData();
@@ -90,16 +95,35 @@ export default function PubPageSettingDetail() {
     setTriggerSearch(false);
   }, []);
 
+  const [visibleColumns, setVisibleColumns] = useState({
+    title: true,
+    artist: true,
+    genre: true,
+    youtubeUrl: true,
+    tags: true,
+    singingCount: true,
+    skillLevel: true
+  });
+
+  // カラム表示設定のハンドラー
+  const toggleColumn = (column) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [column]: !prev[column]
+    }));
+  };
+
   const handleSave = async () => {
     if (!currentUser || !id) return;
     try {
       // 現在のsearchCriteriaをsavedSearchCriteriaとしても保存
-      // これにより次回ロード時にはこの条件がデフォルトとして適用される
+      // これにより次回ロード時にはこの条件���デフォルトとして適用される
       const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', id);
       await setDoc(publicPageRef, {
         name: editedTitle,
         searchCriteria: searchCriteria,
-        savedSearchCriteria: searchCriteria
+        savedSearchCriteria: searchCriteria,
+        visibleColumns: visibleColumns
       }, { merge: true });
 
       const topLevelPublicPageRef = doc(db, 'publicPages', id);
@@ -130,7 +154,7 @@ export default function PubPageSettingDetail() {
       });
     } catch (error) {
       console.error('Failed to copy: ', error);
-      setMessageInfo({ type: 'error', message: 'URLのコピーに失敗しました' });
+      setMessageInfo({ type: 'error', message: 'URLのコピーに失敗���ました' });
     }
   };
 
@@ -153,6 +177,17 @@ export default function PubPageSettingDetail() {
     setListInfo(newListInfo);
     await handleSave();
   };
+
+  // カラム名の日本語ラベルと順序を固定
+  const columnOrder = [
+    { key: 'title', label: '曲名' },
+    { key: 'artist', label: 'アーティスト' },
+    { key: 'genre', label: 'ジャンル' },
+    { key: 'youtubeUrl', label: 'YouTubeリンク' },
+    { key: 'tags', label: 'タグ' },
+    { key: 'singingCount', label: '歌唱回数' },
+    { key: 'skillLevel', label: '熟練度' }
+  ];
 
   if (loading) return <div>Loading...</div>;
 
@@ -251,15 +286,32 @@ export default function PubPageSettingDetail() {
           />
         </div>
 
-        {/* テーブル表示 */}
+        {/* テーブル表示とカラム表示設定 */}
         <div className="bg-white p-4 rounded shadow-sm">
           <h3 className="text-xl font-bold mb-4">現在の条件で表示される曲(プレビュー)</h3>
           <p className="text-sm text-gray-600 mb-4">
-            以下は現在の条件でフィルタリングした曲の一覧です。このページを保存すると、リスナーがアクセスした際にこの条件に合う最新の曲が表示されます（このプレビュー自体は保存されません）。
+            以下は現在の条件でフィルタリングした曲の一覧です。このページを保存すると、リスナーがアクセスした際にこの条件に合う最新の曲が表示されます。
           </p>
+
+          {/* カラム表示設定 */}
+          <div className="flex flex-wrap gap-4 mb-4">
+            {columnOrder.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => toggleColumn(key)}
+                className={`flex text-xs items-center px-4 py-2 rounded ${
+                  visibleColumns[key] ? `bg-customTheme-${theme}-primary text-white` : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                <FontAwesomeIcon icon={visibleColumns[key] ? faEye : faEyeSlash} className="mr-2" />
+                {label}
+              </button>
+            ))}
+          </div>
+
           <PublicSongTable
             songs={searchResults}
-            visibleColumns={{ title: true, artist: true, genre: true, youtubeUrl: true, tags: true, singingCount: true, skillLevel: true }}
+            visibleColumns={visibleColumns}
           />
         </div>
       </div>

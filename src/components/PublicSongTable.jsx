@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PublicSongTable = ({ songs, visibleColumns, onRequestSort, sortConfig }) => {
+export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig }) {
   const columnLabels = [
     { key: 'title', label: '曲名' },
     { key: 'artist', label: 'アーティスト' },
@@ -99,6 +99,4 @@ const PublicSongTable = ({ songs, visibleColumns, onRequestSort, sortConfig }) =
       </table>
     </div>
   );
-};
-
-export default PublicSongTable;
+}
