@@ -1,14 +1,14 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 
 export default function MigratePublicPages() {
   const { setMessageInfo } = useMessage();
   const router = useRouter();
 
-  const handleMigration = async () => {
+  const handleCreatePublicPages = async () => {
     try {
       // 全ユーザーを取得
       const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -17,63 +17,43 @@ export default function MigratePublicPages() {
       for (const userDoc of users) {
         const userId = userDoc.id;
 
-        // 古い設定データを取得
-        const oldSettingsRef = doc(db, 'users', userId, 'publicPages', 'settings');
-        const oldSettingsDoc = await getDoc(oldSettingsRef);
+        // 既存のpublicPagesドキュメントを取得
+        const publicPagesRef = collection(db, 'users', userId, 'publicPages');
+        const publicPagesSnapshot = await getDocs(publicPagesRef);
 
-        if (oldSettingsDoc.exists()) {
-          const oldData = oldSettingsDoc.data();
+        for (const pageDoc of publicPagesSnapshot.docs) {
+          const pageData = pageDoc.data();
+          const newDocId = pageDoc.id;
 
-          // 旧pageIdを使用し、存在しない場合は新しいUUIDを生成
-          const newDocId = oldData.pageId || crypto.randomUUID();
+          // 新しいトップレベルの公開ページコレクションにドキュメントを作成
+          const newPublicPageRef = doc(db, 'publicPages', newDocId);
 
-          // 新しいデータを作成
-          const initialCriteria = {
-            artist: '',
-            excludedGenres: '',
-            excludedTags: '',
-            freeKeyword: '',
-            genre: '',
-            maxSung: 0,
-            maxSungOption: '以下',
-            memo: '',
-            skillLevel: 0,
-            skillLevelOption: '以下',
-            tag: ''
+          // ドキュメントが既に存在するか確認
+          const existingDoc = await getDoc(newPublicPageRef);
+          if (existingDoc.exists()) {
+            console.log(`ドキュメントID: ${newDocId} は既に存在します。スキップします。`);
+            continue;
+          }
+
+          const newPublicPageData = {
+            name: pageData.name || '名称未設定...',
+            updatedAt: new Date(),
+            userId: userId
           };
 
-          const newData = {
-            createdAt: new Date(),
-            name: oldData.displayName || '名称未設定...',
-            visibleColumns: oldData.visibleColumns || [],
-            savedSearchCriteria: initialCriteria,
-            searchCriteria: initialCriteria
-          };
-
-          // 新しいドキュメントにデータを書き込む
-          const newDocRef = doc(db, 'users', userId, 'publicPages', newDocId);
-          await setDoc(newDocRef, newData);
-
-          // 古い設定ドキュメントを削除
-          await deleteDoc(oldSettingsRef);
+          await setDoc(newPublicPageRef, newPublicPageData);
 
           // データの対応をコンソールに出力
           console.log(`ユーザーID: ${userId}`);
-          console.log('旧データ:');
-          console.log(oldData);
-          console.log('新データ:');
-          console.log(newData);
-          console.log('新ドキュメントID:');
-          console.log(newDocId);
+          console.log('新しい公開ページデータ:');
+          console.log(newPublicPageData);
         }
       }
 
-      setMessageInfo({ message: 'データの移行が完了しました。', type: 'success' });
-      // 移行後に必要であれば、リダイレクトなどの処理を追加できます
-      // router.push('/admin');
+      setMessageInfo({ message: '公開ページの作成が完了しました。', type: 'success' });
     } catch (error) {
-      console.error('データ移行中にエラーが発生しました:', error);
-      setMessageInfo({ message: 'データ移行中にエラーが発生しました。', type: 'error' });
+      console.error('公開ページ作成中にエラーが発生しました:', error);
+      setMessageInfo({ message: '公開ページ作成中にエラーが発生しました。', type: 'error' });
     }
   };
 
@@ -81,10 +61,10 @@ export default function MigratePublicPages() {
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">PublicPageデータの移行</h1>
       <button
-        onClick={handleMigration}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={handleCreatePublicPages}
+        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
       >
-        データを移行する
+        公開ページを作成する
       </button>
     </div>
   );
