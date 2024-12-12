@@ -143,22 +143,22 @@ const Dashboard = () => {
               <StatBox
                 label="曲数"
                 value={userData.totalSongs ? userData.totalSongs.toLocaleString() : 0}
-                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SONGS.toLocaleString() : '制限なし'}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SONGS: '制限なし'}
               />
               <StatBox
                 label="セットリスト数"
                 value={userData.totalSetlists ? userData.totalSetlists.toLocaleString() : 0}
-                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SETLISTS.toLocaleString() : '制限なし'}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SETLISTS: '制限なし'}
               />
               <StatBox
                 label="再生リスト作成回数"
                 value={userData.playlistCreationCount ? userData.playlistCreationCount.toLocaleString() : 0}
-                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_YOUTUBE_PLAYLISTS.toLocaleString() : '制限なし'}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_YOUTUBE_PLAYLISTS : '制限なし'}
               />
               <StatBox
                 label="歌える曲リスト数"
                 value={userData.publicPagesCount ? userData.publicPagesCount.toLocaleString() : 0}
-                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES.toLocaleString() : PREMIUM_PLAN_MAX_PUBLIC_PAGES.toLocaleString()}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES: PREMIUM_PLAN_MAX_PUBLIC_PAGES.toLocaleString()}
               />
               {currentUser.plan === 'free' && (
                 <div className={`p-2 mb-6 bg-customTheme-${theme}-secondary border border-customTheme-${theme}-primary rounded flex justify-between items-center`}>
