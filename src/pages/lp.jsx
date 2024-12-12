@@ -12,7 +12,7 @@ function Feature({ number, imageSrc, title, description }) {
     <div className="flex flex-col md:flex-row items-start gap-8">
       <div className="w-full md:w-1/3 flex justify-center items-center">
         <div className="">
-          <Image src={imageSrc} alt={title} width={80} height={80} />
+          <Image src={imageSrc} alt={title} width={80} height={80} priority={true}/>
         </div>
       </div>
       <div className="w-full md:w-2/3 relative self-center">
@@ -60,7 +60,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/"><Image src="/images/SetLink_trance (1000 x 300 px).png" alt="Setlink" width={150} height={30} /></Link>
+          <Link href="/"><Image src="/images/SetLink_trance (1000 x 300 px).png" alt="Setlink" width={150} height={30} priority={true} /></Link>
           <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
             <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>

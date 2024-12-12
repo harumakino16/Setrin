@@ -4,7 +4,7 @@ import { db } from '../../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
-import SearchForm from '@/components/searchForm';
+import SearchForm from '@/components/SearchForm';
 import Modal from '@/components/modal.jsx';
 import useSearchCriteria from '@/hooks/useSearchCriteria';
 import fetchUsersSetlists from '../hooks/fetchSetlists';

@@ -367,7 +367,7 @@ function Settings() {
                         <div className="bg-white shadow-md rounded px-5 py-3 flex flex-col md:flex-row justify-between items-center">
                             <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
                                 <div className="flex items-center gap-4">
-                                    <Image src={youtubeIcon} alt="Youtubeに接続" width={50} />
+                                    <Image src={youtubeIcon} alt="Youtubeに接続" width={50} priority={true} />
                                     <div className="flex flex-col">
                                         {currentUser.youtubeRefreshToken ? (
                                             <div className="flex items-center">
@@ -391,7 +391,7 @@ function Settings() {
                                 </button>
                             ) : (
                                 <a href={authUrl} className="mt-4 md:mt-0 block text-center">
-                                    <Image src={googleIcon} alt="Youtubeに接続" width={180} />
+                                    <Image src={googleIcon} alt="Youtubeに接続" width={180} priority={true} />
                                 </a>
                             )}
                         </div>
