@@ -17,9 +17,9 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             songsData = songsData.filter(song =>
                 song.title.toLowerCase().includes(keywordLower) ||
                 song.artist.toLowerCase().includes(keywordLower) ||
-                song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) ||
-                song.genre.toLowerCase().includes(keywordLower) ||
-                song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
+                song.tags && song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) ||
+                song.genre && song.genre.toLowerCase().includes(keywordLower) ||
+                song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
                 (song.memo && song.memo.toLowerCase().includes(keywordLower)) ||
                 (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
@@ -35,24 +35,24 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
         if (searchCriteria.tag) {
             const tagLower = searchCriteria.tag.toLowerCase();
-            songsData = songsData.filter(song => song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
+            songsData = songsData.filter(song => song.tags && song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
         }
 
         if (searchCriteria.artist) {
             const artistLower = searchCriteria.artist.toLowerCase();
-            songsData = songsData.filter(song => song.artist.toLowerCase().includes(artistLower));
+            songsData = songsData.filter(song => song.artist && song.artist.toLowerCase().includes(artistLower));
         }
 
         if (searchCriteria.genre) {
             const genreLower = searchCriteria.genre.toLowerCase();
-            songsData = songsData.filter(song => song.genre.toLowerCase().includes(genreLower));
+            songsData = songsData.filter(song => song.genre && song.genre.toLowerCase().includes(genreLower));
         }
 
         if (searchCriteria.skillLevel > 0) {
             if (searchCriteria.skillLevelOption === '以上') {
-                songsData = songsData.filter(song => song.skillLevel >= searchCriteria.skillLevel);
+                songsData = songsData.filter(song => song.skillLevel && song.skillLevel >= searchCriteria.skillLevel);
             } else {
-                songsData = songsData.filter(song => song.skillLevel <= searchCriteria.skillLevel);
+                songsData = songsData.filter(song => song.skillLevel && song.skillLevel <= searchCriteria.skillLevel);
             }
         }
 
