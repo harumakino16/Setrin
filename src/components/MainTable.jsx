@@ -7,6 +7,7 @@ import { useSongs } from '../context/SongsContext';
 import ContextMenu from './ContextMenu';
 import ColumnSettingsModal from './ColumnSettingsModal';
 import { useTheme } from '@/context/ThemeContext';
+import { sortSongs } from '../utils/sortUtils';
 
 function MainTable({
   selectAll,
@@ -58,7 +59,7 @@ function MainTable({
       singingCount: { label: '歌唱回数', visible: true, removable: true },
       skillLevel: { label: '熟練度', visible: true, removable: true },
       memo: { label: '備考', visible: true, removable: true },
-      actions: { label: '作', visible: true, removable: true }
+      actions: { label: '操作', visible: true, removable: true }
     };
   };
 
@@ -76,8 +77,11 @@ function MainTable({
     const filteredData = tableData.filter(song => {
       return true;
     });
-    setCurrentSongs(filteredData.slice(indexOfFirstRecord, indexOfLastRecord));
-  }, [tableData, currentPage, recordsPerPage]);
+    
+    const sortedData = sortSongs(filteredData, sortConfig);
+
+    setCurrentSongs(sortedData.slice(indexOfFirstRecord, indexOfLastRecord));
+  }, [tableData, currentPage, recordsPerPage, sortConfig]);
 
   useEffect(() => {
     const handleClickOutside = () => {
