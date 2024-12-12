@@ -158,7 +158,7 @@ const Dashboard = () => {
               <StatBox
                 label="歌える曲リスト数"
                 value={userData.publicPagesCount ? userData.publicPagesCount.toLocaleString() : 0}
-                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES: PREMIUM_PLAN_MAX_PUBLIC_PAGES.toLocaleString()}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES: PREMIUM_PLAN_MAX_PUBLIC_PAGES}
               />
               {currentUser.plan === 'free' && (
                 <div className={`p-2 mb-6 bg-customTheme-${theme}-secondary border border-customTheme-${theme}-primary rounded flex justify-between items-center`}>
