@@ -3,7 +3,8 @@ import { useTheme } from '@/context/ThemeContext';
 
 const StatBox = ({ label, value, limit }) => {
     const { theme } = useTheme();
-    const percentage = limit !== '制限なし' ? Math.min((value / limit) * 100, 100) : 100;
+    const isLimitNumeric = !isNaN(limit);
+    const percentage = isLimitNumeric ? Math.min((value / limit) * 100, 100) : 100;
   
     return (
       <div className="mb-4">
@@ -11,7 +12,7 @@ const StatBox = ({ label, value, limit }) => {
           <span className="text-gray-700 text-lg font-bold">{label}</span>
           <span className="text-gray-900 text-lg font-bold">{value} / {limit}</span>
         </div>
-        {limit !== '制限なし' && (
+        {isLimitNumeric && (
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
               className={`bg-customTheme-${theme}-primary h-2.5 rounded-full`}
