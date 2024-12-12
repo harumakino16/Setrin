@@ -18,6 +18,8 @@ import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-soli
 import { loadStripe } from '@stripe/stripe-js';
 import H1 from '@/components/ui/h1';
 import { handleUpgradePlan } from '@/utils/stripeUtils';
+import Modal from '@/components/Modal';
+import Price from '@/components/Price';
 
 function Settings() {
     const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
@@ -55,6 +57,7 @@ function Settings() {
     const [isAccordionOpen, setIsAccordionOpen] = useState(false);
     const { upgrade_success } = router.query;
     const [cancelAt, setCancelAt] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const { code } = router.query;
@@ -303,7 +306,7 @@ function Settings() {
                                 <p className="mr-4">現在のプラン: {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}</p>
                                 {currentUser.plan === 'free' ? (
                                     <button
-                                        onClick={handleUpgradePlanClick}
+                                        onClick={() => setIsModalOpen(true)}
                                         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                                     >
                                         プレミアムプランにアップグレード
@@ -413,6 +416,9 @@ function Settings() {
                     </div>
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <Price />
+            </Modal>
         </Layout>
     );
 }

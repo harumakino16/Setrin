@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Music, Youtube, List, Shuffle } from 'lucide-react'
 import Image from 'next/image'
-import { FREE_PLAN_LIMIT, YOUTUBE_CREATE_LIST_LIMIT, PREMIUM_PLAN_PRICE } from '@/constants'
+import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, PREMIUM_PLAN_PRICE } from '@/constants'
 import ContactForm from '@/components/ContactForm'
 import Price from '@/components/Price'
 

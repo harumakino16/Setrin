@@ -1,4 +1,4 @@
-import { faMusic } from "@fortawesome/free-solid-svg-icons";
+import { faMusic, faCog } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHistory, faTools, faUserShield, faChartLine, faList } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
@@ -19,24 +19,24 @@ const MENU = [
         path: "/",
     },
     {
-        title: "ダッシュボード",
-        iconName: faChartLine,
-        path: "/dashboard",
-    },
-    {
         title: "セットリスト",
         iconName: faHistory,
         path: "/setlist",
     },
     {
-        title: "設定",
-        iconName: faTools,
-        path: "/setting",
-    },
-    {
         title: "歌える曲リスト",
         iconName: faList,
         path: "/pubpagesetting",
+    },
+    {
+        title: "ダッシュボード",
+        iconName: faChartLine,
+        path: "/dashboard",
+    },
+    {
+        title: "設定",
+        iconName: faCog,
+        path: "/setting",
     },
 ]
 

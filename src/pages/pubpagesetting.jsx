@@ -10,6 +10,8 @@ import SongListNameModal from '@/components/SongListNameModal';
 import { FaTrash, FaPlus, FaSearch, FaClock } from 'react-icons/fa';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
+import Price from '@/components/Price';
+import Modal from '@/components/Modal';
 
 export default function PubPageSetting() {
     const { currentUser } = useContext(AuthContext);
@@ -19,6 +21,8 @@ export default function PubPageSetting() {
     const [searchQuery, setSearchQuery] = useState('');
     const { setMessageInfo } = useMessage();
     const { theme } = useTheme();
+    const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+
     useEffect(() => {
         if (!currentUser) return;
         const fetchSongLists = async () => {
@@ -35,7 +39,18 @@ export default function PubPageSetting() {
         fetchSongLists();
     }, [currentUser]);
 
-    const handleAddSongList = () => {
+    const handleAddSongList = async () => {
+        if (!currentUser) return;
+
+        if (currentUser.plan !== 'premium') {
+            setMessageInfo({
+                type: 'error',
+                message: '公開リストを追加するにはプレミアムプランが必要です。'
+            });
+            setIsPriceModalOpen(true);
+            return;
+        }
+
         setIsModalOpen(true);
     };
 
@@ -194,6 +209,11 @@ export default function PubPageSetting() {
                     onSave={handleSaveListName}
                     onClose={() => setIsModalOpen(false)}
                 />
+            )}
+            {isPriceModalOpen && (
+                <Modal isOpen={isPriceModalOpen} onClose={() => setIsPriceModalOpen(false)}>
+                    <Price />
+                </Modal>
             )}
         </Layout>
     );

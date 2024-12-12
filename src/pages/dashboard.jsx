@@ -4,8 +4,14 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import Layout from '@/pages/layout';
 import { fetchUserData } from '@/utils/dashboardUtils';
-import { faMusic, faTags, faList } from '@fortawesome/free-solid-svg-icons';
-import { FREE_PLAN_LIMIT, SETLIST_LIMIT, YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
+import { faTags, faList, faDatabase } from '@fortawesome/free-solid-svg-icons';
+import {
+  FREE_PLAN_MAX_SONGS,
+  FREE_PLAN_MAX_SETLISTS,
+  FREE_PLAN_MAX_YOUTUBE_PLAYLISTS,
+  FREE_PLAN_MAX_PUBLIC_PAGES,
+  PREMIUM_PLAN_MAX_PUBLIC_PAGES
+} from '@/constants';
 import H1 from '@/components/ui/h1';
 import DashboardCard from '@/components/DashboardCard';
 import Skeleton from '@/components/Skeleton';
@@ -14,7 +20,9 @@ import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Lege
 import StatBox from '@/components/StatBox';
 import TagsChart from '@/components/TagsChart';
 import Badge from '@/components/Badge'; // 追加（オプション）
-
+import { useTheme } from '@/context/ThemeContext';
+import Modal from '@/components/Modal';
+import Price from '@/components/Price';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // カラージェネレーター関数（HSLを使用して色相を均等に分散）
@@ -39,7 +47,8 @@ const Dashboard = () => {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const { theme } = useTheme();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       if (currentUser) {
@@ -124,25 +133,39 @@ const Dashboard = () => {
     <Layout>
       <div className="p-5">
         <H1>ダッシュボード</H1>
+
+
+
         <div className="space-y-6">
           {/* 容量カード */}
-          <DashboardCard icon={faMusic} title="容量">
+          <DashboardCard icon={faDatabase} title={`容量(${currentUser.plan === 'free' ? '無料プラン' : 'プレミアム'})`}>
             <div className="space-y-4">
               <StatBox
                 label="曲数"
-                value={userData.totalSongs}
-                limit={currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}
+                value={userData.totalSongs ? userData.totalSongs.toLocaleString() : 0}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SONGS.toLocaleString() : '制限なし'}
               />
               <StatBox
                 label="セットリスト数"
-                value={userData.totalSetlists}
-                limit={currentUser.plan === 'free' ? SETLIST_LIMIT : '制限なし'}
+                value={userData.totalSetlists ? userData.totalSetlists.toLocaleString() : 0}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SETLISTS.toLocaleString() : '制限なし'}
               />
               <StatBox
                 label="再生リスト作成回数"
-                value={userData.playlistCreationCount}
-                limit={currentUser.plan === 'free' ? YOUTUBE_CREATE_LIST_LIMIT : '制限なし'}
+                value={userData.playlistCreationCount ? userData.playlistCreationCount.toLocaleString() : 0}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_YOUTUBE_PLAYLISTS.toLocaleString() : '制限なし'}
               />
+              <StatBox
+                label="歌える曲リスト数"
+                value={userData.publicPagesCount ? userData.publicPagesCount.toLocaleString() : 0}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES.toLocaleString() : PREMIUM_PLAN_MAX_PUBLIC_PAGES.toLocaleString()}
+              />
+              {currentUser.plan === 'free' && (
+                <div className={`p-2 mb-6 bg-customTheme-${theme}-secondary border border-customTheme-${theme}-primary rounded flex justify-between items-center`}>
+                  <p className="text-gray-600 text-sm">プレミアムプランにアップグレードすると容量が大幅にアップします</p>
+                  <button className={`px-4 py-2 bg-customTheme-${theme}-primary text-white rounded`} onClick={() => setIsModalOpen(true)}>アップグレード</button>
+                </div>
+              )}
             </div>
           </DashboardCard>
 
@@ -188,7 +211,13 @@ const Dashboard = () => {
           </DashboardCard>
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Price />
+      </Modal>
     </Layout>
+
+
   );
 };
 

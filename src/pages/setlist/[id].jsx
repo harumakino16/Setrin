@@ -16,7 +16,7 @@ import ColumnSettingsModal from '@/components/ColumnSettingsModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Layout from '@/pages/layout';
-import { YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_YOUTUBE_PLAYLISTS } from '@/constants';
 import { useTheme } from '@/context/ThemeContext';
 import { createPlaylist } from '@/utils/createPlaylist'; // createPlaylist関数をインポート
 import H1 from '@/components/ui/h1';

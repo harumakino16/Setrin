@@ -2,12 +2,12 @@ import { useState, useContext } from 'react';
 import { db } from '../../firebaseConfig';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
-import Modal from './modal';
+import Modal from './Modal';
 import { useMessage } from '../context/MessageContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatSongData } from '../utils/songUtils';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { FREE_PLAN_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_SONGS } from '@/constants';
 import { useSongs } from '../context/SongsContext';
 
 const isKatakana = (str) => {
@@ -40,8 +40,8 @@ function SongModal({ isOpen, onClose, song }) {
       return;
     }
 
-    if (isNewSong && songs.length >= FREE_PLAN_LIMIT) {
-      setMessageInfo({ message: `曲の追加が無料プランの上限(${FREE_PLAN_LIMIT})を超えています。`, type: 'error' });
+    if (isNewSong && songs.length >= FREE_PLAN_MAX_SONGS) {
+      setMessageInfo({ message: `曲の追加が無料プランの上限(${FREE_PLAN_MAX_SONGS})を超えています。`, type: 'error' });
       return;
     }
 

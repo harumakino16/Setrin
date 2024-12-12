@@ -64,12 +64,12 @@ module.exports = {
             accent: '#8DCAFF'
           },
           yellow: {
-            primary: '#FFE5B6',
+            primary: '#FFDFA3',
             secondary: '#FFF8E5',
             accent: '#FFD28D'
           },
           green: {
-            primary: '#B6FFBE',
+            primary: '#A5F5AD',
             secondary: '#E5FFE8',
             accent: '#8DFF98'
           },

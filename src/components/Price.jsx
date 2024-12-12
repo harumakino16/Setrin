@@ -3,10 +3,16 @@ import { useAuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { handleUpgradePlan } from '@/utils/stripeUtils';
 import { useRouter } from 'next/router';
+import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, FREE_PLAN_MAX_SETLISTS, PREMIUM_PLAN_PRICE, FREE_PLAN_MAX_PUBLIC_PAGE, PREMIUM_PLAN_MAX_PUBLIC_PAGE } from '@/constants';
+import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
 
 function Price() {
   const { currentUser } = useAuthContext();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const isPremiumUser = currentUser?.plan === 'premium';
   const premiumButtonText = currentUser ? (isPremiumUser ? '現在利用中' : 'プレミアムプランに移行する') : 'プレミアムプランで始める';
@@ -14,7 +20,8 @@ function Price() {
 
   const handleUpgradePlanClick = () => {
     if (currentUser) {
-      handleUpgradePlan(currentUser);
+      setIsLoading(true);
+      handleUpgradePlan(currentUser).finally(() => setIsLoading(false));
     } else {
       alert('ログインが必要です。');
       router.push('/');
@@ -22,7 +29,7 @@ function Price() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#bbe0ff] to-white py-12 px-4">
+    <div className="bg-gradient-to-b from-[#bbe0ff] to-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-600 mb-4">シンプルな料金プラン</h1>
@@ -35,12 +42,12 @@ function Price() {
             price="¥0"
             period="/月"
             features={[
-              { text: "最大登録曲数3,000曲", available: true },
+              { text: `最大登録曲数${FREE_PLAN_MAX_SONGS.toLocaleString()}曲`, available: true },
               { text: "基本的な曲管理機能", available: true },
               { text: "YouTube連携可能", available: true },
-              { text: "月20回の再生リスト作成", available: true },
-              { text: "セットリスト作成数10個まで", available: true },
-              { text: "公開歌える曲リスト1個", available: true },
+              { text: `月${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回の再生リスト作成`, available: true },
+              { text: `月${FREE_PLAN_MAX_SETLISTS}個のセットリスト作成`, available: true },
+              { text: `公開歌える曲リスト${FREE_PLAN_MAX_PUBLIC_PAGE}個`, available: true },
               { text: "歌枠ツール利用", available: false },
             ]}
             buttonText={freeButtonText}
@@ -61,7 +68,7 @@ function Price() {
               { text: "登録曲数無制限", available: true, highlight: true },
               { text: "再生リスト作成回数無制限", available: true, highlight: true },
               { text: "セットリスト作成数無制限", available: true, highlight: true },
-              { text: "公開歌える曲リスト20個まで", available: true, highlight: true },
+              { text: `公開歌える曲リスト${PREMIUM_PLAN_MAX_PUBLIC_PAGE}個`, available: true, highlight: true },
               { text: "歌枠ツール利用可能", available: true, highlight: true },
             ]}
             buttonText={premiumButtonText}
@@ -73,6 +80,7 @@ function Price() {
             disabled={isPremiumUser}
             link={null}
             onClick={handleUpgradePlanClick}
+            isLoading={isLoading}
           />
         </div>
 
@@ -85,7 +93,7 @@ function Price() {
   );
 }
 
-function PlanCard({ title, price, period, features, buttonText, bannerText, bannerColor, buttonColor, buttonHoverColor, textColor = "text-gray-600", disabled = false, link = null, onClick = null }) {
+function PlanCard({ title, price, period, features, buttonText, bannerText, bannerColor, buttonColor, buttonHoverColor, textColor = "text-gray-600", disabled = false, link = null, onClick = null, isLoading = false }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-transform hover:scale-105 flex flex-col justify-between">
       <div>
@@ -109,11 +117,11 @@ function PlanCard({ title, price, period, features, buttonText, bannerText, bann
           </Link>
         ) : (
           <button
-            className={`w-full py-3 px-6 rounded-lg ${buttonColor} text-white font-semibold ${buttonHoverColor} transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={disabled}
+            className={`w-full py-3 px-6 rounded-lg ${buttonColor} text-white font-semibold ${buttonHoverColor} transition-colors ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={disabled || isLoading}
             onClick={onClick}
           >
-            {buttonText}
+            {isLoading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin" /> : buttonText}
           </button>
         )}
       </div>

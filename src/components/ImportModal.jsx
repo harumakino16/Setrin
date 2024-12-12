@@ -7,7 +7,7 @@ import { collection, doc, writeBatch, getDocs, serverTimestamp } from 'firebase/
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
-import { FREE_PLAN_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_SONGS } from '@/constants';
 import { CSV_HEADERS } from '../constants/csvHeaders'; // ヘッダー情報をインポート
 
 const ImportModal = ({ onClose }) => {
@@ -87,8 +87,8 @@ const ImportModal = ({ onClose }) => {
             const querySnapshot = await getDocs(songsRef);
             const currentSongCount = querySnapshot.size;
 
-            if (currentSongCount + data.length > FREE_PLAN_LIMIT) {
-                setMessageInfo({ message: `無料プランでは${FREE_PLAN_LIMIT}曲までしか保存できません。現在の曲数は${currentSongCount}曲です。`, type: 'error' });
+            if (currentSongCount + data.length > FREE_PLAN_MAX_SONGS) {
+                setMessageInfo({ message: `無料プランでは${FREE_PLAN_MAX_SONGS}曲までしか保存できません。現在の曲数は${currentSongCount}曲です。`, type: 'error' });
                 onClose(); // モーダルを閉じる
                 return;
             }
