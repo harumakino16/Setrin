@@ -170,10 +170,11 @@ function MainTable({
   };
 
   useEffect(() => {
-    if (searchPerformed) {
-      setCurrentPage(1); // 検索時にページを1にリセット
+    const totalPages = Math.ceil(tableData.length / recordsPerPage);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages > 0 ? totalPages : 1);
     }
-  }, [searchPerformed]);
+  }, [tableData.length, currentPage, recordsPerPage]);
 
   const requestSort = (key) => {
     let direction = 'ascending';
