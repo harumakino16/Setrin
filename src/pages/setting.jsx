@@ -17,6 +17,7 @@ import Layout from '@/pages/layout';
 import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { loadStripe } from '@stripe/stripe-js';
 import H1 from '@/components/ui/h1';
+import { handleUpgradePlan } from '@/utils/stripeUtils';
 
 function Settings() {
     const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
@@ -248,20 +249,12 @@ function Settings() {
         }
     };
 
-    const handleUpgradePlan = async () => {
-        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
-
-        const response = await fetch('/api/create-checkout-session', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ uid: currentUser.uid }),
-        });
-
-        const session = await response.json();
-
-        await stripe.redirectToCheckout({ sessionId: session.id });
+    const handleUpgradePlanClick = () => {
+        if (currentUser) {
+            handleUpgradePlan(currentUser);
+        } else {
+            alert('ログインが必要です。');
+        }
     };
 
     const handleCancelPlan = async () => {
@@ -310,7 +303,7 @@ function Settings() {
                                 <p className="mr-4">現在のプラン: {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}</p>
                                 {currentUser.plan === 'free' ? (
                                     <button
-                                        onClick={handleUpgradePlan}
+                                        onClick={handleUpgradePlanClick}
                                         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                                     >
                                         プレミアムプランにアップグレード

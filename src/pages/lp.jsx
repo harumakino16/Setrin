@@ -6,6 +6,7 @@ import { Music, Youtube, List, Shuffle } from 'lucide-react'
 import Image from 'next/image'
 import { FREE_PLAN_LIMIT, YOUTUBE_CREATE_LIST_LIMIT, PREMIUM_PLAN_PRICE } from '@/constants'
 import ContactForm from '@/components/ContactForm'
+import Price from '@/components/Price'
 
 function Feature({ number, imageSrc, title, description }) {
   return (
@@ -31,29 +32,6 @@ export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const closeMenu = () => setMenuOpen(false);
-
-  function PricingCard({ title, description, price, features }) {
-    return (
-      <div className="bg-white p-8 rounded-lg shadow-lg transform transition-transform hover:scale-105">
-        <h3 className="text-2xl font-semibold mb-4 text-center text-customTheme-blue-primary">{title}</h3>
-        <p className="text-gray-500 mb-6 text-center">{description}</p>
-        <ul className="space-y-2 mb-6">
-          {features.map((feature, index) => (
-            <li key={index} className="text-gray-500 flex items-center">
-              <svg className="w-5 h-5 text-customTheme-blue-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0v3a1 1 0 01-2 0V7zm1 5a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
-              </svg>
-              {feature}
-            </li>
-          ))}
-        </ul>
-        <div className="text-center">
-          <span className="text-3xl font-bold text-customTheme-blue-primary tracking-wider">{price}</span>
-          <span className="text-gray-500">/月</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-blue-50">
@@ -135,33 +113,8 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl text-gray-600 font-bold mb-12 text-center">料金プラン</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <PricingCard
-              title="無料プラン"
-              description="基本機能を無料でお試しいただけます。"
-              price="¥0"
-              features={[
-                `最大登録曲数${FREE_PLAN_LIMIT.toLocaleString()}曲`,
-                "基本的な曲管理機能",
-                "YouTube連携可能",
-                `月${YOUTUBE_CREATE_LIST_LIMIT}回の再生リスト作成`,
-              ]}
-            />
-            <PricingCard
-              title="プレミアムプラン"
-              description="曲数や再生リスト作成回数を無制限にご利用いただけます。"
-              price={`¥${PREMIUM_PLAN_PRICE}`}
-              features={[
-                "無料プランの全ての機能",
-                "登録曲数無制限",
-                "再生リスト作成回数無制限",
-              ]}
-            />
-          </div>
-        </div>
+      <section id="pricing" className="">
+        <Price />
       </section>
 
       {/* FAQ Section */}
