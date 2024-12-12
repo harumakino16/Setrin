@@ -8,7 +8,7 @@ const EmailVerificationComponent = ({email}) => {
     return (
         <div className="bg-white p-8 rounded-lg w-[400px] mx-auto mt-10">
             <div className="flex justify-center mb-6">
-                <Image src={mailIcon} alt="Email Icon" width={80} height={80} />
+                <Image src={mailIcon} alt="Email Icon" width={80} height={80}priority={true} />
             </div>
             <h2 className="text-center text-lg font-semibold mb-4">認証用メールをご確認ください</h2>
             <p className="text-sm text-center mb-6">下記メールアドレスに認証用メールを送信しました。<br/>メール内に記載されているURLをクリックしてアカウントの認証を完了してください。</p>

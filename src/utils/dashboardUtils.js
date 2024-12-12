@@ -9,6 +9,9 @@ export const fetchUserData = async (userId) => {
     const setlistsRef = collection(db, `users/${userId}/Setlists`);
     const snapshot_setlists = await getCountFromServer(setlistsRef);
 
+    const publicPagesRef = collection(db, `users/${userId}/publicPages`);
+    const snapshot_publicPages = await getCountFromServer(publicPagesRef);
+
     const currentUserRef = doc(db, `users/${userId}`);
     const snapshot_currentUser = await getDoc(currentUserRef)
     
@@ -34,7 +37,8 @@ export const fetchUserData = async (userId) => {
       tags,
       genres,
       totalSetlists: snapshot_setlists.data().count,
-      playlistCreationCount: snapshot_currentUser.data().playlistCreationCount
+      playlistCreationCount: snapshot_currentUser.data().playlistCreationCount,
+      publicPagesCount: snapshot_publicPages.data().count
     };
   } catch (error) {
     console.error("Error fetching user data:", error);

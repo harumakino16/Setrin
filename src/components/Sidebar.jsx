@@ -1,6 +1,6 @@
-import { faMusic } from "@fortawesome/free-solid-svg-icons";
+import { faMusic, faCog } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHistory, faTools, faUserShield, faChartLine } from "@fortawesome/free-solid-svg-icons";
+import { faHistory, faTools, faUserShield, faChartLine, faList } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
@@ -19,18 +19,23 @@ const MENU = [
         path: "/",
     },
     {
-        title: "ダッシュボード",
-        iconName: faChartLine,
-        path: "/dashboard",
-    },
-    {
         title: "セットリスト",
         iconName: faHistory,
         path: "/setlist",
     },
     {
+        title: "歌える曲リスト",
+        iconName: faList,
+        path: "/pubpagesetting",
+    },
+    {
+        title: "ダッシュボード",
+        iconName: faChartLine,
+        path: "/dashboard",
+    },
+    {
         title: "設定",
-        iconName: faTools,
+        iconName: faCog,
         path: "/setting",
     },
 ]
@@ -49,8 +54,6 @@ export function Sidebar({ onLinkClick }) { // onLinkClickを受け取る
     const handleCloseModal = () => {
         setShowCreateSetlistModal(false);
     };
-
-    console.log(isAdmin);
 
     if (!currentUser) {
         return null;

@@ -1,6 +1,6 @@
 import { updateDoc, increment, doc } from 'firebase/firestore';
 import { db } from '@/../firebaseConfig';
-import { YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_YOUTUBE_PLAYLISTS } from '@/constants';
 
 export async function createPlaylist(songs, setlistName, currentUser, setMessageInfo, setLoading, router) {
     setLoading(true); // ローディング開始
@@ -35,8 +35,8 @@ export async function createPlaylist(songs, setlistName, currentUser, setMessage
             currentUser.playlistCreationCount = 0; // ローカルのデータも更新
         }
 
-        if (currentUser.playlistCreationCount >= YOUTUBE_CREATE_LIST_LIMIT) {
-            if (confirm(`無料プランでは月に${YOUTUBE_CREATE_LIST_LIMIT}回まで再生リストを作成できます。有料プランにアップグレードしますか？`)) {
+        if (currentUser.playlistCreationCount >= FREE_PLAN_MAX_YOUTUBE_PLAYLISTS) {
+            if (confirm(`無料プランでは月に${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回まで再生リストを作成できます。有料プランにアップグレードしますか？`)) {
                 router.push('/setting');
             }
             return;

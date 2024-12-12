@@ -1,5 +1,6 @@
-export const FREE_PLAN_LIMIT = 3000;
-export const YOUTUBE_CREATE_LIST_LIMIT = 20;
-export const SETLIST_LIMIT = 20;
+export const FREE_PLAN_MAX_SONGS = 3000;
+export const FREE_PLAN_MAX_YOUTUBE_PLAYLISTS = 20;
+export const FREE_PLAN_MAX_SETLISTS = 10;
 export const PREMIUM_PLAN_PRICE = 490;
-export const PUBLIC_PAGE_LIMIT = 1;
+export const FREE_PLAN_MAX_PUBLIC_PAGES = 1;
+export const PREMIUM_PLAN_MAX_PUBLIC_PAGES = 20;

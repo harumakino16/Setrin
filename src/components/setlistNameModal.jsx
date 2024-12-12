@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
 import fetchUsersSetlists from '@/hooks/fetchSetlists';
-import { SETLIST_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_SETLISTS } from '@/constants';
 
 const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const [inputValue, setInputValue] = useState('');
@@ -25,9 +25,8 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const handleSubmit = async () => {
         if (currentUser) {
             // 無料プランかどうか、セットリストの数をチェック
-            console.log(setlists.length);
-            if (currentUser.plan === 'free' && setlists.length >= SETLIST_LIMIT) {
-                setMessageInfo({ type: 'error', message: `無料プランでは最大${SETLIST_LIMIT}個のセットリストまで保存できます。` });
+            if (currentUser.plan === 'free' && setlists.length >= FREE_PLAN_MAX_SETLISTS) {
+                setMessageInfo({ type: 'error', message: `無料プランでは最大${FREE_PLAN_MAX_SETLISTS}個のセットリストまで保存できます。` });
                 return;
             }
 

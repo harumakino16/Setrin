@@ -20,6 +20,7 @@ const Header = ({ toggleSidebar }) => {
                         alt="SetLink Logo"
                         width={190}
                         height={50}
+                        priority={true}
                     />
                 </Link>
                 {!isListenerPage && ( // toggleSidebarが存在する場合のみボタンを表示

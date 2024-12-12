@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import Modal from './modal';
+import Modal from './Modal';
 import SongFieldModal from './SongFieldModal';
 import ImportModal from './ImportModal';
 import YoutubePlaylistModal from './YoutubePlaylistModal'; // New component imported

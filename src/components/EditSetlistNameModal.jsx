@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Modal from './modal';
+import Modal from './Modal';
 import { db } from '../../firebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
 

@@ -3,7 +3,7 @@ import { AuthContext } from '@/context/AuthContext';
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
 import { doc, deleteDoc } from 'firebase/firestore';
-import Modal from '@/components/modal';
+import Modal from '@/components/Modal';
 import useSetlists from '@/hooks/fetchSetlists';
 import { db } from '../../firebaseConfig';
 import Loading from '@/components/loading';

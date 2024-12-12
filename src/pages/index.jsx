@@ -4,7 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
 import { deleteDoc, doc, collection, getDocs, writeBatch, getCountFromServer } from "firebase/firestore";
-import SearchForm from "@/components/searchForm";
+import SearchForm from "@/components/SearchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

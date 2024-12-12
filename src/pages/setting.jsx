@@ -17,6 +17,9 @@ import Layout from '@/pages/layout';
 import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { loadStripe } from '@stripe/stripe-js';
 import H1 from '@/components/ui/h1';
+import { handleUpgradePlan } from '@/utils/stripeUtils';
+import Modal from '@/components/Modal';
+import Price from '@/components/Price';
 
 function Settings() {
     const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
@@ -54,6 +57,7 @@ function Settings() {
     const [isAccordionOpen, setIsAccordionOpen] = useState(false);
     const { upgrade_success } = router.query;
     const [cancelAt, setCancelAt] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const { code } = router.query;
@@ -237,55 +241,6 @@ function Settings() {
         }
     };
 
-    const handlePublicPageSettingChange = async (key, value) => {
-        const newSettings = {
-            ...publicPageSettings,
-            [key]: value
-        };
-
-        if (value === true && !publicPageSettings.pageId) {
-            newSettings.pageId = crypto.randomUUID();
-        }
-
-        setPublicPageSettings(newSettings);
-
-        try {
-            const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', 'settings');
-            await setDoc(publicPageRef, newSettings);
-            setMessageInfo({ message: '公開設定を更新しました', type: 'success' });
-        } catch (error) {
-            console.error('公開設定の更新エラー:', error);
-            setMessageInfo({ message: '公開設定の更新に失敗しました', type: 'error' });
-        }
-    };
-
-    const handleColumnVisibilityChange = async (columnKey, value) => {
-        const newSettings = {
-            ...publicPageSettings,
-            visibleColumns: {
-                ...publicPageSettings.visibleColumns,
-                [columnKey]: value
-            }
-        };
-
-        setPublicPageSettings(newSettings);
-
-        try {
-            const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', 'settings');
-            await setDoc(publicPageRef, newSettings);
-            setMessageInfo({ message: '表示設定を更新しました', type: 'success' });
-        } catch (error) {
-            console.error('表示設定の更新エラー:', error);
-            setMessageInfo({ message: '表示設定の更新に失敗しました', type: 'error' });
-        }
-    };
-
-    const copyToClipboard = () => {
-        const url = `${window.location.origin}/public/${publicPageSettings.pageId}`;
-        navigator.clipboard.writeText(url);
-        setMessageInfo({ message: 'URLをコピーしました', type: 'success' });
-    };
-
     const handleLogout = async () => {
         const auth = getAuth();
         try {
@@ -297,20 +252,12 @@ function Settings() {
         }
     };
 
-    const handleUpgradePlan = async () => {
-        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
-
-        const response = await fetch('/api/create-checkout-session', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ uid: currentUser.uid }),
-        });
-
-        const session = await response.json();
-
-        await stripe.redirectToCheckout({ sessionId: session.id });
+    const handleUpgradePlanClick = () => {
+        if (currentUser) {
+            handleUpgradePlan(currentUser);
+        } else {
+            alert('ログインが必要です。');
+        }
     };
 
     const handleCancelPlan = async () => {
@@ -359,7 +306,7 @@ function Settings() {
                                 <p className="mr-4">現在のプラン: {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}</p>
                                 {currentUser.plan === 'free' ? (
                                     <button
-                                        onClick={handleUpgradePlan}
+                                        onClick={() => setIsModalOpen(true)}
                                         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                                     >
                                         プレミアムプランにアップグレード
@@ -416,7 +363,7 @@ function Settings() {
                         <div className="bg-white shadow-md rounded px-5 py-3 flex flex-col md:flex-row justify-between items-center">
                             <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
                                 <div className="flex items-center gap-4">
-                                    <Image src={youtubeIcon} alt="Youtubeに接続" width={50} />
+                                    <Image src={youtubeIcon} alt="Youtubeに接続" width={50} priority={true} />
                                     <div className="flex flex-col">
                                         {currentUser.youtubeRefreshToken ? (
                                             <div className="flex items-center">
@@ -440,71 +387,13 @@ function Settings() {
                                 </button>
                             ) : (
                                 <a href={authUrl} className="mt-4 md:mt-0 block text-center">
-                                    <Image src={googleIcon} alt="Youtubeに接続" width={180} />
+                                    <Image src={googleIcon} alt="Youtubeに接続" width={180} priority={true} />
                                 </a>
                             )}
                         </div>
 
                     </div>
-                    <div className="mt-8 mb-8">
-                        <label className="block mb-2 text-gray-700">持ち歌リストの公開設定:</label>
-                        <div className="bg-white shadow-md rounded px-5 py-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <Switch
-                                        checked={publicPageSettings.enabled}
-                                        onChange={(checked) => handlePublicPageSettingChange('enabled', checked)}
-                                    />
-                                    <span>持ち歌リストを公開する</span>
-                                </div>
-                            </div>
-
-                            {publicPageSettings.enabled && (
-                                <div className="mt-4 space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium">表示名</label>
-                                        <input
-                                            type="text"
-                                            value={publicPageSettings.displayName}
-                                            onChange={(e) => handlePublicPageSettingChange('displayName', e.target.value)}
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm py-2 px-3"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium">公開する情報</label>
-                                        {columnLabels.map(({ key, label }) => (
-                                            <div key={key} className="flex items-center mt-2">
-                                                <Switch
-                                                    checked={publicPageSettings.visibleColumns[key] || false}
-                                                    onChange={(checked) => handleColumnVisibilityChange(key, checked)}
-                                                />
-                                                <span className="ml-2">{label}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium">公開ページURL</label>
-                                        <div className="flex mt-1">
-                                            <input
-                                                type="text"
-                                                value={`${window.location.origin}/public/${publicPageSettings.pageId}`}
-                                                readOnly
-                                                className="block w-full rounded-l-md border-gray-300 shadow-sm"
-                                            />
-                                            <button
-                                                onClick={copyToClipboard}
-                                                className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0"
-                                            >
-                                                <FontAwesomeIcon icon={faCopy} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                   
                     <div className="flex justify-between items-center">
                         <div>
                             <button onClick={() => setIsAccordionOpen(!isAccordionOpen)} className="text-black py-2 px-4 rounded text-sm flex items-center">
@@ -527,6 +416,9 @@ function Settings() {
                     </div>
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <Price />
+            </Modal>
         </Layout>
     );
 }

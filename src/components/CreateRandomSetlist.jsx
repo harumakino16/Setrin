@@ -4,13 +4,13 @@ import { db } from '../../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
-import SearchForm from '@/components/searchForm';
-import Modal from '@/components/modal.jsx';
+import SearchForm from '@/components/SearchForm';
+import Modal from '@/components/Modal.jsx';
 import useSearchCriteria from '@/hooks/useSearchCriteria';
 import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useSongs } from '@/context/SongsContext'; // SongsContextからuseSongsをインポート
 import { useTheme } from '@/context/ThemeContext';
-import { SETLIST_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_SETLISTS } from '@/constants';
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
@@ -43,8 +43,8 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     };
 
     const createRandomSetlist = async () => {
-        if (currentUser.plan === 'free' && existingSetlists.length >= SETLIST_LIMIT) {
-            setMessageInfo({ type: 'error', message: `無料プランでは最大${SETLIST_LIMIT}個のセットリストまで保存できます。` });
+        if (currentUser.plan === 'free' && existingSetlists.length >= FREE_PLAN_MAX_SETLISTS) {
+            setMessageInfo({ type: 'error', message: `無料プランでは最大${FREE_PLAN_MAX_SETLISTS}個のセットリストまで保存できます。` });
             return;
         }
 

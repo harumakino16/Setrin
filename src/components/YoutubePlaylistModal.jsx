@@ -7,7 +7,7 @@ import { formatSongData } from '../utils/songUtils';
 import Link from 'next/link';
 import LoadingIcon from './ui/loadingIcon';
 import { useTheme } from '@/context/ThemeContext';
-import { FREE_PLAN_LIMIT } from '@/constants';
+import { FREE_PLAN_MAX_SONGS } from '@/constants';
 
 
 const YoutubePlaylistModal = ({ onClose }) => {
@@ -42,7 +42,7 @@ const YoutubePlaylistModal = ({ onClose }) => {
         
     }, [currentUser.uid]);
 
-    const SONG_LIMIT = currentUser.plan === 'free' ? FREE_PLAN_LIMIT : Infinity;
+    const SONG_LIMIT = currentUser.plan === 'free' ? FREE_PLAN_MAX_SONGS : Infinity;
 
     const isOverLimit = (totalSongCount + importedSongs.length) > SONG_LIMIT;
 

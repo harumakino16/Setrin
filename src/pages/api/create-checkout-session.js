@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export default async function handler(req, res) {
-  const { uid } = req.body;
+  const { uid, returnUrl } = req.body;
 
   try {
     // FirestoreからユーザーのメールアドレスとStripe顧客IDを取得
@@ -43,8 +43,8 @@ export default async function handler(req, res) {
           uid: uid,
         },
       },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/setting?upgrade_success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/setting`,
+      success_url: `${returnUrl}?upgrade_success=true`,
+      cancel_url: returnUrl,
       metadata: {
         uid: uid,
       },
