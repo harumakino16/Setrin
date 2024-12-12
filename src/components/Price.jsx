@@ -3,7 +3,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { handleUpgradePlan } from '@/utils/stripeUtils';
 import { useRouter } from 'next/router';
-import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, FREE_PLAN_MAX_SETLISTS, PREMIUM_PLAN_PRICE, FREE_PLAN_MAX_PUBLIC_PAGE, PREMIUM_PLAN_MAX_PUBLIC_PAGE } from '@/constants';
+import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, FREE_PLAN_MAX_SETLISTS, PREMIUM_PLAN_PRICE, FREE_PLAN_MAX_PUBLIC_PAGES, PREMIUM_PLAN_MAX_PUBLIC_PAGES } from '@/constants';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -47,7 +47,7 @@ function Price() {
               { text: "YouTube連携可能", available: true },
               { text: `月${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回の再生リスト作成`, available: true },
               { text: `月${FREE_PLAN_MAX_SETLISTS}個のセットリスト作成`, available: true },
-              { text: `公開歌える曲リスト${FREE_PLAN_MAX_PUBLIC_PAGE}個`, available: true },
+              { text: `公開歌える曲リスト${FREE_PLAN_MAX_PUBLIC_PAGES}個`, available: true },
               { text: "歌枠ツール利用", available: false },
             ]}
             buttonText={freeButtonText}
@@ -61,15 +61,15 @@ function Price() {
 
           <PlanCard
             title="Premiumプラン"
-            price="¥490"
+            price={`¥${PREMIUM_PLAN_PRICE.toLocaleString()}`}
             period="/月"
             features={[
               { text: "無料プランの全ての機能", available: true, highlight: true },
               { text: "登録曲数無制限", available: true, highlight: true },
               { text: "再生リスト作成回数無制限", available: true, highlight: true },
               { text: "セットリスト作成数無制限", available: true, highlight: true },
-              { text: `公開歌える曲リスト${PREMIUM_PLAN_MAX_PUBLIC_PAGE}個`, available: true, highlight: true },
-              { text: "歌枠ツール利用可能", available: true, highlight: true },
+              { text: `公開歌える曲リスト${PREMIUM_PLAN_MAX_PUBLIC_PAGES}個`, available: true, highlight: true },
+              { text: "歌枠ツール利用可能(準備中)", available: true, highlight: true },
             ]}
             buttonText={premiumButtonText}
             bannerText="歌枠配信者におすすめ！"

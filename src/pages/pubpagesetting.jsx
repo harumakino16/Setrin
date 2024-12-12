@@ -12,6 +12,8 @@ import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
 import Price from '@/components/Price';
 import Modal from '@/components/Modal';
+import { getCountFromServer } from 'firebase/firestore';
+import { FREE_PLAN_MAX_PUBLIC_PAGES, PREMIUM_PLAN_MAX_PUBLIC_PAGES } from '@/constants';
 
 export default function PubPageSetting() {
     const { currentUser } = useContext(AuthContext);
@@ -42,12 +44,24 @@ export default function PubPageSetting() {
     const handleAddSongList = async () => {
         if (!currentUser) return;
 
-        if (currentUser.plan !== 'premium') {
+        const listsRef = collection(db, 'users', currentUser.uid, 'publicPages');
+        const listsSnapshot = await getCountFromServer(listsRef);
+        const listCount = listsSnapshot.data().count;
+
+        if (currentUser.plan === 'free' && listCount >= FREE_PLAN_MAX_PUBLIC_PAGES) {
             setMessageInfo({
                 type: 'error',
-                message: '公開リストを追加するにはプレミアムプランが必要です。'
+                message: `フリープランでは公開リストは${FREE_PLAN_MAX_PUBLIC_PAGES}個までです。`
             });
             setIsPriceModalOpen(true);
+            return;
+        }
+
+        if (currentUser.plan === 'premium' && listCount >= PREMIUM_PLAN_MAX_PUBLIC_PAGES) {
+            setMessageInfo({
+                type: 'error',
+                message: `公開リストは${PREMIUM_PLAN_MAX_PUBLIC_PAGES}個が上限です。`
+            });
             return;
         }
 
