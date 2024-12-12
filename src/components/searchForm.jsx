@@ -17,9 +17,9 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             songsData = songsData.filter(song =>
                 song.title.toLowerCase().includes(keywordLower) ||
                 song.artist.toLowerCase().includes(keywordLower) ||
-                song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) ||
-                song.genre.toLowerCase().includes(keywordLower) ||
-                song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
+                song.tags && song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) ||
+                song.genre && song.genre.toLowerCase().includes(keywordLower) ||
+                song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
                 (song.memo && song.memo.toLowerCase().includes(keywordLower)) ||
                 (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
@@ -35,24 +35,24 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
         if (searchCriteria.tag) {
             const tagLower = searchCriteria.tag.toLowerCase();
-            songsData = songsData.filter(song => song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
+            songsData = songsData.filter(song => song.tags && song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
         }
 
         if (searchCriteria.artist) {
             const artistLower = searchCriteria.artist.toLowerCase();
-            songsData = songsData.filter(song => song.artist.toLowerCase().includes(artistLower));
+            songsData = songsData.filter(song => song.artist && song.artist.toLowerCase().includes(artistLower));
         }
 
         if (searchCriteria.genre) {
             const genreLower = searchCriteria.genre.toLowerCase();
-            songsData = songsData.filter(song => song.genre.toLowerCase().includes(genreLower));
+            songsData = songsData.filter(song => song.genre && song.genre.toLowerCase().includes(genreLower));
         }
 
         if (searchCriteria.skillLevel > 0) {
             if (searchCriteria.skillLevelOption === '以上') {
-                songsData = songsData.filter(song => song.skillLevel >= searchCriteria.skillLevel);
+                songsData = songsData.filter(song => song.skillLevel && song.skillLevel >= searchCriteria.skillLevel);
             } else {
-                songsData = songsData.filter(song => song.skillLevel <= searchCriteria.skillLevel);
+                songsData = songsData.filter(song => song.skillLevel && song.skillLevel <= searchCriteria.skillLevel);
             }
         }
 
@@ -80,7 +80,6 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
     useEffect(() => {
         searchSongs(searchCriteria); // 現在の検索条件を使用
-
     }, [songs, searchCriteria]);
 
     const handleCriteriaChange = (field, value) => {
@@ -91,19 +90,12 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         });
     };
 
-
     return (
         <div>
             <div className="flex flex-col gap-8 mb-8">
                 <div className="">
                     <label className="whitespace-nowrap">フリーキーワード:</label>
-                    <input
-                        type="text"
-                        className="border p-2 rounded w-full h-14"
-                        placeholder="キーワードで検索"
-                        value={searchCriteria.freeKeyword}
-                        onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)}
-                    />
+                    <input type="text" className="border p-2 rounded w-full h-14" placeholder="キーワードで検索" onChange={(e) => handleCriteriaChange('freeKeyword', e.target.value)} />
                 </div>
                 <div onClick={() => setShowAdvancedSearch(!showAdvancedSearch)} className="text-gray-500 py-2 px-4 cursor-pointer flex items-center">
                     <span className="text-gray-500">{isRandomSetlist ? '絞り込み' : '詳細検索'}</span> 

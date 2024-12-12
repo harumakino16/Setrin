@@ -48,15 +48,19 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // 曲データまたはソート設定が変更されたときに tableData を更新
-    let sortedSongs = songs;
-    if (sortConfig.key) {
-      sortedSongs = sortSongs(songs, sortConfig.key, sortConfig.direction);
+    if (!searchPerformed) {
+      let sortedSongs = songs;
+      if (sortConfig.key) {
+        sortedSongs = sortSongs(songs, sortConfig.key, sortConfig.direction);
+      }
+      setTableData(sortedSongs);
     }
-    setTableData(sortedSongs);
-  }, [songs, sortConfig]); // <- 依存配列に songs と sortConfig を追加
+  }, [songs, sortConfig, searchPerformed]); // searchPerformed を依存配列に追加
 
   const handleSearchResults = (results) => {
+    if (sortConfig.key) {
+      results = sortSongs(results, sortConfig.key, sortConfig.direction);
+    }
     setTableData(results);
     setSearchPerformed(true);
   };
@@ -175,9 +179,7 @@ export default function Home() {
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
-    const sortedSongs = sortSongs(tableData, key, direction); // songs -> tableData
     setSortConfig({ key, direction });
-    setTableData(sortedSongs);
   };
 
   const headers = [
@@ -275,12 +277,17 @@ export default function Home() {
     <Layout>
       <div className="flex flex-col sm:flex-row w-full">
         <div className="flex-grow w-full p-0 sm:p-4">
-          <SearchForm currentUser={currentUser} handleSearchResults={handleSearchResults} searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} />
+          <SearchForm 
+            currentUser={currentUser} 
+            handleSearchResults={handleSearchResults} 
+            searchCriteria={searchCriteria} 
+            setSearchCriteria={setSearchCriteria} 
+          />
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-between mb-3">
             {selectedSongs.length > 0 ? (
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
-                <button onClick={() => toggleModal('addSongsInSetlist', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
+                <button onClick={() => toggleModal('addSongsInSetlist')} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
                   <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
                 </button>
                 <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
@@ -289,7 +296,7 @@ export default function Home() {
               </div>
             ) : (<div></div>)}
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-              <button onClick={() => toggleModal('addSong', true)} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}>
+              <button onClick={() => toggleModal('addSong')} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}>
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
