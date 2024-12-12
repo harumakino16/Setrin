@@ -20,7 +20,8 @@ function MainTable({
   refreshSongs,
   onAddToSetlist,
   handleIncreaseSingingCount,
-  handleDecreaseSingingCount
+  handleDecreaseSingingCount,
+  searchPerformed
 }) {
   const { songs } = useSongs();
   const { theme } = useTheme();
@@ -57,7 +58,7 @@ function MainTable({
       singingCount: { label: '歌唱回数', visible: true, removable: true },
       skillLevel: { label: '熟練度', visible: true, removable: true },
       memo: { label: '備考', visible: true, removable: true },
-      actions: { label: '操作', visible: true, removable: true }
+      actions: { label: '作', visible: true, removable: true }
     };
   };
 
@@ -169,8 +170,10 @@ function MainTable({
   };
 
   useEffect(() => {
-    setCurrentPage(1); // 検索時にページを1にリセット
-  }, [tableData]);
+    if (searchPerformed) {
+      setCurrentPage(1); // 検索時にページを1にリセット
+    }
+  }, [searchPerformed]);
 
   const requestSort = (key) => {
     let direction = 'ascending';
