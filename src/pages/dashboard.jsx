@@ -1,85 +1,190 @@
 // pages/dashboard.js
+
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import Layout from '@/pages/layout';
 import { fetchUserData } from '@/utils/dashboardUtils';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTags, faList } from '@fortawesome/free-solid-svg-icons';
-import { useTheme } from '@/context/ThemeContext';
 import { FREE_PLAN_LIMIT, SETLIST_LIMIT, YOUTUBE_CREATE_LIST_LIMIT } from '@/constants';
 import H1 from '@/components/ui/h1';
+import DashboardCard from '@/components/DashboardCard';
+import Skeleton from '@/components/Skeleton';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
+import StatBox from '@/components/StatBox';
+import TagsChart from '@/components/TagsChart';
+import Badge from '@/components/Badge'; // 追加（オプション）
 
-// カードコンポーネント
-const DashboardCard = ({ icon, title, value, limit, children }) => {
-  const { theme } = useTheme();
-  return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <div className="flex items-center mb-4">
-        <FontAwesomeIcon icon={icon} className={`text-2xl text-customTheme-${theme}-primary mr-2`} />
-        <h2 className="text-xl font-semibold">{title}</h2>
-      </div>
-      {children}
-    </div>
-  );
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+
+// カラージェネレーター関数（HSLを使用して色相を均等に分散）
+const generateColors = (num) => {
+  const colors = [];
+  const step = 360 / num;
+  for (let i = 0; i < num; i++) {
+    const hue = i * step;
+    colors.push(`hsl(${hue}, 70%, 50%)`);
+  }
+  return colors;
+};
+
+// generateHoverColors関数を追加
+const generateHoverColors = (colors, alpha = 0.8) => {
+  return colors.map(color => {
+    return color.replace('hsl(', 'hsla(').replace(')', `, ${alpha})`);
+  });
 };
 
 const Dashboard = () => {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       if (currentUser) {
         const data = await fetchUserData(currentUser.uid);
         setUserData(data);
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [currentUser]);
 
-  if (!currentUser) {
-    return <div>Loading...</div>; // またはログインページへのリダイレクト
+  if (!currentUser || loading) {
+    return (
+      <Layout>
+        <div className="p-5">
+          <H1>ダッシュボード</H1>
+          <div className="space-y-6">
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+          </div>
+        </div>
+      </Layout>
+    );
   }
 
-  if (!userData) {
-    return <div>Loading...</div>;
-  }
+  // ジャンルチャート用の色生成
+  const genresLabels = userData.genres ? Object.keys(userData.genres) : [];
+  const genresDataValues = userData.genres ? Object.values(userData.genres) : [];
+  const numGenres = genresLabels.length;
+  const genresDynamicColors = generateColors(numGenres);
+  const genresHoverColors = generateHoverColors(genresDynamicColors, 0.7);
+
+  const genresChartData = {
+    labels: genresLabels,
+    datasets: [
+      {
+        label: 'ジャンル別曲数',
+        data: genresDataValues,
+        backgroundColor: genresDynamicColors,
+        hoverBackgroundColor: genresHoverColors,
+      },
+    ],
+  };
+
+  const genresChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          color: '#4B5563', // Tailwindのtext-gray-700に相当
+        },
+      },
+      tooltip: {
+        enabled: true,
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#4B5563', // Tailwindのtext-gray-700に相当
+        },
+        grid: {
+          color: 'rgba(200, 200, 200, 0.2)',
+        },
+      },
+      y: {
+        ticks: {
+          color: '#4B5563', // Tailwindのtext-gray-700に相当
+        },
+        grid: {
+          color: 'rgba(200, 200, 200, 0.2)',
+        },
+      },
+    },
+    maintainAspectRatio: false,
+  };
 
   return (
     <Layout>
       <div className="p-5">
         <H1>ダッシュボード</H1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <DashboardCard
-            icon={faMusic}
-            title="容量"
-            value={userData.totalSongs}
-            limit={currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}
-          >
-            <ul className="mt-2">
-              <li className="text-gray-600">曲数: {userData.totalSongs}/{currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}</li>
-              <li className="text-gray-600">セットリスト数: {userData.totalSetlists}/{currentUser.plan === 'free' ? SETLIST_LIMIT : '制限なし'}</li>
-              <li className="text-gray-600">再生リスト作成回数: {userData.playlistCreationCount}/{currentUser.plan === 'free' ? YOUTUBE_CREATE_LIST_LIMIT : '制限なし'}</li>
-            </ul>
+        <div className="space-y-6">
+          {/* 容量カード */}
+          <DashboardCard icon={faMusic} title="容量">
+            <div className="space-y-4">
+              <StatBox
+                label="曲数"
+                value={userData.totalSongs}
+                limit={currentUser.plan === 'free' ? FREE_PLAN_LIMIT : '制限なし'}
+              />
+              <StatBox
+                label="セットリスト数"
+                value={userData.totalSetlists}
+                limit={currentUser.plan === 'free' ? SETLIST_LIMIT : '制限なし'}
+              />
+              <StatBox
+                label="再生リスト作成回数"
+                value={userData.playlistCreationCount}
+                limit={currentUser.plan === 'free' ? YOUTUBE_CREATE_LIST_LIMIT : '制限なし'}
+              />
+            </div>
           </DashboardCard>
+
+          {/* タグカード */}
           <DashboardCard icon={faTags} title="タグ">
-            <ul className="mt-2">
-              {userData.tags && Object.entries(userData.tags).map(([tag, count]) => (
-                <li key={tag} className="text-gray-600">
-                  {tag} ({count})
-                </li>
-              ))}
-            </ul>
+            {userData.tags && Object.keys(userData.tags).length > 0 ? (
+              <>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {Object.entries(userData.tags).map(([tag, count]) => (
+                    <Badge key={tag} label={`${tag} (${count})`} />
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">タグ使用頻度</h3>
+                  <TagsChart tags={userData.tags} />
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-32">
+                <p className="text-gray-600 text-center">まだ登録されていません。</p>
+              </div>
+            )}
           </DashboardCard>
+
+          {/* ジャンルカード */}
           <DashboardCard icon={faList} title="ジャンル">
-            <ul className="mt-2">
-              {userData.genres && Object.entries(userData.genres).map(([genre, count]) => (
-                <li key={genre} className="text-gray-600">
-                  {genre} ({count})
-                </li>
-              ))}
-            </ul>
+            {userData.genres && Object.keys(userData.genres).length > 0 ? (
+              <>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {Object.entries(userData.genres).map(([genre, count]) => (
+                    <Badge key={genre} label={`${genre} (${count})`} />
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <Bar data={genresChartData} options={genresChartOptions} />
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-32">
+                <p className="text-gray-600 text-center">まだ登録されていません。</p>
+              </div>
+            )}
           </DashboardCard>
         </div>
       </div>
