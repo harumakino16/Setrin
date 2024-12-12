@@ -35,7 +35,7 @@ export default function Test() {
         } catch (error) {
           setResultMessage(`エラーです`);
         }
-      }}>テスト</button>
+      }}>テスト！</button>
       <div>{resultMessage}</div>
 
     </div>
