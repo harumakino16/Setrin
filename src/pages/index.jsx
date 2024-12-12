@@ -216,7 +216,6 @@ export default function Home() {
       return;
     }
 
-    // 曲の追加���理
   };
 
   const handleIncreaseSingingCount = (songId) => {
