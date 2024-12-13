@@ -8,7 +8,7 @@ import Layout from '@/pages/layout';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
-  const [lastVisible, setLastVisible] = useState(null);
+  const [allUsers, setAllUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortByTotalSongs, setSortByTotalSongs] = useState(false);
   const usersPerPage = 100;
@@ -53,22 +53,16 @@ const ManageUsers = () => {
       const { token: customToken } = responseData;
       await signInWithCustomToken(auth, customToken);
 
-      setMessageInfo({ message: 'ユーザーとしてログインしました。', type: 'success' });
+      setMessageInfo({ message: 'ユーザーとしてロ��インしました。', type: 'success' });
     } catch (error) {
       console.error('Error logging in as user:', error);
       setMessageInfo({ message: 'ユーザーとしてのログインに失敗しました。', type: 'error' });
     }
   };
 
-  const fetchUsers = async (page = 1) => {
+  const fetchAllUsers = async () => {
     const usersCollection = collection(db, 'users');
-    let usersQuery = query(usersCollection, limit(usersPerPage));
-
-    if (page > 1 && lastVisible) {
-      usersQuery = query(usersCollection, startAfter(lastVisible), limit(usersPerPage));
-    }
-
-    const usersSnapshot = await getDocs(usersQuery);
+    const usersSnapshot = await getDocs(usersCollection);
     const usersList = await Promise.all(
       usersSnapshot.docs.map(async (doc) => {
         const userData = doc.data();
@@ -82,19 +76,31 @@ const ManageUsers = () => {
       })
     );
 
+    setAllUsers(usersList);
+  };
+
+  const sortAndPaginateUsers = () => {
+    let sortedUsers = [...allUsers];
+
     if (sortByTotalSongs) {
-      usersList.sort((a, b) => b.totalSongs - a.totalSongs);
+      sortedUsers.sort((a, b) => b.totalSongs - a.totalSongs);
     } else {
-      usersList.sort((a, b) => b.createdAt - a.createdAt);
+      sortedUsers.sort((a, b) => b.createdAt - a.createdAt);
     }
 
-    setUsers(usersList);
-    setLastVisible(usersSnapshot.docs[usersSnapshot.docs.length - 1]);
+    const startIndex = (currentPage - 1) * usersPerPage;
+    const paginatedUsers = sortedUsers.slice(startIndex, startIndex + usersPerPage);
+
+    setUsers(paginatedUsers);
   };
 
   useEffect(() => {
-    fetchUsers(currentPage);
-  }, [currentPage, sortByTotalSongs]);
+    fetchAllUsers();
+  }, []);
+
+  useEffect(() => {
+    sortAndPaginateUsers();
+  }, [allUsers, currentPage, sortByTotalSongs]);
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
