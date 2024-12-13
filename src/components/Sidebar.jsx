@@ -24,7 +24,7 @@ const MENU = [
         path: "/setlist",
     },
     {
-        title: "公開リスト",
+        title: "公開リスト管理",
         iconName: faList,
         path: "/pubpagesetting",
     },

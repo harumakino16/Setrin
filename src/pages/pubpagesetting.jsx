@@ -133,7 +133,7 @@ export default function PubPageSetting() {
         <Layout>
             <div className="p-8 space-y-6 max-w-4xl mx-auto">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold">歌える曲リスト</h1>
+                    <h1 className="text-2xl font-bold">公開リスト管理</h1>
                     <p className="text-gray-700 text-sm">
                         あなたの持ち歌を歌える曲リストとして一般公開できます。<br/>
                         公開する曲の条件を指定でき、リスナーに共有可能な公開ページURLが発行されます。
