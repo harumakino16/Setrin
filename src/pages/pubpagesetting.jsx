@@ -84,7 +84,8 @@ export default function PubPageSetting() {
         const topLevelData = {
             userId: currentUser.uid,
             name: name,
-            createdAt: now
+            createdAt: now,
+            themeColor: theme || 'blue'
         };
 
         try {
