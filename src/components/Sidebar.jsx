@@ -1,6 +1,6 @@
-import { faMusic, faCog } from "@fortawesome/free-solid-svg-icons";
+import { faMusic, faCog, faMicrophone, } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHistory, faTools, faUserShield, faChartLine, faList } from "@fortawesome/free-solid-svg-icons";
+import { faHistory, faTools, faUserShield, faChartLine, faList, } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
@@ -27,6 +27,11 @@ const MENU = [
         title: "公開リスト管理",
         iconName: faList,
         path: "/pubpagesetting",
+    },
+    {
+        title: "歌枠ツール",
+        iconName: faMicrophone,
+        path: "/utawakutool",
     },
     {
         title: "ダッシュボード",
