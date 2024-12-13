@@ -1,13 +1,17 @@
 import withAdminAuth from '@/components/withAdminAuth';
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebaseConfig';
-import { collection, getDocs, getCountFromServer } from 'firebase/firestore';
+import { collection, getDocs, getCountFromServer, query, limit, startAfter } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import Layout from '@/pages/layout';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
+  const [lastVisible, setLastVisible] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortByTotalSongs, setSortByTotalSongs] = useState(false);
+  const usersPerPage = 100;
   const { setMessageInfo } = useMessage();
 
   const [visibleColumns, setVisibleColumns] = useState({
@@ -56,30 +60,53 @@ const ManageUsers = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const usersCollection = collection(db, 'users');
-      const usersSnapshot = await getDocs(usersCollection);
-      const usersList = await Promise.all(
-        usersSnapshot.docs.map(async (doc) => {
-          const userData = doc.data();
-          const songsCollection = collection(db, 'users', doc.id, 'Songs');
-          const songsSnapshot = await getCountFromServer(songsCollection);
-          const totalSongs = songsSnapshot.data().count;
+  const fetchUsers = async (page = 1) => {
+    const usersCollection = collection(db, 'users');
+    let usersQuery = query(usersCollection, limit(usersPerPage));
 
-          const createdAt = userData.createdAt ? userData.createdAt.toDate() : null;
+    if (page > 1 && lastVisible) {
+      usersQuery = query(usersCollection, startAfter(lastVisible), limit(usersPerPage));
+    }
 
-          return { id: doc.id, ...userData, totalSongs, createdAt };
-        })
-      );
+    const usersSnapshot = await getDocs(usersQuery);
+    const usersList = await Promise.all(
+      usersSnapshot.docs.map(async (doc) => {
+        const userData = doc.data();
+        const songsCollection = collection(db, 'users', doc.id, 'Songs');
+        const songsSnapshot = await getCountFromServer(songsCollection);
+        const totalSongs = songsSnapshot.data().count;
 
+        const createdAt = userData.createdAt ? userData.createdAt.toDate() : null;
+
+        return { id: doc.id, ...userData, totalSongs, createdAt };
+      })
+    );
+
+    if (sortByTotalSongs) {
+      usersList.sort((a, b) => b.totalSongs - a.totalSongs);
+    } else {
       usersList.sort((a, b) => b.createdAt - a.createdAt);
+    }
 
-      setUsers(usersList);
-    };
+    setUsers(usersList);
+    setLastVisible(usersSnapshot.docs[usersSnapshot.docs.length - 1]);
+  };
 
-    fetchUsers();
-  }, []);
+  useEffect(() => {
+    fetchUsers(currentPage);
+  }, [currentPage, sortByTotalSongs]);
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
+  const toggleSortByTotalSongs = () => {
+    setSortByTotalSongs((prev) => !prev);
+  };
 
   return (
     <Layout>
@@ -103,6 +130,12 @@ const ManageUsers = () => {
             </label>
           ))}
         </div>
+        <button
+          onClick={toggleSortByTotalSongs}
+          className="bg-gray-500 text-white px-4 py-2 rounded mb-4"
+        >
+          {sortByTotalSongs ? '登録日時順にソート' : '総曲数順にソート'}
+        </button>
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -140,6 +173,21 @@ const ManageUsers = () => {
             ))}
           </tbody>
         </table>
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+            className="bg-gray-500 text-white px-4 py-2 rounded"
+          >
+            前のページ
+          </button>
+          <button
+            onClick={handleNextPage}
+            className="bg-gray-500 text-white px-4 py-2 rounded"
+          >
+            次のページ
+          </button>
+        </div>
       </div>
     </Layout>
   );

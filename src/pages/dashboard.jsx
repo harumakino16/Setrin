@@ -156,7 +156,7 @@ const Dashboard = () => {
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_YOUTUBE_PLAYLISTS : '制限なし'}
               />
               <StatBox
-                label="歌える曲リスト数"
+                label="公開リスト数"
                 value={userData.publicPagesCount ? userData.publicPagesCount.toLocaleString() : 0}
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES: PREMIUM_PLAN_MAX_PUBLIC_PAGES}
               />
