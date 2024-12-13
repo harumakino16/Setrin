@@ -24,7 +24,7 @@ const MENU = [
         path: "/setlist",
     },
     {
-        title: "歌える曲リスト",
+        title: "公開リスト",
         iconName: faList,
         path: "/pubpagesetting",
     },
