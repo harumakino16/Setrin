@@ -44,7 +44,7 @@ function SongModal({ isOpen, onClose, song }) {
       existingSong.title === title && existingSong.artist === artist
     );
     if (isDuplicate) {
-      setMessageInfo({ message: `${title}/${artist}は既に存在します。`, type: 'error' });
+      setMessageInfo({ message: `${title}/${artist} は既に存在します。`, type: 'error' });
       return;
     }
 
