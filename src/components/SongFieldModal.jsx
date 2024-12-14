@@ -40,6 +40,14 @@ function SongModal({ isOpen, onClose, song }) {
       return;
     }
 
+    const isDuplicate = songs.some(existingSong => 
+      existingSong.title === title && existingSong.artist === artist
+    );
+    if (isDuplicate) {
+      setMessageInfo({ message: `${title}/${artist}は既に存在します。`, type: 'error' });
+      return;
+    }
+
     if (isNewSong && songs.length >= FREE_PLAN_MAX_SONGS) {
       setMessageInfo({ message: `曲の追加が無料プランの上限(${FREE_PLAN_MAX_SONGS})を超えています。`, type: 'error' });
       return;
