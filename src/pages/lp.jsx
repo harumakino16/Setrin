@@ -41,6 +41,17 @@ export default function LandingPage() {
         <meta name="keywords" content="Vtuber, セトリ, YouTube, 再生リスト, 管理ツール" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.setlink.com/lp" />
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQ6L8VVTH3"></script>
+        <script>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-WQ6L8VVTH3');
+          `}
+        </script>
       </head>
       <div className="bg-blue-50">
         {/* Header */}
@@ -100,7 +111,7 @@ export default function LandingPage() {
               <Feature
                 number="1"
                 imageSrc="/images/songlist_icon.svg"
-                title="簡単なセトリ作成"
+                title="簡単なセト���作成"
                 description="直感的なインターフェースで、数クリックでセトリを作成。曲の追加や削除も簡単に行えます。"
               />
               <Feature

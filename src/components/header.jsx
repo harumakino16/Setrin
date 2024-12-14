@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { db } from '@/../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
+import Head from 'next/head';
 
 const Header = ({ toggleSidebar }) => {
     const { theme } = useTheme();
@@ -28,24 +29,39 @@ const Header = ({ toggleSidebar }) => {
     }, [isListenerPage, router.query.id]);
 
     return (
-        <header className={headerClassName}>
-            <div className="container mx-auto flex justify-between items-center h-[60px]">
-                <Link href="/">
-                    <Image
-                        src="/images/SetLink_white_trance (1000 x 300 px).png"
-                        alt="SetLink Logo"
-                        width={190}
-                        height={50}
-                        priority={true}
-                    />
-                </Link>
-                {!isListenerPage && ( // toggleSidebarが存在する場合のみボタンを表示
-                    <button className="md:hidden text-white" onClick={toggleSidebar}>
-                        <FaBars size={24} />
-                    </button>
-                )}
-            </div>
-        </header>
+        <>
+            <Head>
+                {/* Google tag (gtag.js) */}
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQ6L8VVTH3"></script>
+                <script>
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+
+                        gtag('config', 'G-WQ6L8VVTH3');
+                    `}
+                </script>
+            </Head>
+            <header className={headerClassName}>
+                <div className="container mx-auto flex justify-between items-center h-[60px]">
+                    <Link href="/">
+                        <Image
+                            src="/images/SetLink_white_trance (1000 x 300 px).png"
+                            alt="SetLink Logo"
+                            width={190}
+                            height={50}
+                            priority={true}
+                        />
+                    </Link>
+                    {!isListenerPage && (
+                        <button className="md:hidden text-white" onClick={toggleSidebar}>
+                            <FaBars size={24} />
+                        </button>
+                    )}
+                </div>
+            </header>
+        </>
     );
 };
 
