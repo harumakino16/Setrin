@@ -43,12 +43,11 @@ function Price() {
             period="/月"
             features={[
               { text: `最大登録曲数${FREE_PLAN_MAX_SONGS.toLocaleString()}曲`, available: true },
-              { text: "基本的な曲管理機能", available: true },
-              { text: "YouTube連携可能", available: true },
-              { text: `月${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回の再生リスト作成`, available: true },
-              { text: `月${FREE_PLAN_MAX_SETLISTS}個のセットリスト作成`, available: true },
-              { text: `公開歌える曲リスト${FREE_PLAN_MAX_PUBLIC_PAGES}個`, available: true },
-              { text: "歌枠ツール利用", available: false },
+              { text: `セトリ自動作成無制限`, available: true },
+              { text: `公開リスト${FREE_PLAN_MAX_PUBLIC_PAGES}個`, available: true },
+              { text: `再生リスト作成回数 ${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回/月`, available: true },
+              { text: `セットリスト数 ${FREE_PLAN_MAX_SETLISTS}個`, available: true },
+              { text: "歌枠ツール利用不可", available: false },
             ]}
             buttonText={freeButtonText}
             bannerText="まずはここから！"
@@ -66,9 +65,9 @@ function Price() {
             features={[
               { text: "無料プランの全ての機能", available: true, highlight: true },
               { text: "登録曲数無制限", available: true, highlight: true },
-              { text: "再生リスト作成回数無制限", available: true, highlight: true },
-              { text: "セットリスト作成数無制限", available: true, highlight: true },
-              { text: `公開歌える曲リスト${PREMIUM_PLAN_MAX_PUBLIC_PAGES}個`, available: true, highlight: true },
+              { text: `公開リスト${PREMIUM_PLAN_MAX_PUBLIC_PAGES}個`, available: true, highlight: true },
+              { text: "再生リスト作成回数 無制限", available: true, highlight: true },
+              { text: "セットリスト数 無制限", available: true, highlight: true },
               { text: "歌枠ツール利用可能(準備中)", available: true, highlight: true },
             ]}
             buttonText={premiumButtonText}
