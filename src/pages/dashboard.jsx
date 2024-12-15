@@ -142,22 +142,22 @@ const Dashboard = () => {
             <div className="space-y-4">
               <StatBox
                 label="曲数"
-                value={userData.totalSongs ? userData.totalSongs.toLocaleString() : 0}
+                value={userData.totalSongs ? userData.totalSongs : 0}
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SONGS: '制限なし'}
               />
               <StatBox
                 label="セットリスト数"
-                value={userData.totalSetlists ? userData.totalSetlists.toLocaleString() : 0}
+                value={userData.totalSetlists ? userData.totalSetlists : 0}
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_SETLISTS: '制限なし'}
               />
               <StatBox
                 label="再生リスト作成回数"
-                value={userData.playlistCreationCount ? userData.playlistCreationCount.toLocaleString() : 0}
+                value={userData.playlistCreationCount ? userData.playlistCreationCount : 0}
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_YOUTUBE_PLAYLISTS : '制限なし'}
               />
               <StatBox
                 label="公開リスト数"
-                value={userData.publicPagesCount ? userData.publicPagesCount.toLocaleString() : 0}
+                value={userData.publicPagesCount ? userData.publicPagesCount : 0}
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES: PREMIUM_PLAN_MAX_PUBLIC_PAGES}
               />
               {currentUser.plan === 'free' && (

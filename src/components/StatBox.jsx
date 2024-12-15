@@ -9,7 +9,7 @@ const StatBox = ({ label, value, limit }) => {
       <div className="mb-4">
         <div className="flex justify-between items-center mb-1">
           <span className="text-gray-700 text-lg font-bold">{label}</span>
-          <span className="text-gray-900 text-lg font-bold">{value} / {limit}</span>
+          <span className="text-gray-900 text-lg font-bold">{value.toLocaleString()} / {limit.toLocaleString()}</span>
         </div>
         {limit !== '制限なし' && (
           <div className="w-full bg-gray-200 rounded-full h-2.5">
