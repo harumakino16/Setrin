@@ -85,7 +85,7 @@ export default function PubPageSetting() {
             userId: currentUser.uid,
             name: name,
             createdAt: now,
-            themeColor: theme || 'blue'
+            color: theme || 'blue'
         };
 
         try {
