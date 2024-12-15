@@ -43,7 +43,7 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                   scope="col"
                   className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer 
                   ${sortConfig?.key === key ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
-                  style={{ maxWidth: '250px' }}
+                  style={{ maxWidth: '250px', userSelect: 'none' }}
                   onClick={() => handleHeaderClick(key)}
                 >
                   <div className="flex items-center space-x-2">
