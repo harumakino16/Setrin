@@ -43,7 +43,7 @@ function SongModal({ isOpen, onClose, song }) {
     const isDuplicate = songs.some(existingSong => 
       existingSong.title === title && existingSong.artist === artist
     );
-    if (isDuplicate) {
+    if (isNewSong && isDuplicate) {
       setMessageInfo({ message: `${title}/${artist} は既に存在します。`, type: 'error' });
       return;
     }
