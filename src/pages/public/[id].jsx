@@ -2,25 +2,33 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, addDoc } from 'firebase/firestore';
 import NoSidebarLayout from '../noSidebarLayout';
 import PublicSongTable from '@/components/PublicSongTable';
 import { convertKanaToHira } from '@/utils/stringUtils';
+import { useMessage } from '@/context/MessageContext';
+
 
 export default function PublicSongList() {
   const [songs, setSongs] = useState([]);
-  const [filteredSongs, setFilteredSongs] = useState([]); // VTuberの条件でフィルタ済みの曲
-  const [displaySongs, setDisplaySongs] = useState([]);   // 上記filteredSongsに対するユーザーの2次絞り込み後の曲
+  const [filteredSongs, setFilteredSongs] = useState([]);
+  const [displaySongs, setDisplaySongs] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [searchCriteria, setSearchCriteria] = useState({});
   const [loading, setLoading] = useState(true);
+  const { setMessageInfo } = useMessage();
 
-  const [userKeyword, setUserKeyword] = useState(''); // 2次絞り込み用キーワード
+  const [userKeyword, setUserKeyword] = useState('');
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const router = useRouter();
   const { id } = router.query;
+
+  // リクエスト関連状態
+  const [isRequestingSong, setIsRequestingSong] = useState(false);
+  const [requestTargetSong, setRequestTargetSong] = useState(null);
+  const [requesterName, setRequesterName] = useState('');
 
   const filterSongs = (allSongs, criteria) => {
     let songsData = [...allSongs];
@@ -49,7 +57,7 @@ export default function PublicSongList() {
 
     if (criteria.tag) {
       const tagLower = criteria.tag.toLowerCase();
-      songsData = songsData.filter(song => song.tags && song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
+      songsData = songsData.filter(song => song.tags && song.tags.map(t => t.toLowerCase()).includes(tagLower));
     }
 
     if (criteria.artist) {
@@ -100,7 +108,6 @@ export default function PublicSongList() {
     async function fetchPublicSongs() {
       if (!id) return;
       try {
-        // トップレベルpublicPages/{id} からuserId取得
         const topLevelRef = doc(db, 'publicPages', id);
         const topLevelDoc = await getDoc(topLevelRef);
         if (!topLevelDoc.exists()) {
@@ -110,7 +117,6 @@ export default function PublicSongList() {
         const topData = topLevelDoc.data();
         const userId = topData.userId;
 
-        // ユーザー固有publicPages/{id}取得
         const publicPageRef = doc(db, 'users', userId, 'publicPages', id);
         const publicPageDoc = await getDoc(publicPageRef);
         if (!publicPageDoc.exists()) {
@@ -130,10 +136,10 @@ export default function PublicSongList() {
             tags: true,
             singingCount: true,
             skillLevel: true
-          }
+          },
+          requestMode: publicPageData.requestMode || false
         });
 
-        // searchCriteriaを取得
         const criteria = publicPageData.searchCriteria || {};
         setSearchCriteria(criteria);
 
@@ -148,7 +154,7 @@ export default function PublicSongList() {
 
         const filtered = filterSongs(allSongs, criteria);
         setFilteredSongs(filtered);
-        setDisplaySongs(filtered); // 初期表示はフィルタ済みの全曲
+        setDisplaySongs(filtered);
 
       } catch (error) {
         console.error('Error fetching public songs:', error);
@@ -160,10 +166,8 @@ export default function PublicSongList() {
     fetchPublicSongs();
   }, [id, router]);
 
-  // userKeywordが変更されたら2次絞り込み
   useEffect(() => {
     if (!userKeyword) {
-      // キーワードが空ならfilteredSongsをそのまま表示
       setDisplaySongs(filteredSongs);
     } else {
       const kw = userKeyword.toLowerCase();
@@ -181,14 +185,12 @@ export default function PublicSongList() {
     }
   }, [userKeyword, filteredSongs]);
 
-  // ソート関数
   const sortSongs = (songs, key, direction) => {
     return [...songs].sort((a, b) => {
       let aValue = a[key];
       let bValue = b[key];
 
       if (key === 'title') {
-        // titleカラムはfurigana優先
         aValue = a.furigana || a.title;
         bValue = b.furigana || b.title;
       }
@@ -196,14 +198,12 @@ export default function PublicSongList() {
       if (Array.isArray(aValue)) aValue = aValue.join(', ');
       if (Array.isArray(bValue)) bValue = bValue.join(', ');
 
-      // 数値比較可能なら数値で比較
       if (!isNaN(Number(aValue)) && !isNaN(Number(bValue))) {
         return direction === 'ascending'
           ? Number(aValue) - Number(bValue)
           : Number(bValue) - Number(aValue);
       }
 
-      // 文字列比較
       return direction === 'ascending'
         ? String(aValue || '').localeCompare(String(bValue || ''))
         : String(bValue || '').localeCompare(String(aValue || ''));
@@ -220,7 +220,33 @@ export default function PublicSongList() {
     setDisplaySongs(sorted);
   };
 
+  const handleRequestClick = (song) => {
+    setRequestTargetSong(song);
+    setIsRequestingSong(true);
+  };
+
+  const handleSubmitRequest = async () => {
+    if (!requestTargetSong || !id) return;
+    try {
+      const requestsRef = collection(db, 'publicPages', id, 'requests');
+      await addDoc(requestsRef, {
+        songId: requestTargetSong.id,
+        songTitle: requestTargetSong.title,
+        requesterName: requesterName.trim() || '匿名',
+        requestedAt: new Date()
+      });
+      setMessageInfo({ type: 'success', message: 'リクエストを送信しました！' });
+      setIsRequestingSong(false);
+      setRequesterName('');
+    } catch (err) {
+      console.error(err);
+      alert('リクエスト送信中にエラーが発生しました。');
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
+
+  const requestMode = userInfo?.requestMode || false;
 
   return (
     <NoSidebarLayout>
@@ -230,7 +256,7 @@ export default function PublicSongList() {
           <p className="mb-8">{userInfo.description}</p>
         )}
 
-        {/* 2次絞り込み用のテキスト入力欄 */}
+        {/* 2次絞り込み */}
         <div className="mb-4">
           <input
             type="text"
@@ -246,7 +272,50 @@ export default function PublicSongList() {
           visibleColumns={userInfo?.visibleColumns}
           onRequestSort={requestSort}
           sortConfig={sortConfig}
+          extraAction={
+            requestMode
+              ? (song) => (
+                  <button
+                    className="text-white bg-green-500 px-2 py-1 rounded hover:bg-green-700"
+                    onClick={() => handleRequestClick(song)}
+                  >
+                    リクエスト
+                  </button>
+                )
+              : null
+          }
         />
+
+        {isRequestingSong && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+              <h2 className="text-xl font-bold mb-4">リクエスト</h2>
+              <p className="mb-4">「{requestTargetSong?.title}」をリクエストします。<br />お名前を入力してください (任意)</p>
+              <input
+                type="text"
+                className="border p-2 w-full rounded mb-4"
+                placeholder="お名前（空欄で匿名）"
+                value={requesterName}
+                onChange={(e) => setRequesterName(e.target.value)}
+              />
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleSubmitRequest}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  送信
+                </button>
+                <button
+                  onClick={() => setIsRequestingSong(false)}
+                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </NoSidebarLayout>
   );

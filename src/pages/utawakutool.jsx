@@ -29,7 +29,7 @@ const UtawakuTool = () => {
                     description="公開リストにリクエストボタンが出現し、リスナーからのリクエストを受け付けることができます。"
                     icon={FaMusic}
                     color="green"
-                    href="/roulette-utawaku"
+                    href="/request-utawaku"
                 />
                 <ToolCard
                     title="ルーレット歌枠"
@@ -43,7 +43,7 @@ const UtawakuTool = () => {
                     description="3つの単語を与えると、その単語に関連する曲をAIが選曲します。"
                     icon={FaRobot}
                     color="blue"
-                    href="/roulette-utawaku"
+                    href="/ai-utawaku"
                 />
             </div>
         </Layout>

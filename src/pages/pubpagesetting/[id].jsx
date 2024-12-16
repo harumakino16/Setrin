@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/router';
-import { db } from '../../../firebaseConfig';
-import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { db } from '@/../firebaseConfig';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import Layout from '@/pages/layout';
 import SearchForm from '@/components/SearchForm';
 import PublicSongTable from '@/components/PublicSongTable';
@@ -34,24 +34,24 @@ export default function PubPageSettingDetail() {
   });
 
   const [searchResults, setSearchResults] = useState([]);
-  
+
   const [listInfo, setListInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // タイトル編集関連
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
 
-  // searchCriteria が更新されたら検索を実行
-  useEffect(() => {
-    if (searchCriteria) {
-      // 検索をトリガーするために、一時的にステートを更新
-      setTriggerSearch(true);
-    }
-  }, [searchCriteria]);
-
-  // 検索を実行するためのトリガー用ステート
   const [triggerSearch, setTriggerSearch] = useState(false);
+
+  const [visibleColumns, setVisibleColumns] = useState({
+    title: true,
+    artist: true,
+    genre: true,
+    youtubeUrl: true,
+    tags: true,
+    singingCount: true,
+    skillLevel: true
+  });
 
   useEffect(() => {
     if (!currentUser || !id) return;
@@ -65,7 +65,6 @@ export default function PubPageSettingDetail() {
       const data = publicPageDoc.data();
       setListInfo(data);
 
-      // 「保存した検索条件」があればそれを適用
       if (data.savedSearchCriteria) {
         setSearchCriteria(data.savedSearchCriteria);
       } else if (data.searchCriteria) {
@@ -78,7 +77,6 @@ export default function PubPageSettingDetail() {
         setEditedTitle('名称未設定...');
       }
 
-      // visibleColumns をデータから設定
       if (data.visibleColumns) {
         setVisibleColumns(data.visibleColumns);
       }
@@ -88,24 +86,17 @@ export default function PubPageSettingDetail() {
     fetchPublicPageData();
   }, [currentUser, id, router]);
 
-  // 検索結果を受け取りプレビュー用にstateを更新
+  useEffect(() => {
+    if (searchCriteria) {
+      setTriggerSearch(true);
+    }
+  }, [searchCriteria]);
+
   const handleSearchResults = useCallback((results) => {
     setSearchResults(results);
-    // 検索が完了したらトリガーをリセット
     setTriggerSearch(false);
   }, []);
 
-  const [visibleColumns, setVisibleColumns] = useState({
-    title: true,
-    artist: true,
-    genre: true,
-    youtubeUrl: true,
-    tags: true,
-    singingCount: true,
-    skillLevel: true
-  });
-
-  // カラム表示設定のハンドラー
   const toggleColumn = (column) => {
     setVisibleColumns(prev => ({
       ...prev,
@@ -116,8 +107,6 @@ export default function PubPageSettingDetail() {
   const handleSave = async () => {
     if (!currentUser || !id) return;
     try {
-      // 現在のsearchCriteriaをsavedSearchCriteriaとしても保存
-      // これにより次回ロード時にはこの条件デフォルトとして適用される
       const publicPageRef = doc(db, 'users', currentUser.uid, 'publicPages', id);
       await setDoc(publicPageRef, {
         name: editedTitle,
@@ -140,8 +129,8 @@ export default function PubPageSettingDetail() {
     }
   };
 
-  const publicURL = typeof window !== 'undefined' 
-    ? `${window.location.origin}/public/${id}` 
+  const publicURL = typeof window !== 'undefined'
+    ? `${window.location.origin}/public/${id}`
     : '';
 
   const handleCopyURL = async () => {
@@ -178,7 +167,6 @@ export default function PubPageSettingDetail() {
     await handleSave();
   };
 
-  // カラム名の日本語ラベルと順序を固定
   const columnOrder = [
     { key: 'title', label: '曲名' },
     { key: 'artist', label: 'アーティスト' },
@@ -198,14 +186,14 @@ export default function PubPageSettingDetail() {
   return (
     <Layout>
       <div className="p-8 space-y-6 mx-auto">
-        {/* 一覧に戻るボタン */}
         <button
           onClick={handleBackToList}
-          className="flex items-center text-sm"
+          className="flex items-center text-sm mb-4 hover:text-blue-600 transition-colors"
         >
           <FontAwesomeIcon icon={faChevronLeft} className="mr-2 text-sm item-center" />
           一覧に戻る
         </button>
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {isEditingTitle ? (
@@ -220,14 +208,14 @@ export default function PubPageSettingDetail() {
                   className="border p-2 rounded text-gray-700 focus:outline-none focus:border-blue-500"
                   placeholder="タイトルを入力"
                 />
-                <button 
+                <button
                   onClick={confirmEditingTitle}
                   className="text-green-600 hover:text-green-800"
                   title="タイトルを確定"
                 >
                   <FontAwesomeIcon icon={faCheck} />
                 </button>
-                <button 
+                <button
                   onClick={cancelEditingTitle}
                   className="text-red-600 hover:text-red-800"
                   title="編集をキャンセル"
@@ -240,7 +228,7 @@ export default function PubPageSettingDetail() {
                 <h2 className="text-2xl font-bold">
                   {editedTitle || '名称未設定...'}
                 </h2>
-                <button 
+                <button
                   onClick={startEditingTitle}
                   className="text-gray-500 hover:text-gray-700"
                   title="タイトルを編集"
@@ -258,12 +246,11 @@ export default function PubPageSettingDetail() {
           </button>
         </div>
 
-
-        {/* 公開URLセクション */}
+        {/* 公開URL */}
         <div className="bg-gray-50 p-4 rounded shadow-sm space-y-2">
           <p className="font-semibold">公開ページURL:</p>
           <p className="text-sm text-gray-600">
-            下記のURLをリスナーと共有すると、誰でもこの公開ページを見ることができます。
+            下記のURLを共有すると、リスナーがこの公開ページを見ることができます。
           </p>
           <div className="flex items-center gap-2">
             <input
@@ -272,9 +259,9 @@ export default function PubPageSettingDetail() {
               readOnly
               className="border p-2 rounded w-full text-gray-700"
             />
-            <button 
-              onClick={handleCopyURL} 
-              className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0"
+            <button
+              onClick={handleCopyURL}
+              className="px-4 py-2 bg-gray-100 rounded-r-md border border-l-0 hover:bg-gray-200 transition-colors"
               title="URLをコピー"
             >
               <FontAwesomeIcon icon={faCopy} />
@@ -286,8 +273,7 @@ export default function PubPageSettingDetail() {
         <div className="bg-white p-4 rounded shadow-sm">
           <h3 className="text-xl font-bold mb-4">公開する曲を絞り込む</h3>
           <p className="text-sm text-gray-600 mb-4">
-            下記の検索フォームで公開時に表示する曲の条件を設定します。  
-            前回保存した検索条件があれば、それが初値として自動的に適用されています。
+            下記フォームで公開条件を指定できます。保存後、リスナーはこの条件でフィルタされた曲のみを見ることができます。
           </p>
           <SearchForm
             currentUser={currentUser}
@@ -299,11 +285,11 @@ export default function PubPageSettingDetail() {
           />
         </div>
 
-        {/* テーブル表示とカラム表示設定 */}
+        {/* プレビュー */}
         <div className="bg-white p-4 rounded shadow-sm">
           <h3 className="text-xl font-bold mb-4">現在の条件で表示される曲(プレビュー)</h3>
           <p className="text-sm text-gray-600 mb-4">
-            以下は現在の条件でフィルタリングした曲の一覧です。このページを保存すると、リスナーがアクセスした際にこの条件に合う最新の曲が表示されます。
+            以下は設定条件下で表示される曲リストのプレビューです。
           </p>
 
           {/* カラム表示設定 */}
@@ -314,7 +300,7 @@ export default function PubPageSettingDetail() {
                 onClick={() => toggleColumn(key)}
                 className={`flex text-xs items-center px-4 py-2 rounded ${
                   visibleColumns[key] ? `bg-customTheme-${theme}-primary text-white` : 'bg-gray-200 text-gray-700'
-                }`}
+                } hover:opacity-90 transition-opacity`}
               >
                 <FontAwesomeIcon icon={visibleColumns[key] ? faEye : faEyeSlash} className="mr-2" />
                 {label}
