@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "setlink-test"
+    "default": "setlink-test",       // テスト環境
+    "production": "regal-muse-384522"        // 本番環境
   }
 }
