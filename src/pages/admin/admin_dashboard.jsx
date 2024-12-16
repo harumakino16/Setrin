@@ -69,6 +69,11 @@ const AdminDashboard = () => {
             <p className="bg-blue-500 text-white px-4 py-2 rounded">データベース操作ページへ</p>
           </Link>
         </div>
+        <div className="mt-4">
+          <Link href="/admin/test">
+            <p className="bg-blue-500 text-white px-4 py-2 rounded">テストページへ</p>
+          </Link>
+        </div>
       </div>
     </Layout>
   );
