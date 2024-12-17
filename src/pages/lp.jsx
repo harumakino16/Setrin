@@ -37,8 +37,12 @@ export default function LandingPage() {
     <>
       <head>
         <title>Setlink - Vtuberのセトリ管理ツール</title>
-        <meta name="description" content="Setlinkは、Vtuberのためのセトリ作成とYouTube再生リスト管理を簡単にするツールです。無料で始めて、歌枠活動をスムーズにしましょう。" />
+        <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
         <meta name="keywords" content="Vtuber, セトリ, YouTube, 再生リスト, 管理ツール" />
+        <meta property="og:title" content="Setlink - Vtuberのセトリ管理ツール" />
+        <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
+        <meta property="og:image" content="/images/bunner.png" />
+        <meta property="og:url" content="https://www.setlink.com/lp" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.setlink.com/lp" />
         {/* Google tag (gtag.js) */}
