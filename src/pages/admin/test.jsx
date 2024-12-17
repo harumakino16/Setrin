@@ -7,6 +7,8 @@ const Test = () => {
         <Layout>
             <H1>テストページ</H1>
             <StartRequestModeCTA publicURL="https://www.google.com" />
+            <p className="text-red-500 md:text-blue-500">テストページ</p>
+
         </Layout>
     );
 };

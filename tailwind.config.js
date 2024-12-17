@@ -13,10 +13,16 @@ module.exports = {
       center: true,
       padding: "2rem",
       screens: {
+        "md": "1016px",
         "2xl": "1400px",
       },
     },
     extend: {
+      screens: {
+        'sm': '640px',
+        'md': '1016px',
+
+      },
       colors: {
         // デフォルトのフォントカラーをカスタマイズ
         border: "hsl(var(--border))",
