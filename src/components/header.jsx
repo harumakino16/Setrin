@@ -42,6 +42,13 @@ const Header = ({ toggleSidebar }) => {
                         gtag('config', 'G-WQ6L8VVTH3');
                     `}
                 </script>
+                <title>SetLink</title>
+                <meta property="og:title" content="SetLink" />
+                <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
+                <meta property="og:image" content="/images/bunner.png" />
+                <meta property="og:url" content="https://setlink.vercel.app/" />
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="SetLink" />
             </Head>
             <header className={headerClassName}>
                 <div className="container mx-auto flex justify-between items-center h-[60px]">
