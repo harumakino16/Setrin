@@ -241,7 +241,7 @@ export default function Home() {
         <div className="flex flex-col min-h-screen">
           <div className="flex-grow flex flex-col items-center justify-center p-6">
             <h1 className="text-3xl md:text-5xl font-extrabold mb-6">Setlinkへようこそ</h1>
-            <p className="text-xl mb-8 text-center md:text-left">Vtuberの歌枠をもっと簡単に</p>
+            <p className="text-xl mb-8 text-center md:text-left">歌枠をもっと楽しく、もっと便利に</p>
             <LoginForm />
           </div>
           <div className="bg-white bg-opacity-20 rounded-t-3xl p-8 text-left backdrop-filter backdrop-blur-lg">

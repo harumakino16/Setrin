@@ -41,7 +41,7 @@ export default function LandingPage() {
         <meta name="keywords" content="Vtuber, セトリ, YouTube, 再生リスト, 管理ツール" />
         <meta property="og:title" content="Setlink - Vtuberのセトリ管理ツール" />
         <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
-        <meta property="og:image" content="/images/bunner.png" />
+        <meta property="og:image" content="https://setlink.vercel.app/images/bunner.png" />
         <meta property="og:url" content="https://www.setlink.com/lp" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.setlink.com/lp" />
