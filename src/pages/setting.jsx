@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { db } from '../../firebaseConfig';
-import { updateDoc, doc, deleteDoc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { updateDoc, doc, deleteDoc, getDoc, setDoc, onSnapshot, writeBatch, collection, getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import googleIcon from '../../public/images/web_light_rd_SI@4x.png';
@@ -173,8 +173,19 @@ function Settings() {
             await updateDoc(userRef, {
                 email: email,
                 displayName: displayName,
-                theme: selectedTheme, // 追加
+                theme: selectedTheme, // テーマの更新
             });
+
+            // トップレベルpublicPagesからuserIdが一致するドキュメントのcolorフィールドを更新
+            const topLevelPublicPagesRef = collection(db, 'publicPages');
+            const q = query(topLevelPublicPagesRef, where('userId', '==', currentUser.uid));
+            const topLevelPublicPagesSnapshot = await getDocs(q);
+            const topLevelBatch = writeBatch(db);
+            topLevelPublicPagesSnapshot.forEach((doc) => {
+                topLevelBatch.update(doc.ref, { color: selectedTheme });
+            });
+            await topLevelBatch.commit();
+
             setMessageInfo({ message: '設定が更新されました。', type: 'success' });
         } catch (error) {
             setMessageInfo({ message: '設定の更新に失敗しました。', type: 'error' });
