@@ -25,10 +25,12 @@ export default function PublicSongList() {
   const router = useRouter();
   const { id } = router.query;
 
-  // リクエスト関連状態
+  // リクエスト関連���態
   const [isRequestingSong, setIsRequestingSong] = useState(false);
   const [requestTargetSong, setRequestTargetSong] = useState(null);
   const [requesterName, setRequesterName] = useState('');
+
+  const [isFirstTime, setIsFirstTime] = useState(false);
 
   const filterSongs = (allSongs, criteria) => {
     let songsData = [...allSongs];
@@ -245,17 +247,20 @@ export default function PublicSongList() {
     if (!requestTargetSong || !id || !userInfo?.userId) return;
     try {
       const userId = userInfo.userId;
-      const requestsRef = collection(db, 'users', userId, 'requests');
+      const requestsRef = collection(db, 'users', userId, 'publicPages', id, 'requests');
       await addDoc(requestsRef, {
         songId: requestTargetSong.id,
         songTitle: requestTargetSong.title,
         requesterName: requesterName.trim() || '匿名',
+        youtubeUrl: requestTargetSong.youtubeUrl || '',
         requestedAt: new Date(),
-        publicPageId: id
+        publicPageId: id,
+        isFirstTime: isFirstTime
       });
       setMessageInfo({ type: 'success', message: 'リクエストを送信しました！' });
       setIsRequestingSong(false);
       setRequesterName('');
+      setIsFirstTime(false);
     } catch (err) {
       console.error(err);
       alert('リクエスト送信中にエラーが発生しました。');
@@ -309,6 +314,16 @@ export default function PublicSongList() {
             <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
               <h2 className="text-xl font-bold mb-4">リクエスト</h2>
               <p className="mb-4">「{requestTargetSong?.title}」をリクエストします。<br />お名前を入力してください (任意)</p>
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="firstTimeCheck"
+                  checked={isFirstTime}
+                  onChange={(e) => setIsFirstTime(e.target.checked)}
+                  className="mr-2"
+                />
+                <label htmlFor="firstTimeCheck">初見です！</label>
+              </div>
               <input
                 type="text"
                 className="border p-2 w-full rounded mb-4"
@@ -316,10 +331,11 @@ export default function PublicSongList() {
                 value={requesterName}
                 onChange={(e) => setRequesterName(e.target.value)}
               />
+              
               <div className="flex flex-col gap-2">
                 <button
                   onClick={handleSubmitRequest}
-                  className={`w-full bg-customTheme-${color}-primary text-white px-4 py-2 rounded hover:opacity-80 transition-opacity duration-300`}
+                  className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300`}
                 >
                   送信
                 </button>

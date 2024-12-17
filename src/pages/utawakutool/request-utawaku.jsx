@@ -10,6 +10,7 @@ import { useMessage } from '@/context/MessageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function RequestUtawaku() {
     const { currentUser } = useContext(AuthContext);
@@ -67,7 +68,7 @@ export default function RequestUtawaku() {
                     setPublicURL(`${window.location.origin}/public/${selectedPageId}`);
                 }
 
-                const requestsRef = collection(db, 'users', userId, 'requests');
+                const requestsRef = collection(db, 'users', userId, 'publicPages', selectedPageId, 'requests');
                 const q = query(requestsRef, where('publicPageId', '==', selectedPageId));
                 const unsubscribe = onSnapshot(q, (snapshot) => {
                     const reqData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -97,7 +98,7 @@ export default function RequestUtawaku() {
 
     const handleConsumeRequest = async (requestId) => {
         if (!selectedPageId || !requestId || !ownerUserId) return;
-        const requestRef = doc(db, 'users', ownerUserId, 'requests', requestId);
+        const requestRef = doc(db, 'users', ownerUserId, 'publicPages', selectedPageId, 'requests', requestId);
         await setDoc(requestRef, { consumed: true }, { merge: true });
         setMessageInfo({ type: 'success', message: 'リクエストを消化しました。' });
     };
@@ -152,21 +153,29 @@ export default function RequestUtawaku() {
                                 <p className="text-gray-700 text-sm font-semibold mb-1">公開ページ</p>
                                 <select
                                     value={selectedPageId}
-                                onChange={(e) => {
-                                    setSelectedPageId(e.target.value);
-                                    if (typeof window !== 'undefined') {
-                                      setPublicURL(`${window.location.origin}/public/${e.target.value}`);
-                                    }
-                                }}
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                            >
-                                {publicPages.length === 0 && <option>公開ページがありません</option>}
-                                {publicPages.map((page) => (
-                                    <option key={page.id} value={page.id}>
-                                        {page.name || '名称未設定...'}
-                                    </option>
-                                ))}
-                            </select>
+                                    onChange={(e) => {
+                                        setSelectedPageId(e.target.value);
+                                        if (typeof window !== 'undefined') {
+                                            setPublicURL(`${window.location.origin}/public/${e.target.value}`);
+                                        }
+                                    }}
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                >
+                                    {publicPages.length === 0 ? (
+                                        <option disabled>公開ページがありません</option>
+                                    ) : (
+                                        publicPages.map((page) => (
+                                            <option key={page.id} value={page.id}>
+                                                {page.name || '名称未設定...'}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                                {publicPages.length === 0 && (
+                                    <Link href="/pubpagesetting" className="text-blue-500 hover:underline">
+                                        +公開ページを作成する
+                                    </Link>
+                                )}
                             </div>
 
                             <div className="flex-grow">
@@ -246,9 +255,10 @@ export default function RequestUtawaku() {
                                         <tr>
                                             <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">曲名</th>
                                             <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">送信者</th>
+                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">初見</th>
                                             <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">時刻</th>
                                             <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">ステータス</th>
-                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">消化する</th>
+                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase text-center">消化する</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
@@ -267,8 +277,15 @@ export default function RequestUtawaku() {
                                             const isConsumed = req.consumed;
                                             return (
                                                 <tr key={req.id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-4 py-2 text-gray-700 max-w-[200px] truncate" title={req.songTitle}>{req.songTitle}</td>
+                                                    <td className="px-4 py-2 text-gray-700 max-w-[200px] truncate" title={req.songTitle}>
+                                                        {req.youtubeUrl ? (
+                                                            <Link href={req.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{req.songTitle}</Link>
+                                                        ) : (
+                                                            req.songTitle
+                                                        )}
+                                                    </td>
                                                     <td className="px-4 py-2 text-gray-700">{req.requesterName || '匿名'}</td>
+                                                    <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{req.isFirstTime ? '初見' : '常連'}</td>
                                                     <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{timeStr}</td>
                                                     <td className="px-4 py-2">
                                                         {isConsumed ? (
