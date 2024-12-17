@@ -1,6 +1,7 @@
+// components/PublicSongTable.jsx
 import React from 'react';
 
-export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig }) {
+export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig, extraAction }) {
   const columnLabels = [
     { key: 'title', label: '曲名' },
     { key: 'artist', label: 'アーティスト' },
@@ -13,7 +14,7 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
 
   const getSortIndicator = (key) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return '⇅'; // ソート可能なことを示すデフォルトアイコン
+      return '⇅'; // ソート可能なことを示す
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
@@ -33,6 +34,7 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
               <col key={key} style={{ width: '250px' }} />
             )
           )}
+          {extraAction && <col style={{ width: '120px' }} />}
         </colgroup>
         <thead className="bg-gray-50">
           <tr>
@@ -41,7 +43,7 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                 <th
                   key={key}
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer 
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer
                   ${sortConfig?.key === key ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
                   style={{ maxWidth: '250px', userSelect: 'none' }}
                   onClick={() => handleHeaderClick(key)}
@@ -52,6 +54,11 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                   </div>
                 </th>
               )
+            )}
+            {extraAction && (
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                リクエスト
+              </th>
             )}
           </tr>
         </thead>
@@ -92,6 +99,11 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                     </div>
                   </td>
                 )
+              )}
+              {extraAction && (
+                <td className="px-6 py-4">
+                  {extraAction(song)}
+                </td>
               )}
             </tr>
           ))}

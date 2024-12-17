@@ -2,25 +2,35 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, onSnapshot, addDoc } from 'firebase/firestore';
 import NoSidebarLayout from '../noSidebarLayout';
 import PublicSongTable from '@/components/PublicSongTable';
 import { convertKanaToHira } from '@/utils/stringUtils';
+import { useMessage } from '@/context/MessageContext';
 
 export default function PublicSongList() {
   const [songs, setSongs] = useState([]);
-  const [filteredSongs, setFilteredSongs] = useState([]); // VTuberの条件でフィルタ済みの曲
-  const [displaySongs, setDisplaySongs] = useState([]);   // 上記filteredSongsに対するユーザーの2次絞り込み後の曲
+  const [filteredSongs, setFilteredSongs] = useState([]);
+  const [displaySongs, setDisplaySongs] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [searchCriteria, setSearchCriteria] = useState({});
   const [loading, setLoading] = useState(true);
+  const { setMessageInfo } = useMessage();
+  const [color,setColor] = useState('blue');
 
-  const [userKeyword, setUserKeyword] = useState(''); // 2次絞り込み用キーワード
+  const [userKeyword, setUserKeyword] = useState('');
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const router = useRouter();
   const { id } = router.query;
+
+  // リクエスト関連���態
+  const [isRequestingSong, setIsRequestingSong] = useState(false);
+  const [requestTargetSong, setRequestTargetSong] = useState(null);
+  const [requesterName, setRequesterName] = useState('');
+
+  const [isFirstTime, setIsFirstTime] = useState(false);
 
   const filterSongs = (allSongs, criteria) => {
     let songsData = [...allSongs];
@@ -49,7 +59,7 @@ export default function PublicSongList() {
 
     if (criteria.tag) {
       const tagLower = criteria.tag.toLowerCase();
-      songsData = songsData.filter(song => song.tags && song.tags.map(tag => tag.toLowerCase()).includes(tagLower));
+      songsData = songsData.filter(song => song.tags && song.tags.map(t => t.toLowerCase()).includes(tagLower));
     }
 
     if (criteria.artist) {
@@ -97,73 +107,85 @@ export default function PublicSongList() {
   };
 
   useEffect(() => {
-    async function fetchPublicSongs() {
-      if (!id) return;
-      try {
-        // トップレベルpublicPages/{id} からuserId取得
-        const topLevelRef = doc(db, 'publicPages', id);
-        const topLevelDoc = await getDoc(topLevelRef);
-        if (!topLevelDoc.exists()) {
-          router.push('/404');
-          return;
-        }
-        const topData = topLevelDoc.data();
-        const userId = topData.userId;
+    if (!id) return;
+    let unsubscribeTopPage = null;
+    let unsubscribeUserPage = null;
 
-        // ユーザー固有publicPages/{id}取得
-        const publicPageRef = doc(db, 'users', userId, 'publicPages', id);
-        const publicPageDoc = await getDoc(publicPageRef);
-        if (!publicPageDoc.exists()) {
-          router.push('/404');
-          return;
-        }
-
-        const publicPageData = publicPageDoc.data();
-        setUserInfo({
-          displayName: publicPageData.name || topData.name || '名称未設定...',
-          description: publicPageData.description || '',
-          visibleColumns: publicPageData.visibleColumns || {
-            title: true,
-            artist: true,
-            genre: true,
-            youtubeUrl: true,
-            tags: true,
-            singingCount: true,
-            skillLevel: true
-          }
-        });
-
-        // searchCriteriaを取得
-        const criteria = publicPageData.searchCriteria || {};
-        setSearchCriteria(criteria);
-
-        // ユーザーの全曲リストを取得
-        const songsRef = collection(db, 'users', userId, 'Songs');
-        const songsSnapshot = await getDocs(songsRef);
-        const allSongs = songsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setSongs(allSongs);
-
-        const filtered = filterSongs(allSongs, criteria);
-        setFilteredSongs(filtered);
-        setDisplaySongs(filtered); // 初期表示はフィルタ済みの全曲
-
-      } catch (error) {
-        console.error('Error fetching public songs:', error);
-      } finally {
-        setLoading(false);
+    async function fetchInitialData() {
+      const topLevelRef = doc(db, 'publicPages', id);
+      const topLevelDoc = await getDoc(topLevelRef);
+      if (!topLevelDoc.exists()) {
+        router.push('/404');
+        return;
       }
+      const topData = topLevelDoc.data();
+      const userId = topData.userId;
+      setColor(topData.color || 'blue');
+
+      // リアルタイムリスナー: ユーザーのpublicPages/{id}へ
+      const publicPageRef = doc(db, 'users', userId, 'publicPages', id);
+
+      unsubscribeUserPage = onSnapshot(publicPageRef, async (publicPageSnap) => {
+        if (!publicPageSnap.exists()) {
+          router.push('/404');
+          return;
+        }
+        const publicPageData = publicPageSnap.data();
+
+        // 検索条件やカラム表示は初回読み込み時のみ設定
+        if (!userInfo) {
+          const criteria = publicPageData.searchCriteria || {};
+          setSearchCriteria(criteria);
+
+          // ユーザーの全曲リスト取得(初回のみ)
+          const songsRef = collection(db, 'users', userId, 'Songs');
+          const songsSnapshot = await getDocs(songsRef);
+          const allSongs = songsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setSongs(allSongs);
+
+          const filtered = filterSongs(allSongs, criteria);
+          setFilteredSongs(filtered);
+          setDisplaySongs(filtered);
+
+          setUserInfo({
+            displayName: publicPageData.name || topData.name || '名称未設定...',
+            description: publicPageData.description || '',
+            visibleColumns: publicPageData.visibleColumns || {
+              title: true,
+              artist: true,
+              genre: true,
+              youtubeUrl: true,
+              tags: true,
+              singingCount: true,
+              skillLevel: true
+            },
+            requestMode: publicPageData.requestMode || false,
+            userId: userId
+          });
+          setLoading(false);
+        } else {
+          // 2回目以降はrequestModeのみ更新すればOK
+          setUserInfo((prev) => ({
+            ...prev,
+            requestMode: publicPageData.requestMode || false
+          }));
+        }
+      });
     }
 
-    fetchPublicSongs();
+    fetchInitialData();
+
+    return () => {
+      if (unsubscribeTopPage) unsubscribeTopPage();
+      if (unsubscribeUserPage) unsubscribeUserPage();
+    };
   }, [id, router]);
 
-  // userKeywordが変更されたら2次絞り込み
   useEffect(() => {
     if (!userKeyword) {
-      // キーワードが空ならfilteredSongsをそのまま表示
       setDisplaySongs(filteredSongs);
     } else {
       const kw = userKeyword.toLowerCase();
@@ -181,14 +203,12 @@ export default function PublicSongList() {
     }
   }, [userKeyword, filteredSongs]);
 
-  // ソート関数
   const sortSongs = (songs, key, direction) => {
     return [...songs].sort((a, b) => {
       let aValue = a[key];
       let bValue = b[key];
 
       if (key === 'title') {
-        // titleカラムはfurigana優先
         aValue = a.furigana || a.title;
         bValue = b.furigana || b.title;
       }
@@ -196,14 +216,12 @@ export default function PublicSongList() {
       if (Array.isArray(aValue)) aValue = aValue.join(', ');
       if (Array.isArray(bValue)) bValue = bValue.join(', ');
 
-      // 数値比較可能なら数値で比較
       if (!isNaN(Number(aValue)) && !isNaN(Number(bValue))) {
         return direction === 'ascending'
           ? Number(aValue) - Number(bValue)
           : Number(bValue) - Number(aValue);
       }
 
-      // 文字列比較
       return direction === 'ascending'
         ? String(aValue || '').localeCompare(String(bValue || ''))
         : String(bValue || '').localeCompare(String(aValue || ''));
@@ -220,7 +238,38 @@ export default function PublicSongList() {
     setDisplaySongs(sorted);
   };
 
+  const handleRequestClick = (song) => {
+    setRequestTargetSong(song);
+    setIsRequestingSong(true);
+  };
+
+  const handleSubmitRequest = async () => {
+    if (!requestTargetSong || !id || !userInfo?.userId) return;
+    try {
+      const userId = userInfo.userId;
+      const requestsRef = collection(db, 'users', userId, 'publicPages', id, 'requests');
+      await addDoc(requestsRef, {
+        songId: requestTargetSong.id,
+        songTitle: requestTargetSong.title,
+        requesterName: requesterName.trim() || '匿名',
+        youtubeUrl: requestTargetSong.youtubeUrl || '',
+        requestedAt: new Date(),
+        publicPageId: id,
+        isFirstTime: isFirstTime
+      });
+      setMessageInfo({ type: 'success', message: 'リクエストを送信しました！' });
+      setIsRequestingSong(false);
+      setRequesterName('');
+      setIsFirstTime(false);
+    } catch (err) {
+      console.error(err);
+      alert('リクエスト送信中にエラーが発生しました。');
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
+
+  const requestMode = userInfo?.requestMode || false;
 
   return (
     <NoSidebarLayout>
@@ -230,7 +279,7 @@ export default function PublicSongList() {
           <p className="mb-8">{userInfo.description}</p>
         )}
 
-        {/* 2次絞り込み用のテキスト入力欄 */}
+        {/* 2次絞り込み */}
         <div className="mb-4">
           <input
             type="text"
@@ -246,7 +295,61 @@ export default function PublicSongList() {
           visibleColumns={userInfo?.visibleColumns}
           onRequestSort={requestSort}
           sortConfig={sortConfig}
+          extraAction={
+            requestMode
+              ? (song) => (
+                  <button
+                    className={`text-white bg-customTheme-${color}-primary px-2 py-1 rounded hover:opacity-80 transition-opacity duration-300`}
+                    onClick={() => handleRequestClick(song)}
+                  >
+                    リクエスト
+                  </button>
+                )
+              : null
+          }
         />
+
+        {isRequestingSong && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+              <h2 className="text-xl font-bold mb-4">リクエスト</h2>
+              <p className="mb-4">「{requestTargetSong?.title}」をリクエストします。<br />お名前を入力してください (任意)</p>
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="firstTimeCheck"
+                  checked={isFirstTime}
+                  onChange={(e) => setIsFirstTime(e.target.checked)}
+                  className="mr-2"
+                />
+                <label htmlFor="firstTimeCheck">初見です！</label>
+              </div>
+              <input
+                type="text"
+                className="border p-2 w-full rounded mb-4"
+                placeholder="お名前（空欄で匿名）"
+                value={requesterName}
+                onChange={(e) => setRequesterName(e.target.value)}
+              />
+              
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={handleSubmitRequest}
+                  className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300`}
+                >
+                  送信
+                </button>
+                <button
+                  onClick={() => setIsRequestingSong(false)}
+                  className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto`}
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </NoSidebarLayout>
   );
