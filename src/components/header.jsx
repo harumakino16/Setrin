@@ -43,22 +43,22 @@ const Header = ({ toggleSidebar }) => {
                     `}
                 </script>
 
-                {isListenerPage ? <title>{publicPageData.name} | SetLink</title> : <title>SetLink</title>}
-                <meta property="og:title" content="SetLink" />
+                {isListenerPage ? <title>{publicPageData.name} | Setlink</title> : <title>Setlink</title>}
+                <meta property="og:title" content="Setlink" />
                 <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
                 <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
                 <meta name="keywords" content="Vtuber, 歌枠, セトリ, YouTube, 再生リスト, 管理ツール" />
                 <meta property="og:image" content="https://setlink.vercel.app/images/bunner.png" />
                 <meta property="og:url" content="https://setlink.vercel.app/" />
                 <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="SetLink" />
+                <meta property="og:site_name" content="Setlink" />
             </Head>
             <header className={headerClassName}>
                 <div className="container mx-auto flex justify-between items-center h-[60px]">
                     <Link href="/">
                         <Image
-                            src="/images/SetLink_white_trance (1000 x 300 px).png"
-                            alt="SetLink Logo"
+                            src="/images/Setlink_white_trance (1000 x 300 px).png"
+                            alt="Setlink Logo"
                             width={190}
                             height={50}
                             priority={true}
