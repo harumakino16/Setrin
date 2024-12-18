@@ -53,7 +53,7 @@ const ManageUsers = () => {
       const { token: customToken } = responseData;
       await signInWithCustomToken(auth, customToken);
 
-      setMessageInfo({ message: 'ユーザーとしてロ��インしました。', type: 'success' });
+      setMessageInfo({ message: 'ユーザーとしてログインしました。', type: 'success' });
     } catch (error) {
       console.error('Error logging in as user:', error);
       setMessageInfo({ message: 'ユーザーとしてのログインに失敗しました。', type: 'error' });

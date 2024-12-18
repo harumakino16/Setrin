@@ -115,7 +115,7 @@ export default function LandingPage() {
               <Feature
                 number="1"
                 imageSrc="/images/songlist_icon.svg"
-                title="簡単なセト���作成"
+                title="簡単なセトリ作成"
                 description="直感的なインターフェースで、数クリックでセトリを作成。曲の追加や削除も簡単に行えます。"
               />
               <Feature

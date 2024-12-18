@@ -25,7 +25,7 @@ export default function PublicSongList() {
   const router = useRouter();
   const { id } = router.query;
 
-  // リクエスト関連���態
+  // リクエスト関連
   const [isRequestingSong, setIsRequestingSong] = useState(false);
   const [requestTargetSong, setRequestTargetSong] = useState(null);
   const [requesterName, setRequesterName] = useState('');
