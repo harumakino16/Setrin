@@ -5,6 +5,10 @@ import MessageBox from "@/components/MessageBox";
 import { SongsProvider } from "@/context/SongsContext";
 import { Noto_Sans_JP } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css'; // Font Awesome CSSを手動で読み込む
+
+config.autoAddCss = false; // CSS自動追加を無効化
 
 const notoSansJP = Noto_Sans_JP({
   weight: ['400', '700'],
