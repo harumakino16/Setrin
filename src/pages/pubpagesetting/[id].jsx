@@ -50,7 +50,8 @@ export default function PubPageSettingDetail() {
     youtubeUrl: true,
     tags: true,
     singingCount: true,
-    skillLevel: true
+    skillLevel: true,
+    memo: true
   });
 
   useEffect(() => {
@@ -174,7 +175,8 @@ export default function PubPageSettingDetail() {
     { key: 'youtubeUrl', label: 'YouTubeリンク' },
     { key: 'tags', label: 'タグ' },
     { key: 'singingCount', label: '歌唱回数' },
-    { key: 'skillLevel', label: '熟練度' }
+    { key: 'skillLevel', label: '熟練度' },
+    { key: 'memo', label: '備考' }
   ];
 
   const handleBackToList = () => {

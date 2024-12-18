@@ -9,7 +9,8 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
     { key: 'youtubeUrl', label: 'YouTubeリンク' },
     { key: 'tags', label: 'タグ' },
     { key: 'singingCount', label: '歌唱回数' },
-    { key: 'skillLevel', label: '熟練度' }
+    { key: 'skillLevel', label: '熟練度' },
+    { key: 'memo', label: '備考' }
   ];
 
   const getSortIndicator = (key) => {
