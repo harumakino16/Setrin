@@ -80,7 +80,10 @@ export default function PubPageSetting() {
         const now = new Date();
         const pageData = {
             name: name,
-            createdAt: now
+            createdAt: now,
+            description: '',
+            showDescription: true,
+            color: theme || 'blue'
         };
 
         const topLevelPublicPageRef = doc(db, 'publicPages', newId);

@@ -9,6 +9,7 @@ import { convertKanaToHira } from '@/utils/stringUtils';
 import { useMessage } from '@/context/MessageContext';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { FaSearch } from 'react-icons/fa';
 
 
 export default function PublicSongList() {
@@ -155,7 +156,7 @@ export default function PublicSongList() {
 
           setUserInfo({
             displayName: publicPageData.name || topData.name || '名称未設定...',
-            description: publicPageData.description || '',
+            description: publicPageData.showDescription !== false ? publicPageData.description : '',
             visibleColumns: publicPageData.visibleColumns || {
               title: true,
               artist: true,
@@ -277,20 +278,29 @@ export default function PublicSongList() {
   return (
     <NoSidebarLayout>
       <div className="py-8 w-full mx-auto px-4">
-        <h1 className="md:text-3xl text-2xl font-bold mb-4">{userInfo?.displayName || '名称未設定...'}</h1>
+        <h1 className="md:text-3xl text-2xl font-bold mb-4">
+          {userInfo?.displayName || '名称未設定...'}
+        </h1>
         {userInfo?.description && (
-          <p className="mb-8">{userInfo.description}</p>
+          <div className="mb-8 w-full">
+            <div className="bg-white p-6 rounded-lg border border-gray-200m">
+              <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                {userInfo.description}
+              </p>
+            </div>
+          </div>
         )}
 
         {/* 2次絞り込み */}
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <input
             type="text"
             placeholder="曲名、アーティスト、タグ、ジャンル、フリガナで絞り込み"
-            className="border p-2 rounded w-full h-14"
+            className="border p-2 pl-12 rounded w-full h-14"
             value={userKeyword}
             onChange={(e) => setUserKeyword(e.target.value)}
           />
+          <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
         </div>
 
         <PublicSongTable

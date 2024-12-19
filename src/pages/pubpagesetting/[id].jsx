@@ -56,6 +56,11 @@ export default function PubPageSettingDetail() {
     memo: true
   });
 
+  const [description, setDescription] = useState('');
+  const [showDescription, setShowDescription] = useState(true);
+
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
   useEffect(() => {
     if (!currentUser || !id) return;
     const fetchPublicPageData = async () => {
@@ -84,6 +89,9 @@ export default function PubPageSettingDetail() {
         setVisibleColumns(data.visibleColumns);
       }
 
+      setDescription(data.description || '');
+      setShowDescription(data.showDescription !== false);
+
       setLoading(false);
     };
     fetchPublicPageData();
@@ -100,11 +108,20 @@ export default function PubPageSettingDetail() {
     setTriggerSearch(false);
   }, []);
 
+  const handleSearchCriteriaChange = (newCriteria) => {
+    setSearchCriteria(newCriteria);
+    setHasUnsavedChanges(true);
+  };
+
   const toggleColumn = (column) => {
-    setVisibleColumns(prev => ({
-      ...prev,
-      [column]: !prev[column]
-    }));
+    setVisibleColumns(prev => {
+      const newColumns = {
+        ...prev,
+        [column]: !prev[column]
+      };
+      setHasUnsavedChanges(true);
+      return newColumns;
+    });
   };
 
   const handleSave = async () => {
@@ -115,7 +132,9 @@ export default function PubPageSettingDetail() {
         name: editedTitle,
         searchCriteria: searchCriteria,
         savedSearchCriteria: searchCriteria,
-        visibleColumns: visibleColumns
+        visibleColumns: visibleColumns,
+        description: description,
+        showDescription: showDescription
       }, { merge: true });
 
       const topLevelPublicPageRef = doc(db, 'publicPages', id);
@@ -125,6 +144,7 @@ export default function PubPageSettingDetail() {
         updatedAt: new Date()
       }, { merge: true });
 
+      setHasUnsavedChanges(false);
       setMessageInfo({ type: 'success', message: '公開ページを更新しました' });
     } catch (error) {
       console.error('Error saving public page:', error);
@@ -167,7 +187,17 @@ export default function PubPageSettingDetail() {
     setIsEditingTitle(false);
     const newListInfo = { ...listInfo, name: editedTitle };
     setListInfo(newListInfo);
-    await handleSave();
+    setHasUnsavedChanges(true);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+    setHasUnsavedChanges(true);
+  };
+
+  const toggleShowDescription = () => {
+    setShowDescription(!showDescription);
+    setHasUnsavedChanges(true);
   };
 
   const columnOrder = [
@@ -252,9 +282,9 @@ export default function PubPageSettingDetail() {
 
         {/* 公開URL */}
         <div className="bg-gray-50 p-4 rounded shadow-sm space-y-2">
-          <p className="font-semibold">公開ページURL:</p>
+          <p className="font-semibold">公開ページURL</p>
           <p className="text-sm text-gray-600">
-            下記のURLを共有すると、リスナーがこの公開ページを見ることができます。
+            下記のURLを共有すると、リスナーがの公開ページを見ることができます。
           </p>
           <div className="flex items-center gap-2">
             <input
@@ -273,6 +303,37 @@ export default function PubPageSettingDetail() {
           </div>
         </div>
 
+        {/* 説明欄設定 - タイトル編集の下に追加 */}
+        <div className="bg-white p-4 rounded shadow-sm space-y-2">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">説明文</h3>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">表示する</span>
+              <button
+                onClick={toggleShowDescription}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  showDescription ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    showDescription ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600">
+            公開ページに説明文を表示することができます。
+          </p>
+          <textarea
+            value={description}
+            onChange={handleDescriptionChange}
+            placeholder="リスナーに向けた説明文を入力してください"
+            className="w-full h-32 p-2 border rounded focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
         {/* 絞り込みフォーム */}
         <div className="bg-white p-4 rounded shadow-sm">
           <h3 className="text-xl font-bold mb-4">公開する曲を絞り込む</h3>
@@ -283,7 +344,7 @@ export default function PubPageSettingDetail() {
             currentUser={currentUser}
             handleSearchResults={handleSearchResults}
             searchCriteria={searchCriteria}
-            setSearchCriteria={setSearchCriteria}
+            setSearchCriteria={handleSearchCriteriaChange}
             isRandomSetlist={false}
             triggerSearch={triggerSearch}
           />
@@ -318,6 +379,20 @@ export default function PubPageSettingDetail() {
           />
         </div>
       </div>
+      {hasUnsavedChanges && (
+        <div className={`fixed bottom-0 left-0 right-0 bg-customTheme-${theme}-secondary p-4 shadow-lg border-t border-customTheme-${theme}-primary flex justify-between items-center`}>
+          <div className={`text-customTheme-${theme}-primary`}>
+            <span className="font-bold text-gray-700">未保存の変更があります。</span>
+            <span className="ml-2 text-gray-700">変更を保存するには「公開ページを保存」ボタンを押してください。</span>
+          </div>
+          <button
+            onClick={handleSave}
+            className={`bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-accent transition-colors`}
+          >
+            公開ページを保存
+          </button>
+        </div>
+      )}
     </Layout>
   );
 }
