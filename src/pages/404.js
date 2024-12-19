@@ -12,10 +12,11 @@ export default function Custom404() {
   );
 }
 
-// 静的パスを生成するための新しいメソッド
-export async function getStaticPaths({ locales }) {
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
     return {
-        paths: [], // 空の配列で、すべてのパスを動的に生成
-        fallback: 'blocking' // サーバーサイドでページを生成
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
     };
 }
