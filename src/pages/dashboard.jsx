@@ -23,6 +23,8 @@ import Badge from '@/components/Badge'; // 追加（オプション）
 import { useTheme } from '@/context/ThemeContext';
 import Modal from '@/components/Modal';
 import Price from '@/components/Price';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // カラージェネレーター関数（HSLを使用して色相を均等に分散）
@@ -49,6 +51,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { t } = useTranslation('common');
   useEffect(() => {
     const fetchData = async () => {
       if (currentUser) {
@@ -220,5 +223,13 @@ const Dashboard = () => {
 
   );
 };
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}
 
 export default Dashboard;

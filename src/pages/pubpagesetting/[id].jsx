@@ -11,6 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faEdit, faCheck, faTimes, faEye, faEyeSlash, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export default function PubPageSettingDetail() {
   const { currentUser } = useContext(AuthContext);
@@ -318,4 +320,21 @@ export default function PubPageSettingDetail() {
       </div>
     </Layout>
   );
+}
+
+// 静的パスを生成するための新しいメソッド
+export async function getStaticPaths({ locales }) {
+  return {
+      paths: [], // 空の配列で、すべてのパスを動的に生成
+      fallback: 'blocking' // サーバーサイドでページを生成
+  };
+}
+
+export async function getStaticProps({ params, locale }) {
+  return {
+      props: {
+          ...(await serverSideTranslations(locale, ['common'])),
+      },
+      revalidate: 60 // 必要に応じて、ページを再生成する間隔（秒）
+  };
 }

@@ -4,6 +4,9 @@ import { doc, updateDoc, collection, getDocs, setDoc, getDoc } from 'firebase/fi
 import { db } from '@/../firebaseConfig';
 import { useMessage } from '@/context/MessageContext';
 import Layout from '@/pages/layout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 const DatabaseOperation = () => {
     const [userId, setUserId] = useState('');
@@ -81,3 +84,12 @@ const DatabaseOperation = () => {
 };
 
 export default DatabaseOperation;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

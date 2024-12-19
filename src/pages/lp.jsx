@@ -7,6 +7,8 @@ import Image from 'next/image'
 import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, PREMIUM_PLAN_PRICE } from '@/constants'
 import ContactForm from '@/components/ContactForm'
 import Price from '@/components/Price'
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 function Feature({ number, imageSrc, title, description }) {
   return (
@@ -26,6 +28,7 @@ function Feature({ number, imageSrc, title, description }) {
 }
 
 export default function LandingPage() {
+  const { t } = useTranslation('common');
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
@@ -156,7 +159,7 @@ export default function LandingPage() {
                 },
                 {
                   question: 'セットリストの最大曲数は何曲ですか？',
-                  answer: '無料プランでは1つのセットリストにつき最大50曲まで登録可能です。有料プランでは制限なく曲を追加できます。',
+                  answer: '��料プランでは1つのセットリストにつき最大50曲まで登録可能です。有料プランでは制限なく曲を追加できます。',
                 },
                 {
                   question: 'アプリのアップデート頻度はどのくらいですか？',
@@ -220,6 +223,14 @@ export default function LandingPage() {
       </div>
     </>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
 }
 
 // PricingCard Component

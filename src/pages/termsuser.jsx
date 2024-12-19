@@ -1,7 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import NoSidebarLayout from '@/pages/noSidebarLayout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 const TermsOfUse = () => {
+  const { t } = useTranslation('common');
   return (
     <NoSidebarLayout>
 
@@ -37,3 +41,12 @@ const TermsOfUse = () => {
 };
 
 export default TermsOfUse;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

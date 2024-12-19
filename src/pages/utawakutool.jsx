@@ -3,6 +3,9 @@ import H1 from '@/components/ui/h1';
 import { FaMusic, FaRandom, FaRobot } from 'react-icons/fa';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 const ToolCard = ({ title, description, icon: Icon, href, color, isReady }) => {
     return (
@@ -56,3 +59,12 @@ const UtawakuTool = () => {
 }
 
 export default UtawakuTool;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

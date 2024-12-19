@@ -4,6 +4,8 @@ import { AuthContext } from "@/context/AuthContext";
 import { useMessage } from "@/context/MessageContext";
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const EmailAuthentication = () => {
   const router = useRouter();
@@ -40,3 +42,12 @@ const EmailAuthentication = () => {
 };
 
 export default EmailAuthentication;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}

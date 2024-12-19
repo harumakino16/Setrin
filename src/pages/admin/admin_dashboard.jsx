@@ -4,6 +4,9 @@ import { db } from '../../../firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import Link from 'next/link'; // 追加
 import Layout from '@/pages/layout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 const AdminDashboard = () => {
   const [recentActivities, setRecentActivities] = useState([]);
@@ -80,3 +83,12 @@ const AdminDashboard = () => {
 };
 
 export default withAdminAuth(AdminDashboard); 
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

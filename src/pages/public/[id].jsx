@@ -7,6 +7,9 @@ import NoSidebarLayout from '../noSidebarLayout';
 import PublicSongTable from '@/components/PublicSongTable';
 import { convertKanaToHira } from '@/utils/stringUtils';
 import { useMessage } from '@/context/MessageContext';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 export default function PublicSongList() {
   const [songs, setSongs] = useState([]);
@@ -353,4 +356,20 @@ export default function PublicSongList() {
       </div>
     </NoSidebarLayout>
   );
+}
+// 静的パスを生成するための新しいメソッド
+export async function getStaticPaths({ locales }) {
+  return {
+      paths: [], // 空の配列で、すべてのパスを動的に生成
+      fallback: 'blocking' // サーバーサイドでページを生成
+  };
+}
+
+export async function getStaticProps({ params, locale }) {
+  return {
+      props: {
+          ...(await serverSideTranslations(locale, ['common'])),
+      },
+      revalidate: 60 // 必要に応じて、ページを再生成する間隔（秒）
+  };
 }

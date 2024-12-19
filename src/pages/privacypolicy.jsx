@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import NoSidebarLayout from './noSidebarLayout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const PrivacyPolicy = () => {
   return (
@@ -65,3 +67,12 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}

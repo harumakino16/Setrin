@@ -10,6 +10,8 @@ import Loading from '@/components/loading';
 import { useTheme } from '@/context/ThemeContext';
 import Layout from '@/pages/layout';
 import H1 from '@/components/ui/h1';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export default function Setlist() {
   const { currentUser } = useContext(AuthContext);
@@ -21,6 +23,7 @@ export default function Setlist() {
   const { theme } = useTheme();
   const router = useRouter();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const { t } = useTranslation('common');
 
   const handleOpenModal = () => setIsOpen(true);
   const handleCloseModal = () => setIsOpen(false);
@@ -228,4 +231,13 @@ export default function Setlist() {
       </div>
     </Layout>
   );
+}
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
 }

@@ -3,6 +3,9 @@ import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
 import { collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 export default function MigratePublicPages() {
   const { setMessageInfo } = useMessage();
@@ -69,3 +72,12 @@ export default function MigratePublicPages() {
     </div>
   );
 } 
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

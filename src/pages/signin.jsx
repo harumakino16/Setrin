@@ -2,6 +2,9 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { firebaseConfig } from "../../firebaseConfig";
 import { initializeApp } from "firebase/app";
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 function Signin() {
   const [email, setEmail] = useState('');
@@ -43,3 +46,12 @@ function Signin() {
 }
 
 export default Signin;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

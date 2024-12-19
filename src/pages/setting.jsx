@@ -20,6 +20,9 @@ import H1 from '@/components/ui/h1';
 import { handleUpgradePlan } from '@/utils/stripeUtils';
 import Modal from '@/components/Modal';
 import Price from '@/components/Price';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 function Settings() {
     const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
@@ -435,3 +438,12 @@ function Settings() {
 }
 
 export default Settings;
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

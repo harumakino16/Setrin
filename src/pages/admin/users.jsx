@@ -5,6 +5,9 @@ import { collection, getDocs, getCountFromServer, query, limit, startAfter } fro
 import { useMessage } from '@/context/MessageContext';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import Layout from '@/pages/layout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -200,3 +203,12 @@ const ManageUsers = () => {
 };
 
 export default withAdminAuth(ManageUsers);
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+    };
+}

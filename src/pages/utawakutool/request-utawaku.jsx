@@ -11,6 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export default function RequestUtawaku() {
     const { currentUser } = useContext(AuthContext);
@@ -25,6 +27,7 @@ export default function RequestUtawaku() {
     const [pageName, setPageName] = useState('');
     const [publicURL, setPublicURL] = useState('');
     const [ownerUserId, setOwnerUserId] = useState('');
+    const { t } = useTranslation('common');
 
     useEffect(() => {
         if (!currentUser) return;
@@ -316,3 +319,12 @@ export default function RequestUtawaku() {
         </Layout>
     );
 }
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+      props: {
+        ...(await serverSideTranslations(locale, ['common'])),
+      },
+    };
+  }

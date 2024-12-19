@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../../firebaseConfig';
-import { doc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import SetlistTable from '@/components/SetlistTable'; // SongTable コンポーネントをインポート
@@ -20,6 +20,8 @@ import { FREE_PLAN_MAX_YOUTUBE_PLAYLISTS } from '@/constants';
 import { useTheme } from '@/context/ThemeContext';
 import { createPlaylist } from '@/utils/createPlaylist'; // createPlaylist関数をインポート
 import H1 from '@/components/ui/h1';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
@@ -34,6 +36,7 @@ const SetlistDetail = () => {
     const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
     const [showArtist, setShowArtist] = useState(false);
     const { theme } = useTheme();
+    const { t } = useTranslation('common');
 
 
     // visibleColumns の初期値をローカルストレージから取得
@@ -233,6 +236,23 @@ const SetlistDetail = () => {
         </Layout>
     );
 };
+
+// 静的パスを生成するための新しいメソッド
+export async function getStaticPaths({ locales }) {
+    return {
+        paths: [], // 空の配列で、すべてのパスを動的に生成
+        fallback: 'blocking' // サーバーサイドでページを生成
+    };
+}
+
+export async function getStaticProps({ params, locale }) {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
+        revalidate: 60 // 必要に応じて、ページを再生成する間隔（秒）
+    };
+}
 
 export default SetlistDetail;
 

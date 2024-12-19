@@ -14,6 +14,9 @@ import Price from '@/components/Price';
 import Modal from '@/components/Modal';
 import { getCountFromServer } from 'firebase/firestore';
 import { FREE_PLAN_MAX_PUBLIC_PAGES, PREMIUM_PLAN_MAX_PUBLIC_PAGES } from '@/constants';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 
 export default function PubPageSetting() {
     const { currentUser } = useContext(AuthContext);
@@ -233,3 +236,12 @@ export default function PubPageSetting() {
         </Layout>
     );
 }
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+    return {
+      props: {
+        ...(await serverSideTranslations(locale, ['common'])),
+      },
+    };
+  }
