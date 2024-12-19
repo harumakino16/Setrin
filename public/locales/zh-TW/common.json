@@ -1,6 +1,6 @@
 {
-    "welcome": "歡迎",
-    "description": "這是一個使用Next.js和next-i18next的應用程式。",
+    "welcome": "Setlink歡迎",
+    "description": "讓歌唱直播更有趣、更便利",
     "menu": "選單",
     "songList": "曲目列表",
     "setlist": "曲目清單",
