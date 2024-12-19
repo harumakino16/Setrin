@@ -163,7 +163,7 @@ const Dashboard = () => {
                 value={userData.publicPagesCount ? userData.publicPagesCount : 0}
                 limit={currentUser.plan === 'free' ? FREE_PLAN_MAX_PUBLIC_PAGES: PREMIUM_PLAN_MAX_PUBLIC_PAGES}
               />
-              {currentUser.plan === 'free' && (
+              {currentUser.plan === 'premium' && (
                 <div className={`p-2 mb-6 bg-customTheme-${theme}-secondary border border-customTheme-${theme}-primary rounded flex justify-between items-center`}>
                   <p className="text-gray-600 text-sm">プレミアムプランにアップグレードすると容量が大幅にアップします</p>
                   <button className={`px-4 py-2 bg-customTheme-${theme}-primary text-white rounded`} onClick={() => setIsModalOpen(true)}>アップグレード</button>

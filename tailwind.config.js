@@ -91,7 +91,7 @@ module.exports = {
           },
           black: {
             primary: '#1D2129',
-            secondary: '#333333',
+            secondary: '#dbdbdb',
             accent: '#666666'
           }
         }
@@ -120,7 +120,7 @@ module.exports = {
   plugins: [require("tailwindcss-animate")],
   safelist: [
     {
-      pattern: /^(bg|border|text)-customTheme-(pink|blue|yellow|green|orange|purple)-(primary|secondary|accent)$/,
+      pattern: /^(bg|border|text)-customTheme-(pink|blue|yellow|green|orange|purple|black)-(primary|secondary|accent)$/,
       variants: ['hover'],
     }
   ],

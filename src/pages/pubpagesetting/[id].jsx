@@ -387,7 +387,7 @@ export default function PubPageSettingDetail() {
           </div>
           <button
             onClick={handleSave}
-            className={`bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-accent transition-colors`}
+            className={`bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-primary transition-colors`}
           >
             公開ページを保存
           </button>
