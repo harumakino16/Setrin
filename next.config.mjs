@@ -1,3 +1,6 @@
+import pkg from './next-i18next.config.js';
+const { i18n } = pkg;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -10,6 +13,7 @@ const nextConfig = {
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
     FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
   },
+  i18n, // ここでi18n設定を適用する
 };
 
 export default nextConfig;

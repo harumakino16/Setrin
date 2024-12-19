@@ -21,6 +21,8 @@ import LoginForm from "@/components/LoginForm";
 import Layout from "@/pages/layout";
 import NoSidebarLayout from "./noSidebarLayout";
 import { exportToCSV } from '../utils/csvUtils'; // 新しいファイルからインポート
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -41,6 +43,7 @@ export default function Home() {
   const { setMessageInfo } = useMessage();
   const [tableData, setTableData] = useState([]);
   const { theme } = useTheme();
+  const { t } = useTranslation('common');
 
   // 初期状態では、全曲をテーブルに表示
   useEffect(() => {
@@ -240,8 +243,8 @@ export default function Home() {
       <NoSidebarLayout>
         <div className="flex flex-col min-h-screen">
           <div className="flex-grow flex flex-col items-center justify-center p-6">
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-6">Setlinkへようこそ</h1>
-            <p className="text-xl mb-8 text-center md:text-left">歌枠をもっと楽しく、もっと便利に</p>
+            <h1 className="text-3xl md:text-5xl font-extrabold mb-6">{t('welcome')}</h1>
+            <p className="text-xl mb-8 text-center md:text-left">{t('description')}</p>
             <LoginForm />
           </div>
           <div className="bg-white bg-opacity-20 rounded-t-3xl p-8 text-left backdrop-filter backdrop-blur-lg">
@@ -345,4 +348,13 @@ export default function Home() {
       </div>
     </Layout>
   );
+}
+
+// ページで翻訳データを取得する部分
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
 }

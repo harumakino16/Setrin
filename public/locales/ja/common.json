@@ -1,0 +1,13 @@
+{
+  "welcome": "Setlinkへようこそ",
+  "description": "Setlinkは、シングリストを作成、管理、共有するためのサービスです。",
+  "menu": "メニュー",
+  "songList": "曲リスト",
+  "setlist": "セットリスト",
+  "publicListManagement": "公開リスト管理",
+  "singingTool": "歌枠ツール",
+  "dashboard": "ダッシュボード",
+  "settings": "設定",
+  "adminPage": "管理者ページ",
+  "createSetlist": "セトリを作る"
+}

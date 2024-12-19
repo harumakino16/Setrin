@@ -7,6 +7,7 @@ import { Noto_Sans_JP } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css'; // Font Awesome CSSを手動で読み込む
+import { appWithTranslation } from 'next-i18next'; // 追加
 
 config.autoAddCss = false; // CSS自動追加を無効化
 
@@ -15,7 +16,7 @@ const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
 });
 
-export default function App({ Component, pageProps }) {
+function App({ Component, pageProps }) {
   const getLayout = Component.getLayout || ((page) => page);
 
   return (
@@ -33,3 +34,5 @@ export default function App({ Component, pageProps }) {
     </AuthProvider>
   );
 }
+
+export default appWithTranslation(App); // appWithTranslationを適用
