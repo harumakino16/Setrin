@@ -142,13 +142,21 @@ const SetlistDetail = () => {
 
                                 </div>
                                 {currentSongs.length === 0 ? (
-                                    <div className="text-center">
-                                        <p>このセットリストに曲はありません。</p>
+                                    <div className="text-center p-8">
+                                        <p className="mb-4">このセットリストに曲はありません。</p>
+                                        <div className={`bg-customTheme-${theme}-secondary border-l-4 border-customTheme-${theme}-primary text-gray-700 p-4 mb-4`}>
+                                            <p className="font-bold mb-2">曲の追加方法:</p>
+                                            <ol className="text-left list-decimal list-inside">
+                                                <li className="mb-2">トップページの<Link href="/" className="text-blue-500 hover:text-blue-700 underline">曲リスト</Link>から追加したい曲を選択</li>
+                                                <li className="mb-2">「セットリストに追加」ボタンをクリック</li>
+                                                <li>このセットリストを選択</li>
+                                            </ol>
+                                        </div>
                                         <button
                                             onClick={() => router.push('/')}
                                             className={`bg-customTheme-${theme}-primary text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out`}
                                         >
-                                            曲を追加する
+                                            曲リストへ移動
                                         </button>
                                     </div>
                                 ) : (

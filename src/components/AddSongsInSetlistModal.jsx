@@ -70,51 +70,82 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="overflow-y-auto p-4 md:p-8">
-                <h2 className="text-2xl font-bold mb-4">セットリストに曲を追加</h2>
+            <div className={`overflow-y-auto p-6 max-w-2xl mx-auto ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                <h2 className="text-2xl font-bold mb-6 pb-2 border-b">セットリストに曲を追加</h2>
+                
                 {setlists.length > 0 && (
-                    <>
-                        <ul className="space-y-4">
+                    <div className="mb-8">
+                        <h3 className="text-lg font-semibold mb-4">既存のセットリスト</h3>
+                        <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
                             {setlists.map(setlist => (
-                                <li key={setlist.id}>
-                                    <label className="flex items-center">
-                                        <input type="checkbox" className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300" checked={selectedSetlists.includes(setlist.id)} onChange={() => handleCheckboxChange(setlist.id)} />
-                                        <span className="ml-2">{setlist.name}</span>
+                                <li key={setlist.id} 
+                                    className={`p-3 rounded-lg transition-all duration-200 ${
+                                        selectedSetlists.includes(setlist.id) 
+                                            ? 'bg-blue-50 dark:bg-blue-900/30' 
+                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                                    }`}
+                                >
+                                    <label className="flex items-center cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            className="w-5 h-5 rounded-md text-blue-600 border-gray-300 focus:ring-blue-500 transition-all duration-200" 
+                                            checked={selectedSetlists.includes(setlist.id)} 
+                                            onChange={() => handleCheckboxChange(setlist.id)} 
+                                        />
+                                        <span className="ml-3 font-medium">{setlist.name}</span>
                                     </label>
                                 </li>
                             ))}
                         </ul>
-                        <div className="mt-4">
-                            <button
-                                className={`flex items-center justify-center w-full p-2 mt-4 rounded ${selectedSetlists.length === 0 ? 'bg-gray-300' : 'bg-blue-500 hover:bg-blue-600 text-white font-bold'}`}
-                                onClick={selectedSetlists.length === 0 ? undefined : handleAddSongsToSetlists}
-                                disabled={selectedSetlists.length === 0}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        
+                        <button
+                            className={`w-full mt-4 px-6 py-3 rounded-lg transition-all duration-200 ${
+                                selectedSetlists.length === 0 
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800' 
+                                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                            }`}
+                            onClick={selectedSetlists.length === 0 ? undefined : handleAddSongsToSetlists}
+                            disabled={selectedSetlists.length === 0}
+                        >
+                            <div className="flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
-                                既存のセットリストに追加
-                            </button>
-                        </div>
-                    </>
+                                選択したセットリストに追加
+                            </div>
+                        </button>
+                    </div>
                 )}
-                <div className="mt-4">
-                    <h2 className="text-xl font-bold mb-4">新しいセットリストを作成</h2>
+
+                <div className="pt-6 border-t">
+                    <h3 className="text-lg font-semibold mb-4">新しいセットリストを作成</h3>
                     <input
                         type="text"
                         value={newSetlistName}
                         onChange={(e) => setNewSetlistName(e.target.value)}
                         placeholder="セットリスト名を入力"
-                        className="border p-2 rounded w-full mb-4"
+                        className={`w-full px-4 py-3 rounded-lg border ${
+                            theme === 'dark' 
+                                ? 'bg-gray-800 border-gray-700 text-white' 
+                                : 'bg-white border-gray-300'
+                        } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200`}
                     />
+                    
                     <button
-                        className="flex items-center justify-center w-full p-2 mt-4 rounded bg-green-500 hover:bg-green-600 text-white font-bold"
+                        className={`w-full mt-4 px-6 py-3 rounded-lg transition-all duration-200 ${
+                            newSetlistName.trim() === '' 
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800' 
+                                : 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
+                        }`}
                         onClick={handleCreateAndAddSongsToNewSetlist}
+                        disabled={newSetlistName.trim() === ''}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        新しいセットリストを作成
+                        <div className="flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            新規セットリストを作成
+                        </div>
                     </button>
                 </div>
             </div>
