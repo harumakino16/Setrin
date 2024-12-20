@@ -38,3 +38,6 @@ next-env.d.ts
 
 # temporary files
 .tmp.driveupload
+.tmp.drivedownload
+.tmp.driveupload.json
+.tmp.drivedownload.json
