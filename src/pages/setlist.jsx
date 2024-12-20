@@ -90,109 +90,142 @@ export default function Setlist() {
 
   return (
     <Layout>
-      <div className="flex flex-col md:flex-row">
-        <div className="flex-grow p-4 md:p-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <H1>セットリスト</H1>
-            <div>
-              <button onClick={handleOpenModal} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center mb-4 md:mb-0`}>
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col p-4 md:p-8">
+          <H1>セットリスト</H1>
+          <div className="flex justify-end mb-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleOpenModal}
+                className={`
+                  bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent 
+                  text-white font-medium py-2.5 px-4 rounded-lg
+                  transition-all duration-200 ease-in-out
+                  flex items-center justify-center min-w-[200px]
+                  shadow-sm hover:shadow-md
+                `}
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                新しいセットリストを追加
+                新規セットリスト
               </button>
               {selectedSetlists.length > 0 && (
-                <button onClick={handleOpenDeleteConfirmModal} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2 inline-flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button
+                  onClick={handleOpenDeleteConfirmModal}
+                  className="
+                    bg-red-500 hover:bg-red-600 text-white 
+                    font-medium py-2.5 px-4 rounded-lg
+                    transition-all duration-200 ease-in-out
+                    flex items-center justify-center min-w-[200px]
+                    shadow-sm hover:shadow-md
+                  "
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  選択したセットリストを削除
+                  {selectedSetlists.length}件を削除
                 </button>
               )}
             </div>
           </div>
-          <div className="overflow-x-auto">
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
             {loading ? (
-              <Loading />
+              <div className="p-8">
+                <Loading />
+              </div>
             ) : setlists.length === 0 ? (
-              <div className="text-center">
-                <p className="text-gray-500">まだセットリストがありません</p>
-                <button onClick={handleOpenModal} className={`mt-4 bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
-                  新しいセットリストを追加
+              <div className="text-center py-16">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <p className="mt-4 text-gray-500 text-lg">セットリストがありません</p>
+                <button
+                  onClick={handleOpenModal}
+                  className={`
+                    mt-4 bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent 
+                    text-white font-medium py-2.5 px-6 rounded-lg
+                    transition-all duration-200 ease-in-out
+                  `}
+                >
+                  最初のセットリストを作成
                 </button>
               </div>
             ) : (
-              <table className="min-w-full divide-y divide-gray-300 shadow-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-1 md:px-3 py-3 text-left max-w-1">
-                      <input
-                        type="checkbox"
-                        className='w-5 h-5'
-                        onChange={handleSelectAll}
-                        checked={selectedSetlists.length === setlists.length}
-                      />
-                    </th>
-                    <th className="px-1 md:px-3 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                      セットリスト名
-                    </th>
-                    <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                      作成日
-                    </th>
-                    <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                      曲数
-                    </th>
-                    <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {setlists.map((setlist) => (
-                    <tr
-                      className='hover:cursor-pointer hover:bg-gray-100 transition-all'
-                      key={setlist.id}
-                      onClick={() => router.push(`/setlist/${setlist.id}`)}
-                    >
-                      <td className="px-1 md:px-3 py-4 whitespace-nowrap max-w-1">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-3 py-4 text-left">
                         <input
                           type="checkbox"
-                          className='w-5 h-5'
-                          checked={selectedSetlists.includes(setlist.id)}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleSelect(setlist.id);
-                          }}
-                          onClick={(e) => e.stopPropagation()}
+                          className="w-5 h-5 rounded border-gray-300 text-customTheme-${theme}-primary focus:ring-customTheme-${theme}-accent"
+                          onChange={handleSelectAll}
+                          checked={selectedSetlists.length === setlists.length}
                         />
-                      </td>
-                      <td className="px-1 md:px-3 py-4 whitespace-nowrap text-gray-900">
-                        {setlist.name}
-                      </td>
-                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
-                        {setlist.createdAt}
-                      </td>
-                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
-                        {setlist.songIds ? setlist.songIds.length : 0} 曲
-                      </td>
-                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedSetlist(setlist);
-                            setIsEditOpen(true);
-                          }}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          削除
-                        </button>
-                      </td>
+                      </th>
+                      <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        セットリスト名
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        作成日
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        曲数
+                      </th>
+                      <th className="px-6 py-4"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                    {setlists.map((setlist) => (
+                      <tr
+                        key={setlist.id}
+                        onClick={() => router.push(`/setlist/${setlist.id}`)}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 ease-in-out cursor-pointer"
+                      >
+                        <td className="px-1 md:px-3 py-4 whitespace-nowrap max-w-1">
+                          <input
+                            type="checkbox"
+                            className='w-5 h-5'
+                            checked={selectedSetlists.includes(setlist.id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleSelect(setlist.id);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </td>
+                        <td className="px-1 md:px-3 py-4 whitespace-nowrap text-gray-900">
+                          {setlist.name}
+                        </td>
+                        <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
+                          {setlist.createdAt}
+                        </td>
+                        <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900">
+                          {setlist.songIds ? setlist.songIds.length : 0} 曲
+                        </td>
+                        <td className="px-2 md:px-6 py-4 whitespace-nowrap text-gray-900 text-right">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedSetlist(setlist);
+                              setIsEditOpen(true);
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            削除
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>
+
         {isOpen && <SetlistNameModal isOpen={isOpen} onClose={handleCloseModal} />}
         {isEditOpen && (
           <Modal isOpen={isEditOpen} onClose={handleCloseEditModal}>

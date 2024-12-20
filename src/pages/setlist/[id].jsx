@@ -22,6 +22,7 @@ import { createPlaylist } from '@/utils/createPlaylist'; // createPlaylist関数
 import H1 from '@/components/ui/h1';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import BackButton from '@/components/BackButton';
 
 const SetlistDetail = () => {
     const [setlist, setSetlist] = useState(null); // スナップショットによるセットリスト
@@ -119,105 +120,140 @@ const SetlistDetail = () => {
 
     return (
         <Layout>
-            <div className="flex">
-                <div className="flex-grow p-5 w-full">
-                    <Link href="/setlist" className="text-indigo-600 hover:text-indigo-900 mt-4">＜セットリスト履歴に戻る</Link>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="py-8">
+                    <BackButton text="セットリスト履歴に戻る" href="/setlist" />
                     <H1>セットリスト詳細</H1>
-                    {loading && (
-                        <Loading />
-                    )}
-                    {setlist && (
-                        <div className="bg-white p-6">
-                            <p className="text-lg">
-                                <strong>名前：</strong>{setlist.name}
-                                <FaPen
-                                    onClick={handleOpenEditModal}
-                                    className="inline ml-2 text-gray-500 cursor-pointer text-sm"
-                                />
-                            </p>
-                            <p className="text-lg"><strong>作成日:</strong> {setlist.createdAt.toDate().toLocaleDateString()}</p>
-                            <p className="text-lg"><strong>曲数:</strong> {setlist.songIds ? setlist.songIds.length : 0}</p>
-                            <div className="mt-4">
-                                <div className="flex justify-between items-center mb-2">
+                    {loading && <Loading />}
 
+                    {setlist && (
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center space-x-4">
+                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                        {setlist.name}
+                                    </h2>
+                                    <button
+                                        onClick={handleOpenEditModal}
+                                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                                    >
+                                        <FaPen className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                {currentSongs.length === 0 ? (
-                                    <div className="text-center p-8">
-                                        <p className="mb-4">このセットリストに曲はありません。</p>
-                                        <div className={`bg-customTheme-${theme}-secondary border-l-4 border-customTheme-${theme}-primary text-gray-700 p-4 mb-4`}>
-                                            <p className="font-bold mb-2">曲の追加方法:</p>
-                                            <ol className="text-left list-decimal list-inside">
-                                                <li className="mb-2">トップページの<Link href="/" className="text-blue-500 hover:text-blue-700 underline">曲リスト</Link>から追加したい曲を選択</li>
-                                                <li className="mb-2">「セットリストに追加」ボタンをクリック</li>
-                                                <li>このセットリストを選択</li>
-                                            </ol>
-                                        </div>
+                                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                    <span>作成日: {setlist.createdAt.toDate().toLocaleDateString()}</span>
+                                    <span>•</span>
+                                    <span>曲数: {setlist.songIds ? setlist.songIds.length : 0}</span>
+                                </div>
+                            </div>
+
+                            {currentSongs.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <div className="mx-auto w-24 h-24 mb-4">
+                                        <svg className="w-full h-full text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                                        このセットリストに曲はありません
+                                    </h3>
+                                    <div className={`bg-customTheme-${theme}-secondary/10 rounded-lg p-6 mb-6 max-w-2xl mx-auto`}>
+                                        <h4 className="font-bold mb-4">曲の追加方法:</h4>
+                                        <ol className="space-y-3 text-left list-decimal list-inside">
+                                            <li>トップページの<Link href="/" className="text-indigo-600 hover:text-indigo-900 underline">曲リスト</Link>から追加したい曲を選択</li>
+                                            <li>「セットリストに追加」ボタンをクリック</li>
+                                            <li>このセットリストを選択</li>
+                                        </ol>
+                                    </div>
+                                    <button
+                                        onClick={() => router.push('/')}
+                                        className={`inline-flex items-center px-6 py-3 bg-customTheme-${theme}-primary text-white rounded-lg hover:opacity-80 transition duration-200`}
+                                    >
+                                        曲リストへ移動
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-center">
                                         <button
-                                            onClick={() => router.push('/')}
-                                            className={`bg-customTheme-${theme}-primary text-white font-bold py-2 px-4 rounded mt-4 transition duration-300 ease-in-out`}
+                                            onClick={() => createPlaylist(currentSongs, setlist.name, currentUser, setMessageInfo, setLoading, router)}
+                                            disabled={!currentUser.youtubeRefreshToken || currentSongs.length === 0}
+                                            className={`inline-flex items-center px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors duration-200
+                                                ${!currentUser.youtubeRefreshToken || currentSongs.length === 0
+                                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                    : 'bg-red-600 text-white hover:bg-red-700'}`}
                                         >
-                                            曲リストへ移動
+                                            <FontAwesomeIcon icon={faYoutube} className="mr-2" />
+                                            YouTubeに再生リストを作成
+                                        </button>
+                                        <button
+                                            onClick={() => setIsColumnSettingsOpen(true)}
+                                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                        >
+                                            <FaPen className="mr-2 w-4 h-4" />
+                                            列の表示設定
                                         </button>
                                     </div>
-                                ) : (
-                                    <div>
-                                        <div className="flex space-x-2 justify-between">
-                                            <button
-                                                onClick={() => createPlaylist(currentSongs, setlist.name, currentUser, setMessageInfo, setLoading, router)}
-                                                disabled={!currentUser.youtubeRefreshToken || currentSongs.length === 0}
-                                                className={`text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out ${!currentUser.youtubeRefreshToken || currentSongs.length === 0 ? ' bg-gray-400 hover:bg-gray-400 cursor-not-allowed disabled' : 'bg-red-500 hover:bg-red-700'}`}
-                                            >
-                                                <FontAwesomeIcon icon={faYoutube} className="mr-2" />
-                                                YouTubeに再生リストを作成
-                                            </button>
-                                            <button
-                                                onClick={() => setIsColumnSettingsOpen(true)}
-                                                className="text-gray-500 py-2 px-4 rounded flex items-center"
-                                            >
-                                                <FaPen className="mr-2" />
-                                                列の表示
-                                            </button>
-                                        </div>
-                                        {!currentUser.youtubeRefreshToken && (
-                                            <Link href="/setting" className="text-blue-600 hover:text-blue-800 ml-4">
-                                                Youtubeとリンクする(設定へ移動)
-                                            </Link>
-                                        )}
-                                        <div className="mt-4">
-                                            <DndProvider backend={HTML5Backend}>
-                                                <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} currentUser={currentUser} setlist={setlist} visibleColumns={visibleColumns} setVisibleColumns={toggleColumnVisibility} />
-                                            </DndProvider>
-                                        </div>
-                                        {currentSongs.length > 0 && (
-                                            <div className="mt-4">
-                                                <div className="flex justify-between mb-2">
-                                                    <p className="text-lg font-bold">曲名一覧(コピー用)</p>
-                                                    <div className="flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            id="showArtist"
-                                                            className="mr-2"
-                                                            onChange={(e) => setShowArtist(e.target.checked)}
-                                                        />
-                                                        <label htmlFor="showArtist" className="text-sm text-gray-500">アーティスト名も表示</label>
-                                                    </div>
+
+                                    {!currentUser.youtubeRefreshToken && (
+                                        <div className="rounded-md bg-yellow-50 p-4">
+                                            <div className="flex">
+                                                <div className="flex-shrink-0">
+                                                    <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
                                                 </div>
-                                                <textarea
-                                                    readOnly
-                                                    className="w-full p-2 border rounded"
-                                                    rows={currentSongs.length}
-                                                    value={currentSongs.map(song => showArtist ? `${song.title} / ${song.artist}` : song.title).join('\n')}
-                                                />
+                                                <div className="ml-3">
+                                                    <Link
+                                                        href="/setting"
+                                                        className="text-sm font-medium text-yellow-800 hover:text-yellow-900"
+                                                    >
+                                                        YouTubeとリンクする（設定へ移動）
+                                                    </Link>
+                                                </div>
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-4">
+                                        <DndProvider backend={HTML5Backend}>
+                                            <SetlistTable currentSongs={currentSongs} setCurrentSongs={setCurrentSongs} currentUser={currentUser} setlist={setlist} visibleColumns={visibleColumns} setVisibleColumns={toggleColumnVisibility} />
+                                        </DndProvider>
                                     </div>
-                                )}
-                            </div>
+
+                                    {currentSongs.length > 0 && (
+                                        <div className="mt-4">
+                                            <div className="flex justify-between mb-2">
+                                                <p className="text-lg font-bold">曲名一覧(コピー用)</p>
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="showArtist"
+                                                        className="mr-2"
+                                                        onChange={(e) => setShowArtist(e.target.checked)}
+                                                    />
+                                                    <label htmlFor="showArtist" className="text-sm text-gray-500">アーティスト名も表示</label>
+                                                </div>
+                                            </div>
+                                            <textarea
+                                                readOnly
+                                                className="w-full p-2 border rounded"
+                                                rows={currentSongs.length}
+                                                value={currentSongs.map(song => showArtist ? `${song.title} / ${song.artist}` : song.title).join('\n')}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
-                    {!setlist && (<div>
-                        <p>再生リストはありません。</p>
-                    </div>)}
+
+                    {!setlist && (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500">セットリストが見つかりませんでした。</p>
+                        </div>
+                    )}
+
                     {isEditOpen && (
                         <EditSetlistNameModal
                             setlist={setlist}

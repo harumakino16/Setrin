@@ -304,132 +304,193 @@ function Settings() {
 
     return (
         <Layout>
-            <div className="flex justify-between items-center p-8 pb-0">
+            <div className="flex justify-between items-center p-8 pb-4 border-b">
                 <H1>設定</H1>
-                <button onClick={handleLogout} className="text-red-500 hover:text-red-700 py-2 px-4 rounded inline-flex items-center">
-                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                    ログアウト
+                <button 
+                    onClick={handleLogout} 
+                    className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors duration-200 py-2 px-4 rounded-lg hover:bg-red-50"
+                >
+                    <FontAwesomeIcon icon={faSignOutAlt} />
+                    <span>ログアウト</span>
                 </button>
             </div>
-            <div className="flex">
-                <div className="flex-grow p-8 pt-0">
-                    <div className='mb-6'>
-                        <div className="mt-8 mb-8">
-                            <label className="block mb-2 text-gray-700">プラン設定:</label>
-                            <div className="bg-white shadow-md rounded px-5 py-3 flex justify-between items-center">
-                                <p className="mr-4">現在のプラン: {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}</p>
-                                {currentUser.plan === 'free' ? (
-                                    <button
-                                        onClick={() => setIsModalOpen(true)}
-                                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        プレミアムプランにアップグレード
-                                    </button>
-                                ) : (
-                                    <div className="flex items-center">
-                                        {cancelAt ? (
-                                            <p className="mr-4">プレミアムプランは {new Date(cancelAt).toLocaleDateString()} に自動解約されます</p>
-                                        ) : (
-                                            <p className="mr-4"></p>
-                                        )}
-                                        <button
-                                            onClick={handleCancelPlan}
-                                            className="text-red-500 hover:text-red-700 py-2 px-4 rounded"
-                                        >
-                                            プレミアムプランをキャンセル
-                                        </button>
-                                    </div>
+
+            <div className="max-w-4xl mx-auto p-8">
+                <section className="mb-12">
+                    <h2 className="text-xl font-bold mb-4">プラン設定</h2>
+                    <div className="bg-white shadow-lg rounded-lg p-6">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div>
+                                <p className="text-lg font-medium">
+                                    現在のプラン: 
+                                    <span className={`ml-2 ${currentUser.plan === 'premium' ? 'text-green-600' : 'text-gray-600'}`}>
+                                        {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}
+                                    </span>
+                                </p>
+                                {cancelAt && (
+                                    <p className="text-sm text-gray-600">
+                                        プレミアムプランは {new Date(cancelAt).toLocaleDateString()} に自動解約されます
+                                    </p>
                                 )}
                             </div>
+                            {currentUser.plan === 'premium' ? (
+                                <button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+                                >
+                                    プレミアムプランにアップグレード
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleCancelPlan}
+                                    className="text-red-500 hover:text-red-700 py-2 px-4 rounded-lg border border-red-500 hover:bg-red-50 transition-colors duration-200"
+                                >
+                                    プレミアムプランをキャンセル
+                                </button>
+                            )}
                         </div>
-                        <div className="mb-6">
-                            <label className="block mb-2 text-gray-700">メールアドレス:</label>
-                            <input type="email" className="border p-2 rounded w-full shadow-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                </section>
+
+                <section className="mb-12">
+                    <h2 className="text-xl font-bold mb-4">プロフィール設定</h2>
+                    <div className="bg-white shadow-lg rounded-lg p-6 space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">メールアドレス</label>
+                            <input 
+                                type="email" 
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                            />
                         </div>
-                        <div className="mb-6">
-                            <label className="block mb-2 text-gray-700">表示名:</label>
-                            <input type="text" className="border p-2 rounded w-full shadow-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">表示名</label>
+                            <input 
+                                type="text" 
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                value={displayName} 
+                                onChange={(e) => setDisplayName(e.target.value)} 
+                            />
                         </div>
-                        <div className="mb-6">
-                            <label className="block mb-2 text-gray-700">テーマカラー:</label>
-                            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                                {[
-                                    { name: 'blue', label: '水色', color: 'bg-customTheme-blue-primary' },
-                                    { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
-                                    { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
-                                    { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
-                                    { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
-                                    { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' },
-                                    { name: 'black', label: '黒', color: 'bg-customTheme-black-primary' }
-                                ].map((theme) => (
-                                    <button
-                                        key={theme.name}
-                                        onClick={() => setSelectedTheme(theme.name)}
-                                        className={`h-20 rounded-lg transition-transform ${theme.color} ${selectedTheme === theme.name ? 'ring-4 ring-offset-2 ring-blue-500 scale-105' : ''
-                                            }`}
-                                    >
-                                        <span className="block text-center text-sm mt-2 text-white">{theme.label}</span>
-                                    </button>
-                                ))}
-                            </div>
+                    </div>
+                </section>
+
+                <section className="mb-12">
+                    <h2 className="text-xl font-bold mb-4">テーマ設定</h2>
+                    <div className="bg-white shadow-lg rounded-lg p-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[
+                                { name: 'blue', label: '水色', color: 'bg-customTheme-blue-primary' },
+                                { name: 'pink', label: 'ピンク', color: 'bg-customTheme-pink-primary' },
+                                { name: 'yellow', label: '黄色', color: 'bg-customTheme-yellow-primary' },
+                                { name: 'green', label: '緑', color: 'bg-customTheme-green-primary' },
+                                { name: 'orange', label: 'オレンジ', color: 'bg-customTheme-orange-primary' },
+                                { name: 'purple', label: '紫', color: 'bg-customTheme-purple-primary' },
+                                { name: 'black', label: '黒', color: 'bg-customTheme-black-primary' }
+                            ].map((theme) => (
+                                <button
+                                    key={theme.name}
+                                    onClick={() => setSelectedTheme(theme.name)}
+                                    className={`
+                                        relative h-24 rounded-xl transition-all duration-200 
+                                        ${theme.color} 
+                                        ${selectedTheme === theme.name ? 'ring-4 ring-offset-2 ring-blue-500 scale-105' : 'hover:scale-105'}
+                                    `}
+                                >
+                                    <span className="absolute inset-0 flex items-center justify-center text-white font-medium">
+                                        {theme.label}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
-                        <label className="block mb-2 text-gray-700">Youtubeとの連携:</label>
-                        <div className="bg-white shadow-md rounded px-5 py-3 flex flex-col md:flex-row justify-between items-center">
-                            <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-                                <div className="flex items-center gap-4">
-                                    <Image src={youtubeIcon} alt="Youtubeに接続" width={50} priority={true} />
-                                    <div className="flex flex-col">
-                                        {currentUser.youtubeRefreshToken ? (
-                                            <div className="flex items-center">
-                                                <svg className="w-4 h-4 text-green-500 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path d="M5 13l4 4L19 7"></path>
-                                                </svg>
-                                                <label className="text-green-500 font-bold">連携中</label>
-                                            </div>
-                                        ) : (
-                                            <label className="text-red-500">未連携</label>
-                                        )}
-                                        <div className="text-gray-700 text-sm">
-                                            Youtubeと連携することで作成したセットリストをYoutubeの再生リストに追加することができます。
+                    </div>
+                </section>
+
+                <section className="mb-12">
+                    <h2 className="text-xl font-bold mb-4">YouTube連携</h2>
+                    <div className="bg-white shadow-lg rounded-lg p-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4">
+                                <Image 
+                                    src={youtubeIcon} 
+                                    alt="YouTube" 
+                                    width={50} 
+                                    className="rounded-lg"
+                                    priority={true} 
+                                />
+                                <div>
+                                    {currentUser.youtubeRefreshToken ? (
+                                        <div className="flex items-center mb-2">
+                                            <svg className="w-5 h-5 text-green-500 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            <span className="text-green-600 font-medium">連携中</span>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <p className="text-red-500 font-medium mb-2">未連携</p>
+                                    )}
+                                    <p className="text-sm text-gray-600">
+                                        YouTubeと連携してセットリストを再生リストとして活用できます
+                                    </p>
                                 </div>
                             </div>
                             {currentUser.youtubeRefreshToken ? (
-                                <button onClick={handleUnlinkYoutube} className="mt-4 md:mt-0 block text-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                    解除する
+                                <button 
+                                    onClick={handleUnlinkYoutube}
+                                    className="whitespace-nowrap px-6 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors duration-200"
+                                >
+                                    連携を解除
                                 </button>
                             ) : (
-                                <a href={authUrl} className="mt-4 md:mt-0 block text-center">
-                                    <Image src={googleIcon} alt="Youtubeに接続" width={180} priority={true} />
+                                <a 
+                                    href={authUrl}
+                                    className="transform hover:scale-105 transition-transform duration-200"
+                                >
+                                    <Image 
+                                        src={googleIcon} 
+                                        alt="YouTubeに接続" 
+                                        width={180} 
+                                        priority={true} 
+                                    />
                                 </a>
                             )}
                         </div>
+                    </div>
+                </section>
 
-                    </div>
-                   
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <button onClick={() => setIsAccordionOpen(!isAccordionOpen)} className="text-black py-2 px-4 rounded text-sm flex items-center">
-                                <FontAwesomeIcon icon={isAccordionOpen ? faChevronUp : faChevronDown} className="mr-2" />
-                                その他の機能
-                            </button>
-                            {isAccordionOpen && (
-                                <div className="mt-2">
-                                    <button onClick={handleDeleteAccount} className="text-red-500 hover:text-red-700 py-2 px-4 rounded">
-                                        アカウントを削除
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <button onClick={handleUpdateProfile} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
-                                更新
-                            </button>
-                        </div>
-                    </div>
+                <div className="flex justify-between items-center pt-4 border-t">
+                    <button 
+                        onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+                        className="text-gray-600 hover:text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2"
+                    >
+                        <FontAwesomeIcon icon={isAccordionOpen ? faChevronUp : faChevronDown} />
+                        その他の機能
+                    </button>
+                    <button 
+                        onClick={handleUpdateProfile}
+                        className={`
+                            bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent 
+                            text-white font-bold py-3 px-8 rounded-lg
+                            transition-all duration-200 transform hover:scale-105
+                        `}
+                    >
+                        設定を保存
+                    </button>
                 </div>
+                
+                {isAccordionOpen && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <button 
+                            onClick={handleDeleteAccount}
+                            className="text-red-500 hover:text-red-700 py-2 px-4 rounded-lg hover:bg-red-50 transition-colors duration-200"
+                        >
+                            アカウントを削除
+                        </button>
+                    </div>
+                )}
             </div>
+
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <Price />
             </Modal>
