@@ -15,11 +15,11 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             const keywordLower = searchCriteria.freeKeyword.toLowerCase();
             const keywordHira = convertKanaToHira(keywordLower);
             songsData = songsData.filter(song =>
-                song.title.toLowerCase().includes(keywordLower) ||
-                song.artist.toLowerCase().includes(keywordLower) ||
-                song.tags && song.tags.some(tag => tag.toLowerCase().includes(keywordLower)) ||
-                song.genre && song.genre.toLowerCase().includes(keywordLower) ||
-                song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower) ||
+                (song.title && song.title.toLowerCase().includes(keywordLower)) ||
+                (song.artist && song.artist.toLowerCase().includes(keywordLower)) ||
+                (song.tags && song.tags.some(tag => tag.toLowerCase().includes(keywordLower))) ||
+                (song.genre && song.genre.toLowerCase().includes(keywordLower)) ||
+                (song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower)) ||
                 (song.memo && song.memo.toLowerCase().includes(keywordLower)) ||
                 (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
@@ -58,20 +58,22 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
         if (searchCriteria.memo) {
             const memoLower = searchCriteria.memo.toLowerCase();
-            songsData = songsData.filter(song => song.memo.toLowerCase().includes(memoLower));
+            songsData = songsData.filter(song => 
+                song.memo && song.memo.toLowerCase().includes(memoLower)
+            );
         }
 
         if (searchCriteria.excludedTags) {
             const excludedTags = searchCriteria.excludedTags.split(',').map(tag => tag.trim().toLowerCase());
             songsData = songsData.filter(song => 
-                !song.tags.some(tag => excludedTags.includes(tag.toLowerCase()))
+                !song.tags || !song.tags.some(tag => excludedTags.includes(tag.toLowerCase()))
             );
         }
 
         if (searchCriteria.excludedGenres) {
             const excludedGenres = searchCriteria.excludedGenres.split(',').map(genre => genre.trim().toLowerCase());
             songsData = songsData.filter(song => 
-                !excludedGenres.includes(song.genre.toLowerCase())
+                !song.genre || !excludedGenres.includes(song.genre.toLowerCase())
             );
         }
 
