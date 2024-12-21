@@ -59,7 +59,7 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
         if (searchCriteria.memo) {
             const memoLower = searchCriteria.memo.toLowerCase();
             songsData = songsData.filter(song => 
-                song.memo && song.memo.toLowerCase().includes(memoLower)
+                song.memo && String(song.memo).toLowerCase().includes(memoLower)
             );
         }
 
