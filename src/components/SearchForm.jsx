@@ -20,7 +20,7 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                 (song.tags && song.tags.some(tag => tag.toLowerCase().includes(keywordLower))) ||
                 (song.genre && song.genre.toLowerCase().includes(keywordLower)) ||
                 (song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower)) ||
-                (song.memo && song.memo.toLowerCase().includes(keywordLower)) ||
+                (song.memo && String(song.memo).toLowerCase().includes(keywordLower)) ||
                 (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
         }
