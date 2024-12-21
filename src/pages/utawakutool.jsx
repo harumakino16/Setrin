@@ -43,7 +43,7 @@ const UtawakuTool = () => {
                     icon={FaRandom}
                     color="purple"
                     href="roulette-utawaku"
-                    isReady={true}
+                    isReady={false}
                 />
                 <ToolCard
                     title="AI歌枠"
