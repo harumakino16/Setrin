@@ -333,7 +333,7 @@ function Settings() {
                                     </p>
                                 )}
                             </div>
-                            {currentUser.plan === 'premium' ? (
+                            {currentUser.plan === 'free' ? (
                                 <button
                                     onClick={() => setIsModalOpen(true)}
                                     className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
