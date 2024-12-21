@@ -11,11 +11,13 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
-  const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const usersPerPage = 20;
-  const { setMessageInfo } = useMessage();
+  const [sortField, setSortField] = useState('createdAt');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [displayUsers, setDisplayUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const usersPerPage = 50;
 
   const [visibleColumns, setVisibleColumns] = useState({
     userId: true,
@@ -26,8 +28,7 @@ const ManageUsers = () => {
     actions: true,
   });
 
-  const [sortField, setSortField] = useState('createdAt');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const { setMessageInfo } = useMessage();
 
   const handleColumnChange = (column) => {
     setVisibleColumns((prev) => ({
@@ -66,35 +67,16 @@ const ManageUsers = () => {
     }
   };
 
-  const fetchUsers = async (isNextPage = false) => {
+  const fetchUsers = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      let usersQuery;
+      const usersQuery = query(
+        collection(db, 'users'),
+        orderBy('createdAt', 'desc')
+      );
       
-      if (sortField === 'createdAt') {
-        usersQuery = query(
-          collection(db, 'users'),
-          orderBy('createdAt', sortDirection),
-          limit(usersPerPage)
-        );
-
-        if (isNextPage && lastVisible) {
-          usersQuery = query(
-            collection(db, 'users'),
-            orderBy('createdAt', sortDirection),
-            startAfter(lastVisible),
-            limit(usersPerPage)
-          );
-        }
-      } else {
-        usersQuery = query(
-          collection(db, 'users'),
-          limit(usersPerPage * (isNextPage ? 2 : 1))
-        );
-      }
-
       const usersSnapshot = await getDocs(usersQuery);
       
       if (usersSnapshot.empty) {
@@ -102,44 +84,50 @@ const ManageUsers = () => {
         return;
       }
 
-      setLastVisible(usersSnapshot.docs[usersSnapshot.docs.length - 1]);
+      const basicUsersList = usersSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        totalSongs: 0,
+        createdAt: doc.data().createdAt ? doc.data().createdAt.toDate() : null
+      }));
 
-      const usersList = await Promise.all(
-        usersSnapshot.docs.map(async (doc) => {
-          const userData = doc.data();
-          try {
-            const songsCollection = collection(db, 'users', doc.id, 'Songs');
-            const songsSnapshot = await getCountFromServer(songsCollection);
-            const totalSongs = songsSnapshot.data().count;
-            return {
-              id: doc.id,
-              ...userData,
-              totalSongs,
-              createdAt: userData.createdAt ? userData.createdAt.toDate() : null
-            };
-          } catch (error) {
-            console.error(`Error fetching songs count for user ${doc.id}:`, error);
-            return {
-              id: doc.id,
-              ...userData,
-              totalSongs: 0,
-              createdAt: userData.createdAt ? userData.createdAt.toDate() : null
-            };
-          }
-        })
-      );
+      setUsers(basicUsersList);
+      
+      const batchSize = 10;
+      for (let i = 0; i < usersSnapshot.docs.length; i += batchSize) {
+        const batch = usersSnapshot.docs.slice(i, i + batchSize);
+        const updatedUsers = await Promise.all(
+          batch.map(async (doc) => {
+            try {
+              const songsCollection = collection(db, 'users', doc.id, 'Songs');
+              const songsSnapshot = await getCountFromServer(songsCollection);
+              return {
+                id: doc.id,
+                totalSongs: songsSnapshot.data().count
+              };
+            } catch (error) {
+              console.error(`Error fetching songs count for user ${doc.id}:`, error);
+              return {
+                id: doc.id,
+                totalSongs: 0
+              };
+            }
+          })
+        );
 
-      let sortedUsers = usersList;
-      if (sortField === 'totalSongs') {
-        sortedUsers.sort((a, b) => {
-          if (sortDirection === 'desc') {
-            return b.totalSongs - a.totalSongs;
-          }
-          return a.totalSongs - b.totalSongs;
+        setUsers(prevUsers => {
+          const newUsers = [...prevUsers];
+          updatedUsers.forEach(update => {
+            const index = newUsers.findIndex(user => user.id === update.id);
+            if (index !== -1) {
+              newUsers[index] = { ...newUsers[index], totalSongs: update.totalSongs };
+            }
+          });
+          return newUsers;
         });
-      }
 
-      setUsers(prevUsers => isNextPage ? [...prevUsers, ...sortedUsers] : sortedUsers);
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       setError('ユーザーデータの取得中にエラーが発生しました。');
@@ -148,6 +136,34 @@ const ManageUsers = () => {
     }
   };
 
+  useEffect(() => {
+    if (users.length === 0) return;
+
+    let sortedUsers = [...users];
+    if (sortField === 'totalSongs') {
+      sortedUsers.sort((a, b) => {
+        return sortDirection === 'desc' ? 
+          b.totalSongs - a.totalSongs : 
+          a.totalSongs - b.totalSongs;
+      });
+    } else {
+      sortedUsers.sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return sortDirection === 'desc' ? 
+          b.createdAt - a.createdAt : 
+          a.createdAt - b.createdAt;
+      });
+    }
+
+    const startIndex = (page - 1) * usersPerPage;
+    const endIndex = startIndex + usersPerPage;
+    setDisplayUsers(sortedUsers.slice(startIndex, endIndex));
+  }, [users, sortField, sortDirection, page]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
@@ -155,16 +171,15 @@ const ManageUsers = () => {
       setSortField(field);
       setSortDirection('desc');
     }
-    setUsers([]);
-    setLastVisible(null);
+    setPage(1);
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, [sortField, sortDirection]);
-
   const handleNextPage = () => {
-    fetchUsers(true);
+    setPage(prev => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    setPage(prev => Math.max(prev - 1, 1));
   };
 
   return (
@@ -221,7 +236,7 @@ const ManageUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {displayUsers.map((user) => (
               <tr key={user.id}>
                 {visibleColumns.userId && <td className="border px-4 py-2">{user.id}</td>}
                 {visibleColumns.email && <td className="border px-4 py-2">{user.email}</td>}
@@ -246,13 +261,23 @@ const ManageUsers = () => {
             ))}
           </tbody>
         </table>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-between mt-4">
           <button
-            onClick={handleNextPage}
-            disabled={loading || !lastVisible}
+            onClick={handlePreviousPage}
+            disabled={page === 1 || loading}
             className="bg-gray-500 text-white px-4 py-2 rounded"
           >
-            さらに読み込む
+            前のページ
+          </button>
+          <span className="px-4 py-2">
+            ページ {page} / {Math.ceil(users.length / usersPerPage)}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={page >= Math.ceil(users.length / usersPerPage) || loading}
+            className="bg-gray-500 text-white px-4 py-2 rounded"
+          >
+            次のページ
           </button>
         </div>
       </div>
