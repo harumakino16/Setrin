@@ -214,10 +214,21 @@ export default function LandingPage() {
         <section className="py-20 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 opacity-50"></div>
           <div className="container mx-auto px-4 text-center relative">
+
             <div className="mb-8 animate-fade-in-up">
               <span className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-6 py-3 rounded-full text-2xl font-semibold shadow-lg">
                 VTuber・配信者のための歌枠総合支援ツール
               </span>
+            </div>
+            <div className="">
+              <Image 
+                src="/images/Setlink_trance (1000 x 300 px).png" 
+                alt="Setlinkロゴ" 
+                width={400} 
+                height={90} 
+                priority={true}
+                className="mx-auto"
+              />
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto">
