@@ -1,7 +1,7 @@
 // components/PublicSongTable.jsx
 import React from 'react';
 
-export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig, extraAction }) {
+export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig, extraAction, originalSongs }) {
   const columnLabels = [
     { key: 'title', label: '曲名' },
     { key: 'artist', label: 'アーティスト' },
@@ -28,6 +28,13 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
 
   return (
     <div className="overflow-x-auto">
+      <div className="flex justify-end mb-2 text-sm text-gray-600">
+        {originalSongs && originalSongs.length !== songs.length ? (
+          <>表示中: {songs.length}曲 / 総曲数: {originalSongs.length}曲</>
+        ) : (
+          <>総曲数: {songs.length}曲</>
+        )}
+      </div>
       <table className="min-w-full whitespace-nowrap divide-y divide-gray-200" style={{ tableLayout: 'fixed' }}>
         <colgroup>
           {columnLabels.map(({ key }) =>

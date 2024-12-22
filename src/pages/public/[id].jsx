@@ -305,6 +305,7 @@ export default function PublicSongList() {
 
         <PublicSongTable
           songs={displaySongs}
+          originalSongs={filteredSongs}
           visibleColumns={userInfo?.visibleColumns}
           onRequestSort={requestSort}
           sortConfig={sortConfig}
