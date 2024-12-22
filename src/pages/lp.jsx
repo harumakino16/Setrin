@@ -404,7 +404,7 @@ export default function LandingPage() {
                 機能紹介
               </span>
               <h2 className="text-4xl font-bold mt-6 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-customTheme-blue-primary to-blue-600">
-                充実の機能で枠配信をサポート
+                充実の機能で歌枠配信をサポート
               </h2>
 
               {/* Vtuber画像を追加 */}
