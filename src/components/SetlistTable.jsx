@@ -234,14 +234,18 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
         )}
         {visibleColumns.title.visible && (
           <td className="border px-4 py-2 max-w-xs">
-            <a
-              href={song.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
-            >
-              <div className="truncate">{song.title}</div>
-            </a>
+            {song.youtubeUrl ? (
+              <a
+                href={song.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                <div className="truncate">{song.title}</div>
+              </a>
+            ) : (
+              <div className="truncate text-black">{song.title}</div>
+            )}
           </td>
         )}
         {visibleColumns.artist.visible && (

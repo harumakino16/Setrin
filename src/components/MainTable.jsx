@@ -29,7 +29,7 @@ function MainTable({
   const recordsPerPage = 30;
   const [currentPage, setCurrentPage] = useState(1);
   const [currentSongs, setCurrentSongs] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'descending' });
   const paginate = pageNumber => setCurrentPage(pageNumber);
   const [contextMenu, setContextMenu] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
@@ -40,17 +40,7 @@ function MainTable({
   const [resizing, setResizing] = useState({ isResizing: false, index: null, startX: 0, startWidth: 0 });
 
   const getInitialVisibleColumns = () => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('mainTableVisibleColumns');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (error) {
-          console.error('Error parsing visibleColumns from localStorage:', error);
-        }
-      }
-    }
-    return {
+    const defaultColumns = {
       title: { label: '曲名', visible: true, removable: true },
       artist: { label: 'アーティスト', visible: true, removable: true },
       genre: { label: 'ジャンル', visible: true, removable: true },
@@ -58,9 +48,25 @@ function MainTable({
       youtubeUrl: { label: 'YouTube', visible: true, removable: true },
       singingCount: { label: '歌唱回数', visible: true, removable: true },
       skillLevel: { label: '熟練度', visible: true, removable: true },
+      createdAt: { label: '追加日', visible: true, removable: true },
       memo: { label: '備考', visible: true, removable: true },
       actions: { label: '操作', visible: true, removable: true }
     };
+
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mainTableVisibleColumns');
+      if (saved) {
+        try {
+          const parsedColumns = JSON.parse(saved);
+          // 新しいカラムがLocalStorageに存在しない場合、デフォルト値をマージする
+          return { ...defaultColumns, ...parsedColumns };
+        } catch (error) {
+          console.error('Error parsing visibleColumns from localStorage:', error);
+          return defaultColumns;
+        }
+      }
+    }
+    return defaultColumns;
   };
 
   const [visibleColumns, setVisibleColumns] = useState(getInitialVisibleColumns);
@@ -335,6 +341,17 @@ function MainTable({
                   )}
                   {visibleColumns.skillLevel.visible && (
                     <td className="px-6 py-4 whitespace-nowrap">{song.skillLevel}</td>
+                  )}
+                  {visibleColumns.createdAt.visible && (
+                    <td className="px-6 py-4 whitespace-nowrap text-xs">
+                      {song.createdAt ? new Date(song.createdAt.seconds * 1000).toLocaleString('ja-JP', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }) : '未設定'}
+                    </td>
                   )}
                   {visibleColumns.memo.visible && (
                     <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.memo}</td>

@@ -24,7 +24,7 @@ export default function PublicSongList() {
 
   const [userKeyword, setUserKeyword] = useState('');
 
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'ascending' });
 
   const router = useRouter();
   const { id } = router.query;
@@ -190,7 +190,8 @@ export default function PublicSongList() {
 
   useEffect(() => {
     if (!userKeyword) {
-      setDisplaySongs(filteredSongs);
+      const sorted = sortSongs(filteredSongs, sortConfig.key, sortConfig.direction);
+      setDisplaySongs(sorted);
     } else {
       const kw = userKeyword.toLowerCase();
       const hiraKw = convertKanaToHira(kw);
@@ -203,9 +204,10 @@ export default function PublicSongList() {
         (song.memo && song.memo.toLowerCase().includes(kw)) ||
         (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(hiraKw))
       );
-      setDisplaySongs(furtherFiltered);
+      const sorted = sortSongs(furtherFiltered, sortConfig.key, sortConfig.direction);
+      setDisplaySongs(sorted);
     }
-  }, [userKeyword, filteredSongs]);
+  }, [userKeyword, filteredSongs, sortConfig]);
 
   const sortSongs = (songs, key, direction) => {
     return [...songs].sort((a, b) => {

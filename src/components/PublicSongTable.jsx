@@ -1,7 +1,7 @@
 // components/PublicSongTable.jsx
 import React from 'react';
 
-export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig, extraAction, originalSongs }) {
+export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig = { key: 'title', direction: 'ascending' }, extraAction, originalSongs }) {
   const columnLabels = [
     { key: 'title', label: '曲名' },
     { key: 'artist', label: 'アーティスト' },
