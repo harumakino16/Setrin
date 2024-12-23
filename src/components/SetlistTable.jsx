@@ -5,10 +5,12 @@ import { doc, getDoc, updateDoc, writeBatch, increment } from 'firebase/firestor
 import { useMessage } from "@/context/MessageContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '@/context/ThemeContext';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, visibleColumns, setVisibleColumns }) => {
   const [isDragged, setIsDragged] = useState(false);
   const { setMessageInfo } = useMessage();
+  const { theme } = useTheme();
 
   const [columnWidths, setColumnWidths] = useState({});
   const tableRef = useRef(null);
@@ -434,18 +436,18 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
         </tbody>
       </table>
       {isDragged && (
-        <button
-          onClick={onSave}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '50%',
-            transform: 'translateX(50%)',
-          }}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-40 rounded"
-        >
-          変更を保存する
-        </button>
+        <div className={`fixed bottom-0 left-0 right-0 bg-customTheme-${theme}-secondary p-4 shadow-lg border-t border-customTheme-${theme}-primary flex justify-between items-center`}>
+          <div className="text-customTheme-${theme}-primary">
+            <span className="font-bold">未保存の変更があります。</span>
+            <span className="ml-2">変更を保存するには「変更を保存」ボタンを押してください。</span>
+          </div>
+          <button
+            onClick={onSave}
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
+          >
+            変更を保存
+          </button>
+        </div>
       )}
     </div>
   );
