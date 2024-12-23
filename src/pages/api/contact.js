@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import { db } from '@/../firebaseConfig'; // Firebaseの設定ファイルをインポート
+import { db } from '@/../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
+import { sendContactEmail } from '@/utils/mailer';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -11,23 +11,8 @@ export default async function handler(req, res) {
     }
 
     try {
-      // メール送信の設定
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER, // 環境変数に設定したメールアドレス
-          pass: process.env.EMAIL_PASS, // 環境変数に設定したメールパスワード
-        },
-      });
-
-      const mailOptions = {
-        from: 'Setlink <px.studio.2020@gmail.com>',
-        to: 'px.studio.2020@gmail.com', // 受信者のメールアドレス
-        subject: `Setlinkからのお問い合わせ: ${subject}`,
-        text: `Setlinkからのお問い合わせ\n\n名前: ${name}\nメール: ${email}\nメッセージ: ${message}`,
-      };
-
-      await transporter.sendMail(mailOptions);
+      // メール送信
+      await sendContactEmail({ name, email, subject, message });
 
       // Firestoreにデータを保存
       const contactRef = collection(db, 'contacts');
