@@ -53,8 +53,15 @@ export async function createPlaylist(songs, setlistName, currentUser, setMessage
         });
 
         if (!refreshTokenResponse.ok) {
-            setMessageInfo({ message: 'エラー：再生リストの作成中にエラーが発生しました', type: 'error' });
-            throw new Error('Failed to refresh access token');
+            setMessageInfo({ 
+                message: 'YouTubeとの連携が切れています。設定ページでYouTubeアカウントを再連携してください。', 
+                type: 'error' 
+            });
+            if (confirm('YouTubeとの連携を再設定する必要があります。設定ページに移動しますか？')) {
+                router.push('/setting');
+                return;
+            }
+            throw new Error('YouTubeとの連携が切れています。設定ページでYouTubeアカウントを再連携してください。');
         }
 
         const { accessToken } = await refreshTokenResponse.json();
