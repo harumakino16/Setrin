@@ -13,6 +13,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Loading from '@/components/loading';
 
 export default function PubPageSettingDetail() {
   const { currentUser } = useContext(AuthContext);
@@ -215,7 +216,7 @@ export default function PubPageSettingDetail() {
     router.push('/pubpagesetting');
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
 
   return (
     <Layout>

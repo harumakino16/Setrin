@@ -5,7 +5,6 @@ import { AuthContext } from '../context/AuthContext';
 
 const useSetlists = () => {
   const [setlists, setSetlists] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -26,20 +25,16 @@ const useSetlists = () => {
             };
           });
           setSetlists(fetchedSetlists);
-          
-          
+
+
         }
-        setLoading(false);
-      }, error => {
-        
-        setLoading(false);
       });
 
       return () => unsubscribe();
     }
   }, [currentUser]);
 
-  return { setlists, loading };
+  return { setlists };
 };
 
 export default useSetlists;

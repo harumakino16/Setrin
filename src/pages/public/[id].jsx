@@ -10,6 +10,7 @@ import { useMessage } from '@/context/MessageContext';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { FaSearch } from 'react-icons/fa';
+import Loading from '@/components/loading';
 
 
 export default function PublicSongList() {
@@ -273,7 +274,7 @@ export default function PublicSongList() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
 
   const requestMode = userInfo?.requestMode || false;
 

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { db } from '@/../firebaseConfig';
 import { AuthContext } from "@/context/AuthContext";
+import Loading from '@/components/loading';
 
 const SongsContext = createContext();
 
@@ -36,7 +37,7 @@ export const SongsProvider = ({ children }) => {
     }, [currentUser]); // currentUserが変更された時にも効果を再実行
 
     if (loading) {
-        return <div>Loading...</div>; // ローディング中の表示
+        return <Loading />; // ローディング中の表示
     }
 
     return (
