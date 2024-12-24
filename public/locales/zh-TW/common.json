@@ -9,5 +9,32 @@
     "dashboard": "數據分析",
     "settings": "設定",
     "adminPage": "管理者頁面",
-    "createSetlist": "創建曲目清單"
-}
+    "createSetlist": "創建曲目清單",
+    
+    "songDeletedSetlistUpdated": "曲目已刪除，曲目清單已更新。",
+    "songDeletionFailed": "刪除曲目失敗。",
+    "selectedSongsDeletedSetlistUpdated": "所選曲目已刪除，曲目清單已更新。",
+    "freePlanUpToMaxSongsUpgradeConfirm": "免費方案可添加 {{FREE_PLAN_MAX_SONGS}} 首歌曲。是否升級為付費方案？",
+    "countSelectedItems": "已選擇 {{count}} 項",
+    "addToSetlist": "添加至曲目清單",
+    "bulkEdit": "批量編輯",
+    "deleteMultiple": "批量刪除",
+    "addSong": "新增曲目",
+    "showColumns": "顯示欄位",
+    "exportButton": "匯出",
+    "bulkEditCompleted": "批量編輯完成",
+    "columnSongTitle": "曲目名稱",
+    "columnFurigana": "假名標註",
+    "columnArtist": "歌手",
+    "columnYoutube": "YouTube",
+    "columnGenre": "類型",
+    "columnTag1": "標籤1",
+    "columnTag2": "標籤2",
+    "columnTag3": "標籤3",
+    "columnTag4": "標籤4",
+    "columnTag5": "標籤5",
+    "columnSingingCount": "演唱次數",
+    "columnSkillLevel": "熟練度",
+    "columnMemo": "備註"
+  }
+  

@@ -39,14 +39,14 @@ export default function Home() {
   const { currentUser } = useContext(AuthContext);
   const { songs, setSongs } = useSongs();
   const [searchPerformed, setSearchPerformed] = useState(false);
-  const { searchCriteria, setSearchCriteria } = useSearchCriteria({}); // カスタムフックを使用
+  const { searchCriteria, setSearchCriteria } = useSearchCriteria({});
   const [selectAll, setSelectAll] = useState(false);
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const { setMessageInfo } = useMessage();
   const [tableData, setTableData] = useState([]);
   const { theme } = useTheme();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('common'); // i18nextフック
   const router = useRouter();
 
   // 初期状態では、全曲をテーブルに表示
@@ -62,7 +62,7 @@ export default function Home() {
       }
       setTableData(sortedSongs);
     }
-  }, [songs, sortConfig, searchPerformed]); // searchPerformed を依存配列に追加
+  }, [songs, sortConfig, searchPerformed]);
 
   const handleSearchResults = (results) => {
     if (sortConfig.key) {
@@ -73,7 +73,7 @@ export default function Home() {
   };
 
   const toggleModal = (modal) => {
-    setModalState(prev => ({ ...prev, [modal]: !prev[modal] }));
+    setModalState((prev) => ({ ...prev, [modal]: !prev[modal] }));
   };
 
   const handleDeleteSong = async (songId) => {
@@ -89,28 +89,27 @@ export default function Home() {
       setlistsSnapshot.forEach((setlistDoc) => {
         const setlistData = setlistDoc.data();
         if (setlistData.songIds && setlistData.songIds.includes(songId)) {
-          const updatedSongIds = setlistData.songIds.filter(id => id !== songId);
+          const updatedSongIds = setlistData.songIds.filter((id) => id !== songId);
           batch.update(setlistDoc.ref, { songIds: updatedSongIds });
         }
       });
 
       await batch.commit();
-      setMessageInfo({ message: '曲が削除され、セットリストが更新されました。', type: 'success' });
+      setMessageInfo({ message: t('songDeletedSetlistUpdated'), type: 'success' });
     } catch (error) {
-
-      setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
+      setMessageInfo({ message: t('songDeletionFailed'), type: 'error' });
     }
   };
 
   const handleSelectAll = () => {
     setSelectAll(!selectAll);
-    setSelectedSongs(selectAll ? [] : tableData.map(song => song.id));
+    setSelectedSongs(selectAll ? [] : tableData.map((song) => song.id));
   };
 
   const handleSelectSong = (songId) => {
-    setSelectedSongs(prev => {
+    setSelectedSongs((prev) => {
       if (prev.includes(songId)) {
-        return prev.filter(id => id !== songId);
+        return prev.filter((id) => id !== songId);
       } else {
         return [...prev, songId];
       }
@@ -123,8 +122,8 @@ export default function Home() {
         const batch = writeBatch(db);
 
         // 選択され曲を削除
-        selectedSongs.forEach(songId => {
-          const songRef = doc(db, "users", currentUser.uid, "Songs", songId);
+        selectedSongs.forEach((songId) => {
+          const songRef = doc(db, 'users', currentUser.uid, 'Songs', songId);
           batch.delete(songRef);
         });
 
@@ -135,7 +134,9 @@ export default function Home() {
         setlistsSnapshot.forEach((setlistDoc) => {
           const setlistData = setlistDoc.data();
           if (setlistData.songIds) {
-            const updatedSongIds = setlistData.songIds.filter(id => !selectedSongs.includes(id));
+            const updatedSongIds = setlistData.songIds.filter(
+              (id) => !selectedSongs.includes(id)
+            );
             if (updatedSongIds.length !== setlistData.songIds.length) {
               batch.update(setlistDoc.ref, { songIds: updatedSongIds });
             }
@@ -144,9 +145,9 @@ export default function Home() {
 
         await batch.commit();
         setSelectedSongs([]);
-        setMessageInfo({ message: '選択された曲が削除され、セットリストが更新されました。', type: 'success' });
+        setMessageInfo({ message: t('selectedSongsDeletedSetlistUpdated'), type: 'success' });
       } catch (error) {
-        setMessageInfo({ message: '曲の削除に失敗しました。', type: 'error' });
+        setMessageInfo({ message: t('songDeletionFailed'), type: 'error' });
         console.error(error);
       }
     }
@@ -157,7 +158,7 @@ export default function Home() {
       let aValue = a[key];
       let bValue = b[key];
 
-      // フリガナが存在する場合はフリガナを優先して使用
+      // フリガナが存在する場合はフリガナを優先
       if (key === 'title') {
         aValue = a.furigana || a.title;
         bValue = b.furigana || b.title;
@@ -189,25 +190,26 @@ export default function Home() {
     setSortConfig({ key, direction });
   };
 
+  // CSVエクスポート用のヘッダー（列名）
   const headers = [
-    { label: "曲名", key: "title" },
-    { label: "フリガナ", key: "furigana" },
-    { label: "アーティスト", key: "artist" },
-    { label: "YouTube", key: "youtubeUrl" },
-    { label: "ジャンル", key: "genre" },
-    { label: "タグ1", key: "tag1" },
-    { label: "タグ2", key: "tag2" },
-    { label: "タグ3", key: "tag3" },
-    { label: "タグ4", key: "tag4" },
-    { label: "タグ5", key: "tag5" },
-    { label: "歌った回数", key: "singingCount" },
-    { label: "熟練度", key: "skillLevel" },
-    { label: "備考", key: "memo" }
+    { label: t('columnSongTitle'), key: "title" },
+    { label: t('columnFurigana'), key: "furigana" },
+    { label: t('columnArtist'), key: "artist" },
+    { label: t('columnYoutube'), key: "youtubeUrl" },
+    { label: t('columnGenre'), key: "genre" },
+    { label: t('columnTag1'), key: "tag1" },
+    { label: t('columnTag2'), key: "tag2" },
+    { label: t('columnTag3'), key: "tag3" },
+    { label: t('columnTag4'), key: "tag4" },
+    { label: t('columnTag5'), key: "tag5" },
+    { label: t('columnSingingCount'), key: "singingCount" },
+    { label: t('columnSkillLevel'), key: "skillLevel" },
+    { label: t('columnMemo'), key: "memo" }
   ];
 
   const handleAddToSetlist = (songIds) => {
     setSelectedSongs(songIds);
-    setModalState(prev => ({ ...prev, addSongsInSetlist: true }));
+    setModalState((prev) => ({ ...prev, addSongsInSetlist: true }));
   };
 
   const handleAddSong = async () => {
@@ -217,93 +219,110 @@ export default function Home() {
     const songCount = snapshot.data().count;
 
     if (currentUser.plan === 'free' && songCount >= 1000) {
-      if (confirm('無料プランでは1,000曲まで追加できます。有料プランにアップグレードしますか？')) {
+      if (confirm(t('freePlanUpTo1000SongsUpgradeConfirm'))) {
         router.push('/setting');
       }
       return;
     }
-
   };
 
   const handleIncreaseSingingCount = (songId) => {
-    setSongs(prevSongs =>
-      prevSongs.map(song =>
+    setSongs((prevSongs) =>
+      prevSongs.map((song) =>
         song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
       )
     );
   };
 
   const handleDecreaseSingingCount = (songId) => {
-    setSongs(prevSongs =>
-      prevSongs.map(song =>
-        song.id === songId ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) } : song
+    setSongs((prevSongs) =>
+      prevSongs.map((song) =>
+        song.id === songId
+          ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) }
+          : song
       )
     );
   };
 
-  // 未ログインユーザーをlpページにリダイレクトする
+  // 未ログインユーザーをlpページにリダイレクト
   useEffect(() => {
     if (!currentUser) {
       router.push('/lp');
     }
   }, [currentUser, router]);
 
-  // ローディング中の表示を追加
+  // ローディング中の表示（または何も返さない）
   if (!currentUser) {
-    return null;  // または適切なローディング表示
+    return null;
   }
 
   return (
     <Layout>
       <div className="flex flex-col sm:flex-row w-full">
         <div className="flex-grow w-full p-0 sm:p-4">
-          <SearchForm 
-            currentUser={currentUser} 
-            handleSearchResults={handleSearchResults} 
-            searchCriteria={searchCriteria} 
-            setSearchCriteria={setSearchCriteria} 
+          <SearchForm
+            currentUser={currentUser}
+            handleSearchResults={handleSearchResults}
+            searchCriteria={searchCriteria}
+            setSearchCriteria={setSearchCriteria}
           />
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-between mb-3">
             {selectedSongs.length > 0 ? (
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
-                <button onClick={() => toggleModal('addSongsInSetlist')} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
-                  <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
+                {/* 件数表示：{{count}}件選択中 */}
+                <span className="self-center text-gray-500">
+                  {t('countSelectedItems', { count: selectedSongs.length })}
+                </span>
+                <button
+                  onClick={() => toggleModal('addSongsInSetlist')}
+                  className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}
+                >
+                  <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />
+                  {t('addToSetlist')}
                 </button>
-                <button onClick={() => toggleModal('bulkEdit')} className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                  <FaPen className="mr-2" />一括編集
+                <button
+                  onClick={() => toggleModal('bulkEdit')}
+                  className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded inline-flex items-center"
+                >
+                  <FaPen className="mr-2" />
+                  {t('bulkEdit')}
                 </button>
-                <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                  <FontAwesomeIcon icon={faTrash} className="mr-2" />まとめて削除
+                <button
+                  onClick={handleDeleteSelectedSongs}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                  {t('deleteMultiple')}
                 </button>
               </div>
-            ) : (<div></div>)}
+            ) : (
+              <div></div>
+            )}
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-              <button onClick={() => toggleModal('addSong')} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}>
+              <button
+                onClick={() => toggleModal('addSong')}
+                className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded shadow inline-flex items-center`}
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                曲を追加する
+                {t('addSong')}
               </button>
               <button
-                onClick={() => setModalState(prev => ({ ...prev, columnSettings: true }))}
+                onClick={() => setModalState((prev) => ({ ...prev, columnSettings: true }))}
                 className="text-gray-500 py-2 px-4 text-sm rounded flex items-center"
               >
                 <FaPen className="mr-2" />
-                列の表示
+                {t('showColumns')}
               </button>
               <button
                 onClick={() => exportToCSV(tableData)}
                 className={`flex items-center bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}
               >
                 <FontAwesomeIcon icon={faFileExport} className="mr-2" />
-                エクスポート
+                {t('exportButton')}
               </button>
             </div>
-          </div>
-
-          <div className="flex justify-end mb-4">
-            
           </div>
 
           <MainTable
@@ -322,17 +341,29 @@ export default function Home() {
             handleDecreaseSingingCount={handleDecreaseSingingCount}
           />
 
-          {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
-          {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
+          {modalState.addSong && (
+            <AddSongModal
+              onClose={() => toggleModal('addSong')}
+              isOpen={modalState.addSong}
+            />
+          )}
+          {modalState.addSongsInSetlist && (
+            <AddSongsInSetlistModal
+              onClose={() => toggleModal('addSongsInSetlist')}
+              isOpen={modalState.addSongsInSetlist}
+              selectedSongs={selectedSongs}
+              currentUser={currentUser}
+            />
+          )}
           {!currentUser && <LoginFormModal isOpen={!currentUser} />}
           {modalState.bulkEdit && (
-            <BulkEditModal 
+            <BulkEditModal
               isOpen={modalState.bulkEdit}
               onClose={() => {
                 toggleModal('bulkEdit');
                 setSelectedSongs([]);
                 setSelectAll(false);
-                setMessageInfo({ message: '一括編集が完了しました', type: 'success' });
+                setMessageInfo({ message: t('bulkEditCompleted'), type: 'success' });
               }}
               selectedSongs={selectedSongs}
               songs={songs}
