@@ -25,6 +25,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import BulkEditModal from '@/components/BulkEditModal';
 import { useRouter } from 'next/router';
+import CtaComponent from "@/components/CtaComponent";
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -260,6 +261,13 @@ export default function Home() {
     <Layout>
       <div className="flex flex-col sm:flex-row w-full">
         <div className="flex-grow w-full p-0 sm:p-4">
+          <CtaComponent
+            title="リクエスト歌枠ツールを使ってみよう"
+            description="リクエスト歌枠ツールが実装されました。下のボタンをクリックするとリクエスト歌枠管理ページへ移動できます。リクエスト歌枠ツールでは、リスナーからのリクエストを受付・停止したり、届いたリクエストを確認・消化して管理することができます。"
+            buttonText="リクエスト歌枠ツールへ移動する"
+            buttonLink="/utawakutool/request-utawaku"
+            ctaId="request-mode-cta"
+          />
           <SearchForm
             currentUser={currentUser}
             handleSearchResults={handleSearchResults}

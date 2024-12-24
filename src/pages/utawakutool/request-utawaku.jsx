@@ -138,8 +138,8 @@ export default function RequestUtawaku() {
                 <div className="space-y-2">
                     <h1 className="text-3xl font-bold text-gray-800">リクエスト歌枠管理</h1>
                     <p className="text-gray-600 text-sm">
-                        ここではリスナーからのリクエスト状況をリアルタイムで監視・管理できます。
-                        リクエスト受付のオン/オフ切り替えや、リクエストの消化が可能です。
+                        ここではリスナーからのリクエスト状況をリアルタイムで管理できます。<br/>
+                        リクエスト受付のオン/オフ切り替えや、届いたリクエストの確認/消化が可能です。
                     </p>
                 </div>
 
