@@ -12,7 +12,7 @@ import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider, signO
 import { useTheme } from '@/context/ThemeContext';
 import Switch from '@/components/Switch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faGlobe, faCheck } from '@fortawesome/free-solid-svg-icons';
 import Layout from '@/pages/layout';
 import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { loadStripe } from '@stripe/stripe-js';
@@ -61,6 +61,29 @@ function Settings() {
     const { upgrade_success } = router.query;
     const [cancelAt, setCancelAt] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { t } = useTranslation('common');
+    const [selectedLanguage, setSelectedLanguage] = useState('');
+    const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+
+    const languageOptions = [
+        { 
+            code: 'ja', 
+            label: '日本語', 
+            flag: '/images/flags/jp.svg'
+        },
+        { 
+            code: 'zh-TW', 
+            label: '繁體中文(準備中)', 
+            flag: '/images/flags/tw.svg'
+        }
+    ];
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedLang = localStorage.getItem('language') || router.locale || 'ja';
+            setSelectedLanguage(savedLang);
+        }
+    }, [router.locale]);
 
     useEffect(() => {
         const { code } = router.query;
@@ -197,7 +220,7 @@ function Settings() {
 
     const handleDeleteAccount = async () => {
         if (!currentUser) {
-            alert('ログインしていないため、アカウントを削除できません。');
+            alert('ログインしていないため、アカウントを��除できません。');
             return;
         }
 
@@ -302,6 +325,12 @@ function Settings() {
         }
     };
 
+    const handleLanguageChange = (lang) => {
+        setSelectedLanguage(lang);
+        localStorage.setItem('language', lang);
+        router.push(router.pathname, router.asPath, { locale: lang });
+    };
+
     return (
         <Layout>
             <div className="flex justify-between items-center p-8 pb-4 border-b">
@@ -316,6 +345,8 @@ function Settings() {
             </div>
 
             <div className="max-w-4xl mx-auto p-8">
+                
+
                 <section className="mb-12">
                     <h2 className="text-xl font-bold mb-4">プラン設定</h2>
                     <div className="bg-white shadow-lg rounded-lg p-6">
@@ -351,6 +382,8 @@ function Settings() {
                         </div>
                     </div>
                 </section>
+
+                
 
                 <section className="mb-12">
                     <h2 className="text-xl font-bold mb-4">プロフィール設定</h2>
@@ -403,6 +436,76 @@ function Settings() {
                                     </span>
                                 </button>
                             ))}
+                        </div>
+                    </div>
+                </section>
+                <section className="mb-12">
+                    <h2 className="text-xl font-bold mb-4">言語設定</h2>
+                    <div className="bg-white shadow-lg rounded-lg p-6">
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                                className={`
+                                    w-full px-4 py-3 border rounded-lg
+                                    flex items-center justify-between
+                                    hover:border-customTheme-${theme}-primary
+                                    transition-colors duration-200
+                                `}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <FontAwesomeIcon icon={faGlobe} className="text-gray-500" />
+                                    <div className="flex items-center gap-2">
+                                        {languageOptions.find(lang => lang.code === selectedLanguage)?.flag && (
+                                            <Image
+                                                src={languageOptions.find(lang => lang.code === selectedLanguage).flag}
+                                                alt=""
+                                                width={20}
+                                                height={20}
+                                                className="rounded-sm"
+                                            />
+                                        )}
+                                        <span>
+                                            {languageOptions.find(lang => lang.code === selectedLanguage)?.label}
+                                        </span>
+                                    </div>
+                                </div>
+                                <svg className={`w-5 h-5 transition-transform duration-200 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {isLanguageDropdownOpen && (
+                                <div className="absolute z-10 w-full mt-2 bg-white border rounded-lg shadow-lg">
+                                    {languageOptions.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => {
+                                                handleLanguageChange(lang.code);
+                                                setIsLanguageDropdownOpen(false);
+                                            }}
+                                            className={`
+                                                w-full px-4 py-3 flex items-center justify-between
+                                                hover:bg-gray-50 transition-colors duration-200
+                                                ${selectedLanguage === lang.code ? `text-customTheme-${theme}-primary` : ''}
+                                            `}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Image
+                                                    src={lang.flag}
+                                                    alt=""
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-sm"
+                                                />
+                                                <span>{lang.label}</span>
+                                            </div>
+                                            {selectedLanguage === lang.code && (
+                                                <FontAwesomeIcon icon={faCheck} className={`text-customTheme-${theme}-primary`} />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

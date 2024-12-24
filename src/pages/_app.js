@@ -19,16 +19,27 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 function App({ Component, pageProps }) {
-  const router = useRouter(); // 追加
+  const router = useRouter();
   const getLayout = Component.getLayout || ((page) => page);
 
-  // 言語の初期設定を追加
+  // 言語の初期化処理を修正
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') || 'ja';
-    if (router.locale !== savedLang) {
-      router.push(router.pathname, router.asPath, { locale: savedLang });
+    // URLから指定された言語を優先
+    const urlLocale = router.locale;
+    const savedLang = localStorage.getItem('language');
+    
+    // ローカルストレージに保存がない場合はURLの言語を保存
+    if (!savedLang && urlLocale) {
+      localStorage.setItem('language', urlLocale);
     }
-  }, []);
+    // URLの言語とローカルストレージの言語が異なる場合のみリダイレクト
+    else if (savedLang && urlLocale !== savedLang) {
+      router.push(router.pathname, router.asPath, { 
+        locale: savedLang,
+        scroll: false 
+      });
+    }
+  }, [router.locale]);
 
   return (
     <AuthProvider>
