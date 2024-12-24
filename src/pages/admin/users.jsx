@@ -1,6 +1,6 @@
 import withAdminAuth from '@/components/withAdminAuth';
 import { useEffect, useState } from 'react';
-import { db } from '../../../firebaseConfig';
+import { db } from '@/../../firebaseConfig';
 import { collection, getDocs, getCountFromServer, query, limit, startAfter, orderBy, where } from 'firebase/firestore';
 import { useMessage } from '@/context/MessageContext';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
