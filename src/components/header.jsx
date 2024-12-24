@@ -57,7 +57,7 @@ const Header = ({ toggleSidebar }) => {
                 <div className="container mx-auto flex justify-between items-center h-[60px]">
                     <Link href="/">
                         <Image
-                            src="/images/Setlink_white_trance (1000 x 300 px).png"
+                            src="/images/Setlink_white_trance_1000x300px.png"
                             alt="Setlink Logo"
                             width={190}
                             height={50}

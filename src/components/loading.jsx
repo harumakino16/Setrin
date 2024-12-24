@@ -7,7 +7,7 @@ const Loading = () => {
     <div className={styles.overlay}>
       <div className={styles.logoContainer}>
         <Image
-          src="/images/Setlink_trance (1000 x 300 px).png"
+          src="/images/Setlink_trance_1000x300px.png"
           alt="Setlinkロゴ"
           width={200}
           height={60}

@@ -185,7 +185,7 @@ export default function LandingPage() {
         {/* Header */}
         <header className="bg-white shadow-sm">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/"><Image src="/images/Setlink_trance (1000 x 300 px).png" alt="Setlinkロゴ" width={150} height={30} priority={true} /></Link>
+            <Link href="/"><Image src="/images/Setlink_trance_1000x300px.png" alt="Setlinkロゴ" width={150} height={30} priority={true} /></Link>
             <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
               <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -222,7 +222,7 @@ export default function LandingPage() {
             </div>
             <div className="">
               <Image 
-                src="/images/Setlink_trance (1000 x 300 px).png" 
+                src="/images/Setlink_trance_1000x300px.png" 
                 alt="Setlinkロゴ" 
                 width={400} 
                 height={90} 
