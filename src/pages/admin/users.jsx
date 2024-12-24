@@ -18,6 +18,7 @@ const ManageUsers = () => {
   const [displayUsers, setDisplayUsers] = useState([]);
   const [page, setPage] = useState(1);
   const usersPerPage = 50;
+  const [searchUserId, setSearchUserId] = useState('');
 
   const [visibleColumns, setVisibleColumns] = useState({
     userId: true,
@@ -140,6 +141,13 @@ const ManageUsers = () => {
     if (users.length === 0) return;
 
     let sortedUsers = [...users];
+    
+    if (searchUserId) {
+      sortedUsers = sortedUsers.filter(user => 
+        user.id.toLowerCase().includes(searchUserId.toLowerCase())
+      );
+    }
+
     if (sortField === 'totalSongs') {
       sortedUsers.sort((a, b) => {
         return sortDirection === 'desc' ? 
@@ -158,7 +166,7 @@ const ManageUsers = () => {
     const startIndex = (page - 1) * usersPerPage;
     const endIndex = startIndex + usersPerPage;
     setDisplayUsers(sortedUsers.slice(startIndex, endIndex));
-  }, [users, sortField, sortDirection, page]);
+  }, [users, sortField, sortDirection, page, searchUserId]);
 
   useEffect(() => {
     fetchUsers();
@@ -186,6 +194,15 @@ const ManageUsers = () => {
     <Layout>
       <div className="p-5">
         <h1 className="text-3xl font-bold mb-4">ユーザー管理</h1>
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchUserId}
+            onChange={(e) => setSearchUserId(e.target.value)}
+            placeholder="ユーザーIDで検索..."
+            className="px-4 py-2 border rounded-lg"
+          />
+        </div>
         <div className="mb-4">
           {Object.keys(visibleColumns).map((column) => (
             <label key={column} className="mr-4">
