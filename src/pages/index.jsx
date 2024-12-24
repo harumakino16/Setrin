@@ -24,6 +24,7 @@ import { exportToCSV } from '../utils/csvUtils'; // 新しいファイルから�
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import BulkEditModal from '@/components/BulkEditModal';
+import { useRouter } from 'next/router';
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -46,6 +47,7 @@ export default function Home() {
   const [tableData, setTableData] = useState([]);
   const { theme } = useTheme();
   const { t } = useTranslation('common');
+  const router = useRouter();
 
   // 初期状態では、全曲をテーブルに表示
   useEffect(() => {
@@ -239,42 +241,16 @@ export default function Home() {
     );
   };
 
-  // 未ログイン時のデザイン
+  // 未ログインユーザーをlpページにリダイレクトする
+  useEffect(() => {
+    if (!currentUser) {
+      router.push('/lp');
+    }
+  }, [currentUser, router]);
+
+  // ローディング中の表示を追加
   if (!currentUser) {
-    return (
-      <NoSidebarLayout>
-        <div className="flex flex-col min-h-screen">
-          <div className="flex-grow flex flex-col items-center justify-center p-6">
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-6">{t('welcome')}</h1>
-            <p className="text-xl mb-8 text-center md:text-left">{t('description')}</p>
-            <LoginForm />
-          </div>
-          <div className="bg-white bg-opacity-20 rounded-t-3xl p-8 text-left backdrop-filter backdrop-blur-lg">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold mb-4">Setlinkとは？</h2>
-              <p className="text-lg mb-6">
-                SetlinkはVtuberのための無料歌枠管理ツールです。<br />歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を取り込んだりできます。
-              </p>
-              <h2 className="text-3xl font-bold mb-4">特徴</h2>
-              <ul className="list-disc list-inside text-lg mb-6 space-y-2">
-                <li>🎵 <strong>簡単なセトリ作成：</strong>直感的なインターフェースで、数クリックで自由にセトリを作成</li>
-                <li>🎬 <strong>YouTube連携：</strong>YouTubeと連携して、再生リストを作成</li>
-                <li>📁 <strong>詳細な曲管理：</strong>曲名、アーティスト、ジャンル、タグなどで曲を整理</li>
-                <li>🔀 <strong>ランダムセトリ作成：</strong>指定した条件でランダムにセトリを生成</li>
-                <li>👂 <strong>歌える曲リスト：</strong>歌える曲リストをリスナーに共有</li>
-              </ul>
-              <div className="text-center">
-                <Link legacyBehavior href="/lp">
-                  <a className="inline-block bg-customTheme-blue-primary hover:bg-customTheme-blue-accent text-white font-bold py-3 px-6 rounded-full transition duration-300">
-                    詳しくはこちら &raquo;
-                  </a>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </NoSidebarLayout>
-    );
+    return null;  // または適切なローディング表示
   }
 
   return (

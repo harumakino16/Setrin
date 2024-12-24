@@ -28,6 +28,10 @@ function Price() {
     }
   };
 
+  const handleFreeButtonClick = () => {
+    router.push('/login');
+  };
+
   return (
     <div className="bg-gradient-to-b from-[#bbe0ff] to-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -55,7 +59,8 @@ function Price() {
             buttonColor="bg-[#bbe0ff]"
             buttonHoverColor="hover:bg-[#a5d4ff]"
             disabled={currentUser?.plan === 'free'}
-            link="/"
+            link={currentUser?.plan === 'free' ? null : undefined}
+            onClick={currentUser?.plan === 'free' ? null : handleFreeButtonClick}
           />
 
           <PlanCard

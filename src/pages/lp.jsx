@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { Music, Youtube, List, Shuffle, Users, Wand2, Shield, Lock, Settings } from 'lucide-react'
 import Image from 'next/image'
 import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, PREMIUM_PLAN_PRICE } from '@/constants'
@@ -9,6 +9,8 @@ import ContactForm from '@/components/ContactForm'
 import Price from '@/components/Price'
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { AuthContext } from '@/context/AuthContext';
+
 
 function Feature({ number, imageSrc, title, description }) {
   return (
@@ -61,8 +63,18 @@ function FeatureCard({ icon: Icon, title, color, sections }) {
 export default function LandingPage() {
   const { t } = useTranslation('common');
   const [menuOpen, setMenuOpen] = useState(false)
+  const { currentUser } = useContext(AuthContext);
 
   const closeMenu = () => setMenuOpen(false);
+
+  const handleGetStarted = (e) => {
+    e.preventDefault();
+    if (!currentUser) {
+      window.location.href = '/login';
+      return;
+    }
+    window.location.href = '/dashboard';
+  };
 
   const features = [
     {
@@ -206,7 +218,12 @@ export default function LandingPage() {
                 <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>お問い合わせ</Link></li>
               </ul>
             </nav>
-            <Link href="/" className="hidden md:block bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">今すぐ無料で始める</Link>
+            <Link 
+              href="/login" 
+              className="hidden md:block bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              {currentUser ? 'マイページへ' : '今すぐ無料で始める'}
+            </Link>
           </div>
         </header>
 
@@ -244,8 +261,12 @@ export default function LandingPage() {
                   </span>
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/" className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    無料で始める
+                  <Link 
+                    href="/login"
+                    onClick={handleGetStarted}
+                    className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    {currentUser ? 'マイページへ' : '無料で始める'}
                   </Link>
                   <Link href="#features" className="bg-white text-customTheme-blue-primary border-2 border-customTheme-blue-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all duration-300">
                     機能を詳しく見る
@@ -342,7 +363,7 @@ export default function LandingPage() {
                   <ul className="text-left text-gray-600 space-y-4">
                     <li className="flex items-center">
                       <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 text-red-600">✕</span>
-                      <span>セトリ作成に時間がかかる</span>
+                      <span>セトリ���成に時間がかかる</span>
                     </li>
                     <li className="flex items-center">
                       <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 text-red-600">✕</span>
@@ -433,7 +454,7 @@ export default function LandingPage() {
               <p className="text-xl text-gray-600 mx-auto leading-relaxed">
                 曲管理からリクエスト対応まで、歌枠配信に必要な全ての機能が揃っています。
                 <span className="block mt-2 text-gray-600">
-                  直感的な操作で、あなたの配信をより楽しく、より便利に。
+                  直感的な操作で、あなたの配信を��り楽しく、より便利に。
                 </span>
               </p>
             </div>
@@ -516,7 +537,7 @@ export default function LandingPage() {
                   <p className="text-gray-600">登録ユーザー数</p>
                 </div>
                 <div className="bg-white p-8 rounded-xl shadow-lg">
-                  <div className="text-5xl font-bold text-customTheme-blue-primary mb-4">130,000曲+</div>
+                  <div className="text-5xl font-bold text-customTheme-blue-primary mb-4">130,000��+</div>
                   <p className="text-gray-600">総登録曲数</p>
                 </div>
                 <div className="bg-white p-8 rounded-xl shadow-lg">
