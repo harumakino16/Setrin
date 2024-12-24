@@ -23,6 +23,7 @@ import NoSidebarLayout from "./noSidebarLayout";
 import { exportToCSV } from '../utils/csvUtils'; // 新しいファイルからインポート
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import BulkEditModal from '@/components/BulkEditModal';
 
 export default function Home() {
   const [modalState, setModalState] = useState({
@@ -30,7 +31,8 @@ export default function Home() {
     editSong: false,
     import: false,
     currentSong: null,
-    addSongsInSetlist: false
+    addSongsInSetlist: false,
+    bulkEdit: false
   });
 
   const { currentUser } = useContext(AuthContext);
@@ -251,7 +253,7 @@ export default function Home() {
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold mb-4">Setlinkとは？</h2>
               <p className="text-lg mb-6">
-                SetlinkはVtuberのための無料歌枠管理ツールです。<br />歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を取り込んだりできます。
+                SetlinkはVtuberのための無料歌枠管理ツールです。<br />歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を���り込んだりできます。
               </p>
               <h2 className="text-3xl font-bold mb-4">特徴</h2>
               <ul className="list-disc list-inside text-lg mb-6 space-y-2">
@@ -291,6 +293,9 @@ export default function Home() {
                 <span className="self-center text-gray-500">{selectedSongs.length}件選択中</span>
                 <button onClick={() => toggleModal('addSongsInSetlist')} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}>
                   <FontAwesomeIcon icon={faFolderPlus} className="mr-2" />セットリストに追加
+                </button>
+                <button onClick={() => toggleModal('bulkEdit')} className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                  <FaPen className="mr-2" />一括編集
                 </button>
                 <button onClick={handleDeleteSelectedSongs} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
                   <FontAwesomeIcon icon={faTrash} className="mr-2" />まとめて削除
@@ -344,6 +349,24 @@ export default function Home() {
           {modalState.addSong && <AddSongModal onClose={() => toggleModal('addSong')} isOpen={modalState.addSong} />}
           {modalState.addSongsInSetlist && <AddSongsInSetlistModal onClose={() => toggleModal('addSongsInSetlist')} isOpen={modalState.addSongsInSetlist} selectedSongs={selectedSongs} currentUser={currentUser} />}
           {!currentUser && <LoginFormModal isOpen={!currentUser} />}
+          {modalState.bulkEdit && (
+            <BulkEditModal 
+              isOpen={modalState.bulkEdit}
+              onClose={() => {
+                toggleModal('bulkEdit');
+                setSelectedSongs([]);
+                setSelectAll(false);
+                setMessageInfo({ message: '一括編集が完了しました', type: 'success' });
+              }}
+              selectedSongs={selectedSongs}
+              songs={songs}
+              refreshSongs={() => {
+                if (typeof refreshSongs === 'function') {
+                  refreshSongs();
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </Layout>
