@@ -2,9 +2,11 @@ import React, { useState, useContext } from 'react';
 import { db } from '@/../../firebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 
 function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) {
   const { currentUser } = useContext(AuthContext);
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     genre: '',
     tags: '',
@@ -29,7 +31,7 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
       const updates = {};
       if (formData.genre) updates.genre = formData.genre;
       if (formData.singingCount) updates.singingCount = parseInt(formData.singingCount);
-      if (formData.skillLevel) updates.skillLevel = formData.skillLevel;
+      if (formData.skillLevel) updates.skillLevel = parseInt(formData.skillLevel);
       if (formData.memo) updates.memo = formData.memo;
 
       // タグの処理
@@ -41,7 +43,7 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
         
         if (formData.tags) {
           if (tagUpdateMode === 'add') {
-            // 既存のタグと新し��タグを結合し、重複を除去
+            // 既存のタグと新しいタグを結合し、重複を除去
             const combinedTags = [...new Set([...(currentSong.tags || []), ...newTags])];
             updates.tags = combinedTags;
           } else {
@@ -127,17 +129,14 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">熟練度</label>
-            <select
+            <input
+              type="number"
               name="skillLevel"
               value={formData.skillLevel}
               onChange={handleChange}
+              min="0"
               className="w-full p-2 border rounded"
-            >
-              <option value="">選択してください</option>
-              <option value="初心者">初心者</option>
-              <option value="練習中">練習中</option>
-              <option value="習得済み">習得済み</option>
-            </select>
+            />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">備考</label>
@@ -158,7 +157,7 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className={`px-4 py-2 bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded inline-flex items-center`}
             >
               更新
             </button>

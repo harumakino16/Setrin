@@ -253,7 +253,7 @@ export default function Home() {
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold mb-4">Setlinkとは？</h2>
               <p className="text-lg mb-6">
-                SetlinkはVtuberのための無料歌枠管理ツールです。<br />歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を���り込んだりできます。
+                SetlinkはVtuberのための無料歌枠管理ツールです。<br />歌える曲リストを手軽に管理し、ランダムセットリストを作成し、YouTubeと連携して再生リストを作成したり、再生リストから曲を取り込んだりできます。
               </p>
               <h2 className="text-3xl font-bold mb-4">特徴</h2>
               <ul className="list-disc list-inside text-lg mb-6 space-y-2">
