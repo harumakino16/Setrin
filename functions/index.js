@@ -1,9 +1,9 @@
-const functions = require("firebase-functions");
+const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-exports.resetPlaylistCreationCount = functions.https.onRequest(async (req, res) => {
+exports.resetMonthlyCount = onRequest(async (req, res) => {
   const db = admin.firestore();
   const usersRef = db.collection("users");
   const batchSize = 500;
@@ -42,11 +42,11 @@ exports.resetPlaylistCreationCount = functions.https.onRequest(async (req, res) 
       lastDoc = snapshot.docs[snapshot.docs.length - 1];
     }
 
-    console.log(`Successfully reset playlistCreationCount for ${processedDocs} users.`);
-    res.status(200).send(`Successfully reset playlistCreationCount for ${processedDocs} users.`);
+    console.log(`Successfully reset monthlyCount for ${processedDocs} users.`);
+    res.status(200).send(`Successfully reset monthlyCount for ${processedDocs} users.`);
   } catch (error) {
-    console.error("Error resetting playlistCreationCount:", error);
-    res.status(500).send(`Error resetting playlistCreationCount: ${error.message}`);
+    console.error("Error resetting monthlyCount:", error);
+    res.status(500).send(`Error resetting monthlyCount: ${error.message}`);
   }
 });
 
