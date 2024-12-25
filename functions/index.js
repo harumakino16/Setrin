@@ -30,11 +30,13 @@ exports.resetPlaylistCreationCount = functions.https.onRequest(async (req, res) 
 
       snapshot.forEach((doc) => {
         batch.update(usersRef.doc(doc.id), {
-          playlistCreationCount: 0,
+          'userActivity.monthlyRandomSetlistCount': 0,
+          'userActivity.monthlyRequestUtawakuCount': 0,
+          'userActivity.monthlyRouletteCount': 0,
         });
         processedDocs++;
       });
-
+      
       await batch.commit();
       console.log(`Processed batch of ${snapshot.docs.length} documents.`);
       lastDoc = snapshot.docs[snapshot.docs.length - 1];
@@ -44,6 +46,7 @@ exports.resetPlaylistCreationCount = functions.https.onRequest(async (req, res) 
     res.status(200).send(`Successfully reset playlistCreationCount for ${processedDocs} users.`);
   } catch (error) {
     console.error("Error resetting playlistCreationCount:", error);
-    res.status(500).send("Error resetting playlistCreationCount.");
+    res.status(500).send(`Error resetting playlistCreationCount: ${error.message}`);
   }
 });
+

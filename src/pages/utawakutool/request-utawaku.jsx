@@ -4,7 +4,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import Layout from '@/pages/layout';
 import { db } from '@/../firebaseConfig';
-import { collection, doc, getDocs, getDoc, setDoc, onSnapshot, updateDoc, query, where } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, setDoc, onSnapshot, updateDoc, query, where, increment, serverTimestamp } from 'firebase/firestore';
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -92,9 +92,41 @@ export default function RequestUtawaku() {
     const handleToggleRequestMode = async () => {
         if (!currentUser || !selectedPageId || !ownerUserId) return;
         const pageRef = doc(db, 'users', ownerUserId, 'publicPages', selectedPageId);
+
+        // 現在のモードを切り替え → requestMode
         await updateDoc(pageRef, {
             requestMode: !requestMode
         });
+
+        // ▼ もしこれが「リクエスト歌枠を開始する」動作に相当するなら
+        if (!requestMode === true) {
+          // OFF → ON になった(開始された)
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data().userActivity || {};
+            const lastTime = data.lastUtawakuSessionTime
+              ? data.lastUtawakuSessionTime.toDate()
+              : null;
+
+            const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
+            // 3時間以上経過していなければ incrementしない
+            if (!lastTime || lastTime < threeHoursAgo) {
+              await updateDoc(userRef, {
+                'userActivity.requestUtawakuCount': increment(1),
+                'userActivity.monthlyRequestUtawakuCount': increment(1),
+                'userActivity.lastUtawakuSessionTime': serverTimestamp(),
+                'userActivity.lastActivityAt': serverTimestamp(),
+              });
+            } else {
+              // 3時間未満の場合は timeStamp だけ更新するかどうかは要件次第
+              await updateDoc(userRef, {
+                'userActivity.lastActivityAt': serverTimestamp(),
+              });
+            }
+          }
+        }
+
         setRequestMode(!requestMode);
         setMessageInfo({ type: 'success', message: `リクエスト受付を${!requestMode ? '開始' : '停止'}しました。` });
     };

@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import SetlistNameModal from '@/components/setlistNameModal';
 import { useRouter } from 'next/router';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDoc, updateDoc, increment, serverTimestamp, writeBatch } from 'firebase/firestore';
 import Modal from '@/components/Modal';
 import useSetlists from '@/hooks/fetchSetlists';
 import { db } from '../../firebaseConfig';
@@ -36,7 +36,19 @@ export default function Setlist() {
   const handleDeleteSetlist = async () => {
     if (selectedSetlist) {
       const setlistRef = doc(db, 'users', currentUser.uid, 'Setlists', selectedSetlist.id);
+
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userRef);
+
       await deleteDoc(setlistRef);
+      
+      if (userSnap.exists()) {
+        await updateDoc(userRef, {
+          'userActivity.setlistCount': increment(-1),
+          'userActivity.lastActivityAt': serverTimestamp(),
+        });
+      }
+
       setIsEditOpen(false);
     }
   };
@@ -66,14 +78,31 @@ export default function Setlist() {
   const handleCloseDeleteConfirmModal = () => setIsDeleteConfirmOpen(false);
 
   const handleDeleteSelected = async () => {
-    const deletePromises = selectedSetlists.map(id => {
-      const setlistRef = doc(db, 'users', currentUser.uid, 'Setlists', id);
-      return deleteDoc(setlistRef);
-    });
-    await Promise.all(deletePromises);
-    setSelectedSetlists([]);
-    setIsDeleteConfirmOpen(false);
-    setIsEditOpen(false);
+    if (!currentUser || selectedSetlists.length === 0) return;
+
+    try {
+      const batch = writeBatch(db);
+      const userRef = doc(db, 'users', currentUser.uid);
+
+      selectedSetlists.forEach(id => {
+        const setlistRef = doc(db, 'users', currentUser.uid, 'Setlists', id);
+        batch.delete(setlistRef);
+      });
+
+      const decrementAmount = -selectedSetlists.length;
+      batch.update(userRef, {
+        'userActivity.setlistCount': increment(decrementAmount),
+        'userActivity.lastActivityAt': serverTimestamp(),
+      });
+
+      await batch.commit();
+
+      setSelectedSetlists([]);
+      setIsDeleteConfirmOpen(false);
+      setIsEditOpen(false);
+    } catch (error) {
+      console.error('Error deleting setlists:', error);
+    }
   };
 
   useEffect(() => {

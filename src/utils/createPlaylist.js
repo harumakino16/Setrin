@@ -26,15 +26,6 @@ export async function createPlaylist(songs, setlistName, currentUser, setMessage
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
 
     if (currentUser.plan === 'free') {
-        // 月初めにカウントをリセット
-        if (!currentUser.planUpdatedAt || currentUser.planUpdatedAt.toDate() < firstDayOfMonth) {
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                playlistCreationCount: 0,
-                planUpdatedAt: currentDate,
-            });
-            currentUser.playlistCreationCount = 0; // ローカルのデータも更新
-        }
-
         if (currentUser.playlistCreationCount >= FREE_PLAN_MAX_YOUTUBE_PLAYLISTS) {
             if (confirm(`無料プランでは月に${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回まで再生リストを作成できます。有料プランにアップグレードしますか？`)) {
                 router.push('/setting');
@@ -91,12 +82,11 @@ export async function createPlaylist(songs, setlistName, currentUser, setMessage
         setMessageInfo({ message: '再生リストを作成しました', type: 'success' });
 
         // プレイリスト作成成功時にカウントをインクリメント
-        if (currentUser.plan === 'free') {
             await updateDoc(doc(db, 'users', currentUser.uid), {
-                playlistCreationCount: increment(1),
-            });
-            currentUser.playlistCreationCount += 1; // ローカルのデータも更新
-        }
+            'userActivity.playlistCreationCount': increment(1),
+            'userActivity.monthlyPlaylistCreationCount': increment(1),
+        });
+        currentUser.playlistCreationCount += 1; // ローカルのデータも更新
     } catch (error) {
         setMessageInfo({ message: error.message, type: 'error' });
     } finally {

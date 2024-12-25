@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/router';
 import { db } from '../../firebaseConfig';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc, increment, serverTimestamp, writeBatch } from 'firebase/firestore';
 import Layout from '@/pages/layout';
 import Link from 'next/link';
 import SongListNameModal from '@/components/SongListNameModal';
@@ -99,6 +99,12 @@ export default function PubPageSetting() {
                 setDoc(userPublicPageRef, pageData),
                 setDoc(topLevelPublicPageRef, topLevelData)
             ]);
+            const userRef = doc(db, 'users', currentUser.uid);
+            // ユーザーの公開リスト数を +1
+            await updateDoc(userRef, {
+                'userActivity.publicPageCount': increment(1),
+                'userActivity.lastActivityAt': serverTimestamp(),
+              });
             router.push(`/pubpagesetting/${newId}`);
         } catch (error) {
             console.error("Error adding document: ", error);
@@ -126,6 +132,12 @@ export default function PubPageSetting() {
                 type: 'success',
                 message: '公開リストを削除しました。'
             });
+            const userRef = doc(db, 'users', currentUser.uid);
+            // ユーザーの公開リスト数を -1 
+            await updateDoc(userRef, {
+                'userActivity.publicPageCount': increment(-1),
+                'userActivity.lastActivityAt': serverTimestamp(),
+              });
         } catch (error) {
             console.error("Error deleting document: ", error);
         }

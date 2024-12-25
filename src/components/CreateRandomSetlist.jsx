@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import SearchForm from '@/components/SearchForm';
@@ -66,6 +66,17 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
             setMessageInfo({ type: 'success', message: 'セットリストが作成されました。' });
             handleClose(); // モーダルを閉じる
             router.push(`/setlist/${docRef.id}`);
+
+            // ▼ ランダムセットリスト作成したのでカウントを +1
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                await updateDoc(userRef, {
+                    'userActivity.randomSetlistCount': increment(1),
+                    'userActivity.monthlyRandomSetlistCount': increment(1),
+                    'userActivity.lastActivityAt': serverTimestamp(),
+                });
+            }
         } catch (error) {
             setMessageInfo({ type: 'error', message: 'セットリストの保存に失敗しました。' });
         }

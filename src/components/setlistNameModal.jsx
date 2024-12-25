@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Modal from "@/components/Modal";
 import { db } from '../../firebaseConfig';
-import { doc, setDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, collection, addDoc, updateDoc, increment } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -37,6 +37,11 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
             });
             setMessageInfo({ message: 'セットリストを作成しました', type: 'success' });
             onClose(); // モーダルを閉じる
+            const userRef = doc(db, 'users', currentUser.uid);
+            await updateDoc(userRef, {
+                'userActivity.setlistCount': increment(1),
+                'userActivity.lastActivityAt': serverTimestamp(),
+              });
         } else {
             alert("ユーザーが認証されていません。");
             setMessageInfo({ message: 'エラー：セットリストの作成中にエラーが発生しました', type: 'error' });

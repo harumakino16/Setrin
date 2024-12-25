@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/pages/layout';
 import { db } from '@/../firebaseConfig';
-import { doc, getDoc, collection, getDocs, addDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, addDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useSongs } from '@/context/SongsContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -143,6 +143,35 @@ export default function RouletteUtawaku() {
     }
   };
 
+  async function handleRouletteStart() {
+    if (!currentUser) return;
+
+    const userRef = doc(db, 'users', currentUser.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) return;
+    const data = userSnap.data().userActivity || {};
+    const lastTime = data.lastRouletteSessionTime
+        ? data.lastRouletteSessionTime.toDate()
+        : null;
+
+    const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    if (!lastTime || lastTime < threeHoursAgo) {
+        await updateDoc(userRef, {
+            'userActivity.rouletteCount': increment(1),
+            'userActivity.monthlyRouletteCount': increment(1),
+            'userActivity.lastRouletteSessionTime': serverTimestamp(),
+            'userActivity.lastActivityAt': serverTimestamp(),
+        });
+    } else {
+        // 3時間未満ならカウントせず lastActivityAt のみ更新
+        await updateDoc(userRef, {
+            'userActivity.lastActivityAt': serverTimestamp(),
+        });
+    }
+  }
+
+
   return (
     <Layout>
       <div className="p-8 space-y-8 max-w-4xl mx-auto">
@@ -244,7 +273,9 @@ export default function RouletteUtawaku() {
 
         {/* ルーレットコンテンツ */}
         {isReady && setlist && currentSongs.length > 0 && (
-          <RouletteContent currentSongs={currentSongs} />
+          <RouletteContent
+            currentSongs={currentSongs}
+          />
         )}
         {/* ポップアップボタン */}
         {isReady && setlist && currentSongs.length > 0 && (

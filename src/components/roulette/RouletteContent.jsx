@@ -1,16 +1,23 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useTheme } from '@/context/ThemeContext';
-import { FaYoutube } from 'react-icons/fa';
-import Link from 'next/link';
+import { doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/../firebaseConfig';
+import { AuthContext } from '@/context/AuthContext';
 
-export default function RouletteContent({ currentSongs }) {
+export default function RouletteContent({ currentSongs, onSpin }) {
   const { theme } = useTheme();
   const [spinning, setSpinning] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
   const [isDecided, setIsDecided] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+
+
 
   const handleSpin = () => {
     if (!currentSongs || currentSongs.length === 0) return;
+    if (onSpin) {
+      onSpin();
+    }
     setSpinning(true);
     setSelectedSong(null);
     setIsDecided(false);
@@ -25,6 +32,7 @@ export default function RouletteContent({ currentSongs }) {
       if (count >= maxCount) {
         clearInterval(interval);
         setSpinning(false);
+        activityCount();
       }
     }, 100);
   };
@@ -34,6 +42,24 @@ export default function RouletteContent({ currentSongs }) {
       window.open(selectedSong.youtubeUrl, '_blank');
     }
     setIsDecided(true);
+  };
+
+  const activityCount = async () => {
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) return;
+
+      await updateDoc(userRef, {
+        'userActivity.rouletteCount': increment(1),
+        'userActivity.monthlyRouletteCount': increment(1),
+        'userActivity.lastRouletteSessionTime': serverTimestamp(),
+        'userActivity.lastActivityAt': serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Activity count update failed:', error);
+    }
   };
 
   const commonContainerClasses = "bg-white p-6 rounded shadow-sm space-y-6 min-h-[280px] flex flex-col";
@@ -52,7 +78,7 @@ export default function RouletteContent({ currentSongs }) {
               対象曲数: <span className="font-bold text-customTheme-${theme}-primary">{currentSongs.length}</span> 曲
             </p>
           </div>
-          
+
           <div className={commonContentClasses}>
             {selectedSong && (
               <div className="text-2xl font-bold break-all text-center mb-8">
@@ -93,7 +119,7 @@ export default function RouletteContent({ currentSongs }) {
               対象曲数: <span className="font-bold text-customTheme-${theme}-primary">{currentSongs.length}</span> 曲
             </p>
           </div>
-          
+
           <div className={commonContentClasses}>
             <div className="text-2xl font-bold text-gray-900 animate-pulse line-clamp-2 text-center">
               {selectedSong?.title || ""}
@@ -118,7 +144,7 @@ export default function RouletteContent({ currentSongs }) {
               対象曲数: <span className="font-bold text-customTheme-${theme}-primary">{currentSongs.length}</span> 曲
             </p>
           </div>
-          
+
           <div className={commonContentClasses}>
             <div className="relative w-full">
               <div className="text-2xl font-bold break-all text-center">
