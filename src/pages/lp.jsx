@@ -363,7 +363,7 @@ export default function LandingPage() {
                   <ul className="text-left text-gray-600 space-y-4">
                     <li className="flex items-center">
                       <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 text-red-600">✕</span>
-                      <span>セトリ���成に時間がかかる</span>
+                      <span>セトリ作成に時間がかかる</span>
                     </li>
                     <li className="flex items-center">
                       <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 text-red-600">✕</span>
@@ -454,7 +454,7 @@ export default function LandingPage() {
               <p className="text-xl text-gray-600 mx-auto leading-relaxed">
                 曲管理からリクエスト対応まで、歌枠配信に必要な全ての機能が揃っています。
                 <span className="block mt-2 text-gray-600">
-                  直感的な操作で、あなたの配信を��り楽しく、より便利に。
+                  直感的な操作で、あなたの配信をより楽しく、より便利に。
                 </span>
               </p>
             </div>
@@ -533,11 +533,11 @@ export default function LandingPage() {
               <h2 className="text-4xl font-bold mt-4 mb-8">多くのVtuberに選ばれています</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
                 <div className="bg-white p-8 rounded-xl shadow-lg">
-                  <div className="text-5xl font-bold text-customTheme-blue-primary mb-4">1,600人+</div>
+                  <div className="text-5xl font-bold text-customTheme-blue-primary mb-4">1,700人+</div>
                   <p className="text-gray-600">登録ユーザー数</p>
                 </div>
                 <div className="bg-white p-8 rounded-xl shadow-lg">
-                  <div className="text-5xl font-bold text-customTheme-blue-primary mb-4">130,000��+</div>
+                  <div className="text-5xl font-bold text-customTheme-blue-primary mb-4">130,000曲+</div>
                   <p className="text-gray-600">総登録曲数</p>
                 </div>
                 <div className="bg-white p-8 rounded-xl shadow-lg">

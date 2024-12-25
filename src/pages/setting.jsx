@@ -220,7 +220,7 @@ function Settings() {
 
     const handleDeleteAccount = async () => {
         if (!currentUser) {
-            alert('ログインしていないため、アカウントを��除できません。');
+            alert('ログインしていないため、アカウントを削除できません。');
             return;
         }
 
