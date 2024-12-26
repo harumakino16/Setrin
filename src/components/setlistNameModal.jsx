@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Modal from "@/components/Modal";
 import { db } from '../../firebaseConfig';
-import { doc, setDoc, serverTimestamp, collection, addDoc, updateDoc, increment } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, collection, addDoc, updateDoc, increment, writeBatch } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -23,27 +23,45 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     }, []);
 
     const handleSubmit = async () => {
-        if (currentUser) {
-            // 無料プランかどうか、セットリストの数をチェック
+        if (!currentUser) {
+            setMessageInfo({ message: 'エラー：ユーザーが認証されていません', type: 'error' });
+            return;
+        }
+
+        try {
+            // 無料プランのチェック
             if (currentUser.plan === 'free' && setlists.length >= FREE_PLAN_MAX_SETLISTS) {
                 setMessageInfo({ type: 'error', message: `無料プランでは最大${FREE_PLAN_MAX_SETLISTS}個のセットリストまで保存できます。` });
                 return;
             }
 
-            const setlistRef = collection(db, 'users', currentUser.uid, 'Setlists');
-            await addDoc(setlistRef, {
+            // バッチ処理を使用して、両方の操作を確実に実行
+            const batch = writeBatch(db);
+            
+            // セットリストの追加
+            const setlistRef = doc(collection(db, 'users', currentUser.uid, 'Setlists'));
+            batch.set(setlistRef, {
                 name: inputValue,
                 createdAt: serverTimestamp()
             });
-            setMessageInfo({ message: 'セットリストを作成しました', type: 'success' });
-            onClose(); // モーダルを閉じる
+
+            // ユーザーアクティビティの更新
             const userRef = doc(db, 'users', currentUser.uid);
-            await updateDoc(userRef, {
+            batch.update(userRef, {
                 'userActivity.setlistCount': increment(1),
                 'userActivity.lastActivityAt': serverTimestamp(),
-              });
-        } else {
-            alert("ユーザーが認証されていません。");
+            });
+
+            // バッチ処理の実行
+            await batch.commit();
+
+            setMessageInfo({ message: 'セットリストを作成しました', type: 'success' });
+            if (onSetlistAdded) {
+                onSetlistAdded();
+            }
+            onClose();
+        } catch (error) {
+            console.error('Error creating setlist:', error);
             setMessageInfo({ message: 'エラー：セットリストの作成中にエラーが発生しました', type: 'error' });
         }
     };

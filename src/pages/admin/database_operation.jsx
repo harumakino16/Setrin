@@ -24,7 +24,7 @@ const DatabaseOperation = () => {
                 });
             });
             await Promise.all(updatePromises);
-            setMessageInfo({ message: '全てのユーザーのプランがFreeに設定されました。', type: 'success' });
+            setMessageInfo({ message: '全てのユーザーのプランがFreeに��定されました。', type: 'success' });
         } catch (error) {
             setMessageInfo({ message: 'プランの設定に失敗しました。', type: 'error' });
             console.error(error);
@@ -55,7 +55,7 @@ const DatabaseOperation = () => {
                         await setDoc(pageRef, {
                             color: "blue",
                         },{merge:true});
-                        console.warn(`ユーザーID ${pageData.userId} にテーマカラーが設定されていません。`);
+                        console.warn(`ユーザーID ${pageData.userId} にテー��カラーが設定されていません。`);
                     }
                 } else {
                     console.warn(`ユーザーID ${pageData.userId} のドキュメントが存在しません。`);
@@ -73,6 +73,9 @@ const DatabaseOperation = () => {
             const usersCollection = collection(db, 'users');
             const usersSnapshot = await getDocs(usersCollection);
             
+            console.log(`総ユーザー数: ${usersSnapshot.size}`);
+            let processedUsers = 0;
+            
             // バッチ処理を準備
             let batch = writeBatch(db);
             let operationCount = 0;
@@ -80,6 +83,12 @@ const DatabaseOperation = () => {
             for (const userDoc of usersSnapshot.docs) {
                 const userData = userDoc.data();
                 const userId = userDoc.id;
+                
+                // 進行状況をログ出力
+                processedUsers++;
+                if (processedUsers % 10 === 0) {  // 10ユーザーごとに進捗を表示
+                    console.log(`処理済み: ${processedUsers}/${usersSnapshot.size} ユーザー (${Math.round(processedUsers/usersSnapshot.size*100)}%)`);
+                }
                 
                 // 1. Setlistsの数を数える
                 const setlistsRef = collection(db, 'users', userId, 'Setlists');
@@ -90,6 +99,9 @@ const DatabaseOperation = () => {
                 const publicPagesRef = collection(db, 'users', userId, 'publicPages');
                 const publicPagesSnapshot = await getDocs(publicPagesRef);
                 const publicListCount = publicPagesSnapshot.size;
+                
+                // データ収集結果をログ出力
+                console.log(`ユーザーID: ${userId} - セットリスト: ${setlistCount}, 公開リスト: ${publicListCount}`);
                 
                 // 3. 既存のplaylistCreationCountを取得
                 const oldPlaylistCount = userData.playlistCreationCount || 0;
@@ -120,19 +132,24 @@ const DatabaseOperation = () => {
                 
                 operationCount++;
                 
-                // 500操作ごとにバッチをコミットして新しいバッチを開始
+                // バッチコミット時にもログを出力
                 if (operationCount >= 500) {
+                    console.log('バッチをコミット中...');
                     await batch.commit();
                     batch = writeBatch(db);
                     operationCount = 0;
+                    console.log('バッチコミット完了');
                 }
             }
             
             // 残りのバッチをコミット
             if (operationCount > 0) {
+                console.log('最終バッチをコミット中...');
                 await batch.commit();
+                console.log('最終バッチコミット完了');
             }
             
+            console.log('全ユーザーの移行が完了しました！');
             setMessageInfo({ 
                 message: 'ユーザーアクティビティの移行が完了しました。', 
                 type: 'success' 
