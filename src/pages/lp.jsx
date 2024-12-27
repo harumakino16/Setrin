@@ -11,24 +11,6 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { AuthContext } from '@/context/AuthContext';
 
-
-function Feature({ number, imageSrc, title, description }) {
-  return (
-    <div className="flex flex-col md:flex-row items-start gap-8">
-      <div className="w-full md:w-1/3 flex justify-center items-center">
-        <div className="">
-          <Image src={imageSrc} alt={title} width={80} height={80} priority={true} />
-        </div>
-      </div>
-      <div className="w-full md:w-2/3 relative self-center">
-        <span className="absolute -left-8 top-0 text-8xl font-bold text-[#E5F0FF] -z-10">{number}</span>
-        <h3 className="text-xl font-bold mb-4 text-customTheme-blue-primary">{title}</h3>
-        <p className="text-gray-500 leading-relaxed">{description}</p>
-      </div>
-    </div>
-  );
-}
-
 function FeatureCard({ icon: Icon, title, color, sections }) {
   return (
     <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-blue-50 group">
@@ -195,29 +177,63 @@ export default function LandingPage() {
       </head>
       <div className="bg-blue-50">
         {/* Header */}
-        <header className="bg-white shadow-sm">
+        <header className="bg-white shadow-sm fixed w-full top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/"><Image src="/images/Setlink_trance_1000x300px.png" alt="Setlinkロゴ" width={150} height={30} priority={true} /></Link>
-            <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-              </svg>
+            <Link href="/">
+              <Image 
+                src="/images/Setlink_trance_1000x300px.png" 
+                alt="Setlinkロゴ" 
+                width={150} 
+                height={30} 
+                priority={true} 
+              />
+            </Link>
+            
+            {/* モバイルメニューボタン */}
+            <button 
+              className="md:hidden z-50" 
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="メニュー"
+            >
+              {!menuOpen ? (
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              )}
             </button>
-            <nav className={`fixed top-0 right-0 h-full bg-white shadow-lg transform ${menuOpen ? 'translate-x-0' : 'translate-x-full'} z-50 transition-transform duration-300 ease-in-out md:shadow-none md:static md:transform-none md:flex md:items-center md:space-x-6`}>
-              <div className="flex justify-end p-4 md:hidden">
-                <button onClick={closeMenu}>
-                  <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </button>
-              </div>
-              <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 p-4 md:p-0">
-                <li><Link href="#features" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>特徴</Link></li>
-                <li><Link href="#pricing" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>料金</Link></li>
-                <li><Link href="#faq" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>FAQ</Link></li>
-                <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary" onClick={closeMenu}>お問い合わせ</Link></li>
-              </ul>
-            </nav>
+
+            {/* モバイルナビゲーション */}
+            <div className={`
+              fixed inset-0 bg-white z-40 
+              transform transition-transform duration-300 ease-in-out
+              ${menuOpen ? 'translate-x-0' : 'translate-x-full'}
+              md:relative md:inset-auto md:transform-none md:translate-x-0 md:bg-transparent
+              md:flex md:items-center
+            `}>
+              <nav className="h-full md:h-auto">
+                <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 p-8 md:p-0">
+                  <li><Link href="#features" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>特徴</Link></li>
+                  <li><Link href="#pricing" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>料金</Link></li>
+                  <li><Link href="#faq" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>FAQ</Link></li>
+                  <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>お問い合わせ</Link></li>
+                  <li className="md:hidden">
+                    <Link 
+                      href="/login" 
+                      className="bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors block text-center"
+                      onClick={closeMenu}
+                    >
+                      {currentUser ? 'マイページへ' : '今すぐ無料で始める'}
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+            {/* デスクトップ用ログインボタン */}
             <Link 
               href="/login" 
               className="hidden md:block bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -227,61 +243,67 @@ export default function LandingPage() {
           </div>
         </header>
 
+        {/* ヘッダーの高さ分のスペーサー */}
+        <div className="h-16"></div>
+
         {/* Hero Section */}
         <section className="py-20 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 opacity-50"></div>
           <div className="container mx-auto px-4 text-center relative">
-
             <div className="mb-8 animate-fade-in-up">
-              <span className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-6 py-3 rounded-full text-2xl font-semibold shadow-lg">
+              <span className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-8 py-4 rounded-full text-lg md:text-4xl font-semibold shadow-lg inline-block">
                 VTuber・配信者のための歌枠総合支援ツール
               </span>
             </div>
-            <div className="">
+            
+            <div className="mb-12">
               <Image 
                 src="/images/Setlink_trance_1000x300px.png" 
                 alt="Setlinkロゴ" 
-                width={400} 
-                height={90} 
+                width={300} 
+                height={70} 
                 priority={true}
-                className="mx-auto"
+                className="mx-auto w-full max-w-[300px]"
               />
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto">
-              <div className="md:w-1/2 text-left">
-                <h1 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-customTheme-blue-primary to-blue-600 leading-tight">
+              <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-customTheme-blue-primary to-blue-600 leading-tight">
                   歌枠を、<br />もっと楽しく。<br />もっと便利に。
                 </h1>
-                <p className="text-xl mb-8 text-gray-600 leading-relaxed">
+                <p className="text-lg md:text-xl mb-8 text-gray-600 leading-relaxed">
                   曲管理からリクエスト受付まで、<br />
                   歌枠配信に必要な全ての機能がここに。<br />
-                  <span className="font-bold text-customTheme-blue-primary inline-block mt-2 text-2xl">
+                  <span className="font-bold text-customTheme-blue-primary inline-block mt-2 text-xl md:text-2xl">
                     {FREE_PLAN_MAX_SONGS.toLocaleString()}曲まで無料！
                   </span>
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                   <Link 
                     href="/login"
                     onClick={handleGetStarted}
-                    className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
                   >
                     {currentUser ? 'マイページへ' : '無料で始める'}
                   </Link>
-                  <Link href="#features" className="bg-white text-customTheme-blue-primary border-2 border-customTheme-blue-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all duration-300">
+                  <Link 
+                    href="#features" 
+                    className="bg-white text-customTheme-blue-primary border-2 border-customTheme-blue-primary px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all duration-300"
+                  >
                     機能を詳しく見る
                   </Link>
                 </div>
               </div>
 
-              <div className="md:w-1/2 mt-12 md:mt-0">
-                <div className="relative">
+              <div className="md:w-1/2">
+                <div className="relative px-4">
                   <Image
                     src="/images/dashboard-preview.png"
                     alt="Setlinkダッシュード"
                     width={600}
                     height={400}
-                    className="rounded-lg shadow-2xl"
+                    className="rounded-lg shadow-2xl w-full"
                     priority={true}
                   />
                   <div className="absolute -bottom-4 -right-4 bg-white p-4 rounded-lg shadow-lg">
