@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/../firebaseConfig';
-import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, Timestamp, collectionGroup } from 'firebase/firestore';
 import withAdminAuth from '@/components/withAdminAuth';
 import Layout from '@/pages/layout';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -13,47 +13,56 @@ const ActiveUsers = () => {
   useEffect(() => {
     const fetchActiveUsers = async () => {
       try {
-        // 30日前のタイムスタンプを作成
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
         const usersRef = collection(db, 'users');
         const querySnapshot = await getDocs(usersRef);
 
-        const activeUsers = querySnapshot.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter(user => {
-            const lastActivity = user.userActivity?.lastActivityAt?.toDate();
-            return lastActivity && lastActivity > thirtyDaysAgo;
-          })
-          .map(user => ({
-            id: user.id,
-            email: user.email || '不明',
-            lastActivity: user.userActivity?.lastActivityAt?.toDate() || null,
-            setlistCount: user.userActivity?.setlistCount || 0,
-            publicListCount: user.userActivity?.publicListCount || 0,
-            playlistCreationCount: user.userActivity?.playlistCreationCount || 0,
-            randomSetlistCount: user.userActivity?.randomSetlistCount || 0,
-            requestUtawakuCount: user.userActivity?.requestUtawakuCount || 0,
-            rouletteCount: user.userActivity?.rouletteCount || 0,
-            monthlyRandomSetlistCount: user.userActivity?.monthlyRandomSetlistCount || 0,
-            monthlyRequestUtawakuCount: user.userActivity?.monthlyRequestUtawakuCount || 0,
-            monthlyRouletteCount: user.userActivity?.monthlyRouletteCount || 0,
-            // 総合スコアを計算（重み付けは適宜調整）
-            totalScore: (
-              (user.userActivity?.setlistCount || 0) * 1 +
-              (user.userActivity?.publicListCount || 0) * 2 +
-              (user.userActivity?.playlistCreationCount || 0) * 1 +
-              (user.userActivity?.randomSetlistCount || 0) * 1 +
-              (user.userActivity?.requestUtawakuCount || 0) * 3 +
-              (user.userActivity?.rouletteCount || 0) * 0.5
-            )
-          }));
+        const activeUsersPromises = querySnapshot.docs
+          .map(async doc => {
+            const userData = doc.data();
+            const lastActivity = userData.userActivity?.lastActivityAt?.toDate();
+            
+            if (lastActivity && lastActivity > thirtyDaysAgo) {
+              // ユーザーごとのSongsサブコレクションを取得
+              const songsRef = collection(db, 'users', doc.id, 'Songs');
+              const songsSnapshot = await getDocs(songsRef);
+              const songCount = songsSnapshot.size;
 
-        setUsers(sortData(activeUsers, sortConfig));
+              return {
+                id: doc.id,
+                email: userData.email || '不明',
+                username: userData.username || '未設定',
+                songCount: songCount,
+                lastActivity: lastActivity,
+                setlistCount: userData.userActivity?.setlistCount || 0,
+                publicListCount: userData.userActivity?.publicListCount || 0,
+                playlistCreationCount: userData.userActivity?.playlistCreationCount || 0,
+                randomSetlistCount: userData.userActivity?.randomSetlistCount || 0,
+                requestUtawakuCount: userData.userActivity?.requestUtawakuCount || 0,
+                rouletteCount: userData.userActivity?.rouletteCount || 0,
+                monthlyRandomSetlistCount: userData.userActivity?.monthlyRandomSetlistCount || 0,
+                monthlyRequestUtawakuCount: userData.userActivity?.monthlyRequestUtawakuCount || 0,
+                monthlyRouletteCount: userData.userActivity?.monthlyRouletteCount || 0,
+                totalScore: (
+                  (userData.userActivity?.setlistCount || 0) * 2 +
+                  (userData.userActivity?.publicListCount || 0) * 2 +
+                  (userData.userActivity?.playlistCreationCount || 0) * 1 +
+                  (userData.userActivity?.randomSetlistCount || 0) * 1 +
+                  (userData.userActivity?.requestUtawakuCount || 0) * 3 +
+                  (userData.userActivity?.rouletteCount || 0) * 0.4
+                )
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        const activeUsers = await Promise.all(activeUsersPromises);
+        const filteredActiveUsers = activeUsers.filter(user => user !== null);
+
+        setUsers(sortData(filteredActiveUsers, sortConfig));
         setLoading(false);
       } catch (error) {
         console.error('Error fetching active users:', error);
@@ -123,6 +132,8 @@ const ActiveUsers = () => {
               <tr>
                 <th className="px-4 py-2 text-left">Rank</th>
                 <SortableHeader label="Email" sortKey="email" />
+                <SortableHeader label="ユーザー名" sortKey="username" />
+                <SortableHeader label="曲数" sortKey="songCount" />
                 <SortableHeader label="最終アクティビティ" sortKey="lastActivity" />
                 <SortableHeader label="セットリスト数" sortKey="setlistCount" />
                 <SortableHeader label="公開リスト数" sortKey="publicListCount" />
@@ -138,6 +149,8 @@ const ActiveUsers = () => {
                 <tr key={user.id} className="border-t hover:bg-gray-50">
                   <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{user.email}</td>
+                  <td className="px-4 py-2">{user.username}</td>
+                  <td className="px-4 py-2">{user.songCount}</td>
                   <td className="px-4 py-2">
                     {user.lastActivity?.toLocaleString('ja-JP', {
                       year: 'numeric',
