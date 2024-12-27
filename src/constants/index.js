@@ -1,5 +1,5 @@
 export const FREE_PLAN_MAX_SONGS = 3000;
-export const FREE_PLAN_MAX_YOUTUBE_PLAYLISTS = 20;
+export const FREE_PLAN_MAX_YOUTUBE_PLAYLISTS = 10;
 export const FREE_PLAN_MAX_SETLISTS = 10;
 export const PREMIUM_PLAN_PRICE = 490;
 export const FREE_PLAN_MAX_PUBLIC_PAGES = 1;
