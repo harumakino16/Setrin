@@ -7,6 +7,7 @@ import { useMessage } from '@/context/MessageContext';
 import { useTheme } from '@/context/ThemeContext';
 import fetchUsersSetlists from '@/hooks/fetchSetlists';
 import { FREE_PLAN_MAX_SETLISTS } from '@/constants';
+import { useSetlistCreation } from '@/hooks/useSetlistCreation';
 
 const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const [inputValue, setInputValue] = useState('');
@@ -14,6 +15,7 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     const { setMessageInfo } = useMessage();
     const { theme } = useTheme();
     const { setlists } = fetchUsersSetlists(currentUser);
+    const { createSetlist } = useSetlistCreation();
 
     // デフォルトのセットリスト名を設定
     useEffect(() => {
@@ -23,47 +25,16 @@ const SetlistNameModal = ({ isOpen, onClose, onSetlistAdded }) => {
     }, []);
 
     const handleSubmit = async () => {
-        if (!currentUser) {
-            setMessageInfo({ message: 'エラー：ユーザーが認証されていません', type: 'error' });
-            return;
+        const newSetlistId = await createSetlist({
+            name: inputValue,
+            songIds: [],
+            existingSetlists: setlists
+        });
+
+        if (newSetlistId && onSetlistAdded) {
+            onSetlistAdded();
         }
-
-        try {
-            // 無料プランのチェック
-            if (currentUser.plan === 'free' && setlists.length >= FREE_PLAN_MAX_SETLISTS) {
-                setMessageInfo({ type: 'error', message: `無料プランでは最大${FREE_PLAN_MAX_SETLISTS}個のセットリストまで保存できます。` });
-                return;
-            }
-
-            // バッチ処理を使用して、両方の操作を確実に実行
-            const batch = writeBatch(db);
-            
-            // セットリストの追加
-            const setlistRef = doc(collection(db, 'users', currentUser.uid, 'Setlists'));
-            batch.set(setlistRef, {
-                name: inputValue,
-                createdAt: serverTimestamp()
-            });
-
-            // ユーザーアクティビティの更新
-            const userRef = doc(db, 'users', currentUser.uid);
-            batch.update(userRef, {
-                'userActivity.setlistCount': increment(1),
-                'userActivity.lastActivityAt': serverTimestamp(),
-            });
-
-            // バッチ処理の実行
-            await batch.commit();
-
-            setMessageInfo({ message: 'セットリストを作成しました', type: 'success' });
-            if (onSetlistAdded) {
-                onSetlistAdded();
-            }
-            onClose();
-        } catch (error) {
-            console.error('Error creating setlist:', error);
-            setMessageInfo({ message: 'エラー：セットリストの作成中にエラーが発生しました', type: 'error' });
-        }
+        onClose();
     };
 
     return (

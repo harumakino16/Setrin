@@ -1,31 +1,31 @@
 import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../../firebaseConfig';
-import { collection, addDoc, doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { AuthContext } from '@/context/AuthContext';
 import { useMessage } from '@/context/MessageContext';
 import SearchForm from '@/components/SearchForm';
 import Modal from '@/components/Modal';
 import useSearchCriteria from '@/hooks/useSearchCriteria';
 import fetchUsersSetlists from '../hooks/fetchSetlists';
-import { useSongs } from '@/context/SongsContext'; // SongsContextからuseSongsをインポート
+import { useSongs } from '@/context/SongsContext';
 import { useTheme } from '@/context/ThemeContext';
-import { FREE_PLAN_MAX_SETLISTS } from '@/constants';
+import { useSetlistCreation } from '@/hooks/useSetlistCreation';
 
 export default function CreateRandomSetlist({ isOpen, onClose }) {
     const { currentUser } = useContext(AuthContext);
     const { setMessageInfo } = useMessage();
     const [searchResults, setSearchResults] = useState([]);
-    const [numberOfSongs, setNumberOfSongs] = useState(10); // デフォルトの曲数を設定
+    const [numberOfSongs, setNumberOfSongs] = useState(10);
     const router = useRouter();
     const { searchCriteria, setSearchCriteria } = useSearchCriteria({});
     const { setlists: existingSetlists } = fetchUsersSetlists(currentUser);
-    const [activeTab, setActiveTab] = useState('random'); // タブの状態を管理
-    const { songs } = useSongs(); // 全曲を取得するためにuseSongsを使用
+    const [activeTab, setActiveTab] = useState('random');
+    const { songs } = useSongs();
     const { theme } = useTheme();
+    const { createSetlist } = useSetlistCreation();
 
     useEffect(() => {
-        // コンポーネントのマウント時に全曲をsearchResultsに設定
         setSearchResults(songs);
     }, [songs]);
 
@@ -43,48 +43,41 @@ export default function CreateRandomSetlist({ isOpen, onClose }) {
     };
 
     const createRandomSetlist = async () => {
-        if (currentUser.plan === 'free' && existingSetlists.length >= FREE_PLAN_MAX_SETLISTS) {
-            setMessageInfo({ type: 'error', message: `無料プランでは最大${FREE_PLAN_MAX_SETLISTS}個のセットリストまで保存できます。` });
-            return;
-        }
-
         if (searchResults.length === 0) {
             setMessageInfo({ type: 'error', message: '検索結果がありません。' });
             return;
         }
 
         const randomSongs = searchResults.sort(() => 0.5 - Math.random()).slice(0, numberOfSongs);
-        const setlistData = {
-            name: `ランダムセットリスト - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-            songIds: randomSongs.map(song => song.id),
-            createdAt: new Date()
-        };
+        const setlistName = `ランダムセットリスト - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
 
         try {
-            const setlistsRef = collection(db, `users/${currentUser.uid}/Setlists`);
-            const docRef = await addDoc(setlistsRef, setlistData);
-            setMessageInfo({ type: 'success', message: 'セットリストが作成されました。' });
-            handleClose(); // モーダルを閉じる
-            router.push(`/setlist/${docRef.id}`);
+            const newSetlistId = await createSetlist({
+                name: setlistName,
+                songIds: randomSongs.map(song => song.id),
+                existingSetlists
+            });
 
-            // ▼ ランダムセットリスト作成したのでカウントを +1
-            const userRef = doc(db, 'users', currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
+            if (newSetlistId) {
+                // ランダムセットリスト作成のカウントを更新
+                const userRef = doc(db, 'users', currentUser.uid);
                 await updateDoc(userRef, {
                     'userActivity.randomSetlistCount': increment(1),
                     'userActivity.monthlyRandomSetlistCount': increment(1),
                     'userActivity.lastActivityAt': serverTimestamp(),
                 });
+
+                handleClose();
+                router.push(`/setlist/${newSetlistId}`);
             }
         } catch (error) {
-            setMessageInfo({ type: 'error', message: 'セットリストの保存に失敗しました。' });
+            console.error('Error creating random setlist:', error);
         }
     };
 
     const handleClose = () => {
-        setActiveTab('random'); // タブをデフォルトにリセット
-        onClose(); // モーダルを閉じる
+        setActiveTab('random');
+        onClose();
     };
 
     return (

@@ -14,6 +14,7 @@ import H1 from '@/components/ui/h1';
 import BackButton from '@/components/BackButton';
 import RouletteContent from '@/components/roulette/RouletteContent';
 import CreateRandomSetlist from '@/components/CreateRandomSetlist';
+import { useSetlistCreation } from '@/hooks/useSetlistCreation';
 
 export default function RouletteUtawaku() {
   const { theme } = useTheme();
@@ -34,9 +35,10 @@ export default function RouletteUtawaku() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isAddSetlistOpen, setIsAddSetlistOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const isReady = currentUser && songs;
+
+  const { createSetlist } = useSetlistCreation();
 
   // ユーザーのセットリスト一覧を取得
   useEffect(() => {
@@ -116,30 +118,28 @@ export default function RouletteUtawaku() {
     if (!currentUser || !songs) return;
     
     try {
-      const setlistRef = collection(db, `users/${currentUser.uid}/Setlists`);
-      const newSetlist = {
+      const newSetlistId = await createSetlist({
         name: '全曲セットリスト',
         songIds: songs.map(song => song.id),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      const docRef = await addDoc(setlistRef, newSetlist);
-      setSelectedSetlistId(docRef.id);
-      
-      // 新しいセットリストを追加
-      setSetlists(prev => [...prev, { id: docRef.id, ...newSetlist }]);
-      
-      // 成功メッセージを表示
-      setSuccessMessage('セットリストを作成しました！');
-      // 3秒後にメッセージを消す
-      setTimeout(() => setSuccessMessage(''), 3000);
-      
-      // アコーディオンを閉じる
-      setIsAddSetlistOpen(false);
+        existingSetlists: setlists
+      });
+
+      if (newSetlistId) {
+        setSelectedSetlistId(newSetlistId);
+        // 新しいセットリストを追加
+        setSetlists(prev => [...prev, {
+          id: newSetlistId,
+          name: '全曲セットリスト',
+          songIds: songs.map(song => song.id),
+          createdAt: new Date()
+        }]);
+        
+        setSuccessMessage('セットリストを作成しました！');
+        setTimeout(() => setSuccessMessage(''), 3000);
+        setIsAddSetlistOpen(false);
+      }
     } catch (error) {
       console.error('セットリスト作成エラー:', error);
-      alert('セットリスト作成に失敗しました。');
     }
   };
 
@@ -262,12 +262,6 @@ export default function RouletteUtawaku() {
                 </div>
               </div>
             )}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow-lg transition-opacity duration-500">
-            {successMessage}
           </div>
         )}
 
