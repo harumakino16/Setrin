@@ -30,10 +30,19 @@ const ActiveUsers = () => {
               const songsSnapshot = await getDocs(songsRef);
               const songCount = songsSnapshot.size;
 
+              const rawTotalScore = (
+                (userData.userActivity?.setlistCount || 0) * 2 +
+                (userData.userActivity?.publicListCount || 0) * 2 +
+                (userData.userActivity?.playlistCreationCount || 0) * 1 +
+                (userData.userActivity?.randomSetlistCount || 0) * 1 +
+                (userData.userActivity?.requestUtawakuCount || 0) * 3 +
+                (userData.userActivity?.rouletteCount || 0) * 0.4
+              );
+
               return {
                 id: doc.id,
                 email: userData.email || '不明',
-                username: userData.username || '未設定',
+                username: userData.displayName || '未設定',
                 songCount: songCount,
                 lastActivity: lastActivity,
                 setlistCount: userData.userActivity?.setlistCount || 0,
@@ -45,14 +54,7 @@ const ActiveUsers = () => {
                 monthlyRandomSetlistCount: userData.userActivity?.monthlyRandomSetlistCount || 0,
                 monthlyRequestUtawakuCount: userData.userActivity?.monthlyRequestUtawakuCount || 0,
                 monthlyRouletteCount: userData.userActivity?.monthlyRouletteCount || 0,
-                totalScore: (
-                  (userData.userActivity?.setlistCount || 0) * 2 +
-                  (userData.userActivity?.publicListCount || 0) * 2 +
-                  (userData.userActivity?.playlistCreationCount || 0) * 1 +
-                  (userData.userActivity?.randomSetlistCount || 0) * 1 +
-                  (userData.userActivity?.requestUtawakuCount || 0) * 3 +
-                  (userData.userActivity?.rouletteCount || 0) * 0.4
-                )
+                totalScore: Math.round(rawTotalScore * 10) / 10,
               };
             }
             return null;
