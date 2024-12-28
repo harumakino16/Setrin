@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/../firebaseConfig';
-import { collection, getDocs, query, where, Timestamp, collectionGroup } from 'firebase/firestore';
+import { collection, getDocs, query, where, Timestamp, collectionGroup, getCountFromServer } from 'firebase/firestore';
 import withAdminAuth from '@/components/withAdminAuth';
 import Layout from '@/pages/layout';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -25,10 +25,10 @@ const ActiveUsers = () => {
             const lastActivity = userData.userActivity?.lastActivityAt?.toDate();
             
             if (lastActivity && lastActivity > thirtyDaysAgo) {
-              // ユーザーごとのSongsサブコレクションを取得
+              // getCountFromServerを使用して曲数を取得
               const songsRef = collection(db, 'users', doc.id, 'Songs');
-              const songsSnapshot = await getDocs(songsRef);
-              const songCount = songsSnapshot.size;
+              const songCountSnapshot = await getCountFromServer(songsRef);
+              const songCount = songCountSnapshot.data().count;
 
               const rawTotalScore = (
                 (userData.userActivity?.setlistCount || 0) * 2 +
