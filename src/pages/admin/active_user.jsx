@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/../firebaseConfig';
-import { collection, getDocs, query, where, Timestamp, collectionGroup, getCountFromServer } from 'firebase/firestore';
+import { collection, getDocs, query, where, Timestamp, getCountFromServer } from 'firebase/firestore';
 import withAdminAuth from '@/components/withAdminAuth';
 import Layout from '@/pages/layout';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -16,55 +16,49 @@ const ActiveUsers = () => {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+        // アクティブユーザーのみをクエリ
         const usersRef = collection(db, 'users');
-        const querySnapshot = await getDocs(usersRef);
+        const activeUsersQuery = query(
+          usersRef,
+          where('userActivity.lastActivityAt', '>', Timestamp.fromDate(thirtyDaysAgo))
+        );
+        const querySnapshot = await getDocs(activeUsersQuery);
 
-        const activeUsersPromises = querySnapshot.docs
-          .map(async doc => {
-            const userData = doc.data();
-            const lastActivity = userData.userActivity?.lastActivityAt?.toDate();
-            
-            if (lastActivity && lastActivity > thirtyDaysAgo) {
-              // getCountFromServerを使用して曲数を取得
-              const songsRef = collection(db, 'users', doc.id, 'Songs');
-              const songCountSnapshot = await getCountFromServer(songsRef);
-              const songCount = songCountSnapshot.data().count;
+        const activeUsersPromises = querySnapshot.docs.map(async doc => {
+          const userData = doc.data();
+          
+          // getCountFromServerを使用して曲数を取得
+          const songsRef = collection(db, 'users', doc.id, 'Songs');
+          const songCountSnapshot = await getCountFromServer(songsRef);
+          const songCount = songCountSnapshot.data().count;
 
-              const rawTotalScore = (
-                (userData.userActivity?.setlistCount || 0) * 2 +
-                (userData.userActivity?.publicListCount || 0) * 2 +
-                (userData.userActivity?.playlistCreationCount || 0) * 1 +
-                (userData.userActivity?.randomSetlistCount || 0) * 1 +
-                (userData.userActivity?.requestUtawakuCount || 0) * 3 +
-                (userData.userActivity?.rouletteCount || 0) * 0.4
-              );
+          const rawTotalScore = (
+            (userData.userActivity?.setlistCount || 0) * 2 +
+            (userData.userActivity?.publicListCount || 0) * 2 +
+            (userData.userActivity?.playlistCreationCount || 0) * 1 +
+            (userData.userActivity?.randomSetlistCount || 0) * 1 +
+            (userData.userActivity?.requestUtawakuCount || 0) * 3 +
+            (userData.userActivity?.rouletteCount || 0) * 0.4
+          );
 
-              return {
-                id: doc.id,
-                email: userData.email || '不明',
-                username: userData.displayName || '未設定',
-                songCount: songCount,
-                lastActivity: lastActivity,
-                setlistCount: userData.userActivity?.setlistCount || 0,
-                publicListCount: userData.userActivity?.publicListCount || 0,
-                playlistCreationCount: userData.userActivity?.playlistCreationCount || 0,
-                randomSetlistCount: userData.userActivity?.randomSetlistCount || 0,
-                requestUtawakuCount: userData.userActivity?.requestUtawakuCount || 0,
-                rouletteCount: userData.userActivity?.rouletteCount || 0,
-                monthlyRandomSetlistCount: userData.userActivity?.monthlyRandomSetlistCount || 0,
-                monthlyRequestUtawakuCount: userData.userActivity?.monthlyRequestUtawakuCount || 0,
-                monthlyRouletteCount: userData.userActivity?.monthlyRouletteCount || 0,
-                totalScore: Math.round(rawTotalScore * 10) / 10,
-              };
-            }
-            return null;
-          })
-          .filter(Boolean);
+          return {
+            id: doc.id,
+            email: userData.email || '不明',
+            username: userData.displayName || '未設定',
+            songCount: songCount,
+            lastActivity: userData.userActivity?.lastActivityAt?.toDate(),
+            setlistCount: userData.userActivity?.setlistCount || 0,
+            publicListCount: userData.userActivity?.publicListCount || 0,
+            playlistCreationCount: userData.userActivity?.playlistCreationCount || 0,
+            randomSetlistCount: userData.userActivity?.randomSetlistCount || 0,
+            requestUtawakuCount: userData.userActivity?.requestUtawakuCount || 0,
+            rouletteCount: userData.userActivity?.rouletteCount || 0,
+            totalScore: Math.round(rawTotalScore * 10) / 10,
+          };
+        });
 
         const activeUsers = await Promise.all(activeUsersPromises);
-        const filteredActiveUsers = activeUsers.filter(user => user !== null);
-
-        setUsers(sortData(filteredActiveUsers, sortConfig));
+        setUsers(sortData(activeUsers, sortConfig));
         setLoading(false);
       } catch (error) {
         console.error('Error fetching active users:', error);
@@ -73,7 +67,7 @@ const ActiveUsers = () => {
     };
 
     fetchActiveUsers();
-  }, []);
+  }, [sortConfig]);
 
   const sortData = (data, { key, direction }) => {
     return [...data].sort((a, b) => {
