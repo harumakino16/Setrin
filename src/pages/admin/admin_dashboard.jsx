@@ -1,7 +1,7 @@
 import withAdminAuth from '@/components/withAdminAuth';
 import { useState, useEffect } from 'react';
 import { db } from '../../../firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs,getCountFromServer } from 'firebase/firestore';
 import Link from 'next/link';
 import Layout from '@/pages/layout';
 import { useTranslation } from 'next-i18next';
@@ -25,8 +25,8 @@ const AdminDashboard = () => {
 
   const fetchUserCount = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'users'));
-      setUserCount(querySnapshot.size);
+      const querySnapshot = await getCountFromServer(collection(db, 'users'));
+      setUserCount(querySnapshot.data().count);
     } catch (error) {
       console.error("Error fetching user count: ", error);
     }
