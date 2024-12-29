@@ -4,7 +4,7 @@ import ctaComponent from '@/components/CtaComponent';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState, useEffect } from 'react';
-
+import withAdminAuth from '@/components/withAdminAuth';
 
 const Test = () => {
     useEffect(() => {
@@ -22,7 +22,7 @@ const Test = () => {
     );
 };
 
-export default Test;
+export default withAdminAuth(Test);
 
 // ページで翻訳データを取得する部分
 export async function getStaticProps({ locale }) {

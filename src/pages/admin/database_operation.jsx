@@ -6,7 +6,7 @@ import { useMessage } from '@/context/MessageContext';
 import Layout from '@/pages/layout';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-
+import withAdminAuth from '@/components/withAdminAuth';
 
 const DatabaseOperation = () => {
     const [userId, setUserId] = useState('');
@@ -192,7 +192,7 @@ const DatabaseOperation = () => {
     );
 };
 
-export default DatabaseOperation;
+export default withAdminAuth(DatabaseOperation);
 
 // ページで翻訳データを取得する部分
 export async function getStaticProps({ locale }) {
