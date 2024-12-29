@@ -127,6 +127,7 @@ const ActiveUsers = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-2 text-left">Rank</th>
+                <SortableHeader label="ID" sortKey="id" />
                 <SortableHeader label="Email" sortKey="email" />
                 <SortableHeader label="ユーザー名" sortKey="username" />
                 <SortableHeader label="曲数" sortKey="songCount" />
@@ -144,6 +145,7 @@ const ActiveUsers = () => {
               {users.map((user, index) => (
                 <tr key={user.id} className="border-t hover:bg-gray-50">
                   <td className="px-4 py-2">{index + 1}</td>
+                  <td className="px-4 py-2">{user.id}</td>
                   <td className="px-4 py-2">{user.email}</td>
                   <td className="px-4 py-2">{user.username}</td>
                   <td className="px-4 py-2">{user.songCount}</td>

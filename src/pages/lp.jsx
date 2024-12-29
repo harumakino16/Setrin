@@ -238,7 +238,7 @@ export default function LandingPage() {
               href="/login" 
               className="hidden md:block bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
-              {currentUser ? 'マイページへ' : '今すぐ無料で始める'}
+              {currentUser ? 'マイページへ' : '今すぐ無料で始める・ログイン'}
             </Link>
           </div>
         </header>

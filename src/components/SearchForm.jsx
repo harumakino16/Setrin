@@ -15,13 +15,13 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             const keywordLower = searchCriteria.freeKeyword.toLowerCase();
             const keywordHira = convertKanaToHira(keywordLower);
             songsData = songsData.filter(song =>
-                (song.title && song.title.toLowerCase().includes(keywordLower)) ||
-                (song.artist && song.artist.toLowerCase().includes(keywordLower)) ||
-                (song.tags && song.tags.some(tag => tag.toLowerCase().includes(keywordLower))) ||
-                (song.genre && song.genre.toLowerCase().includes(keywordLower)) ||
+                (song.title && typeof song.title === 'string' && song.title.toLowerCase().includes(keywordLower)) ||
+                (song.artist && typeof song.artist === 'string' && song.artist.toLowerCase().includes(keywordLower)) ||
+                (song.tags && Array.isArray(song.tags) && song.tags.some(tag => typeof tag === 'string' && tag.toLowerCase().includes(keywordLower))) ||
+                (song.genre && typeof song.genre === 'string' && song.genre.toLowerCase().includes(keywordLower)) ||
                 (song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower)) ||
                 (song.memo && String(song.memo).toLowerCase().includes(keywordLower)) ||
-                (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
+                (song.furigana && typeof song.furigana === 'string' && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
         }
 
@@ -40,12 +40,16 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
 
         if (searchCriteria.artist) {
             const artistLower = searchCriteria.artist.toLowerCase();
-            songsData = songsData.filter(song => song.artist && song.artist.toLowerCase().includes(artistLower));
+            songsData = songsData.filter(song => 
+                song.artist && typeof song.artist === 'string' && song.artist.toLowerCase().includes(artistLower)
+            );
         }
 
         if (searchCriteria.genre) {
             const genreLower = searchCriteria.genre.toLowerCase();
-            songsData = songsData.filter(song => song.genre && song.genre.toLowerCase().includes(genreLower));
+            songsData = songsData.filter(song => 
+                song.genre && typeof song.genre === 'string' && song.genre.toLowerCase().includes(genreLower)
+            );
         }
 
         if (searchCriteria.skillLevel > 0) {

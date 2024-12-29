@@ -1,6 +1,6 @@
 import withAdminAuth from '@/components/withAdminAuth';
 import { useState, useEffect } from 'react';
-import { db } from '../../../firebaseConfig';
+import { db } from '@/../firebaseConfig';
 import { collection, getDocs,getCountFromServer } from 'firebase/firestore';
 import Link from 'next/link';
 import Layout from '@/pages/layout';
@@ -12,6 +12,7 @@ import {
   CircleStackIcon as DatabaseIcon,
   UserIcon,
   BeakerIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
@@ -66,6 +67,13 @@ const AdminDashboard = () => {
       icon: BeakerIcon,
       href: '/admin/test',
       color: 'bg-yellow-500',
+    },
+    {
+      title: 'メール一括送信',
+      description: 'ユーザーへ一括でメールを送信します',
+      icon: EnvelopeIcon,
+      href: '/admin/all_send_mail',
+      color: 'bg-red-500',
     },
   ];
 
