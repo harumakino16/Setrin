@@ -6,6 +6,7 @@ import { useMessage } from "@/context/MessageContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/context/ThemeContext';
+import { convertUrlsToLinks } from '@/utils/textUtils';
 
 const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, visibleColumns, setVisibleColumns }) => {
   const [isDragged, setIsDragged] = useState(false);
@@ -224,62 +225,62 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
       <tr
         ref={ref}
         style={{ opacity: isDragging ? 0 : 1 }}
-        className="bg-white"
+        className="bg-white hover:bg-gray-50 transition-colors duration-150 ease-in-out"
       >
-        <td className="border px-4 py-2">
-          <div ref={drag} style={{ cursor: 'move' }}>
-            <FontAwesomeIcon icon={faBars} />
+        <td className="border-b border-gray-200 px-4 py-3">
+          <div ref={drag} style={{ cursor: 'move' }} className="flex justify-center">
+            <FontAwesomeIcon icon={faBars} className="text-gray-400 hover:text-gray-600" />
           </div>
         </td>
         {visibleColumns.order.visible && (
-          <td className="border px-4 py-2">{index + 1}</td>
+          <td className="border-b border-gray-200 px-4 py-3 text-center font-medium text-gray-500">{index + 1}</td>
         )}
         {visibleColumns.title.visible && (
-          <td className="border px-4 py-2 max-w-xs">
+          <td className="border-b border-gray-200 px-4 py-3 max-w-xs">
             {song.youtubeUrl ? (
               <a
                 href={song.youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
+                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
               >
                 <div className="truncate">{song.title}</div>
               </a>
             ) : (
-              <div className="truncate text-black">{song.title}</div>
+              <div className="truncate text-gray-900 font-medium">{song.title}</div>
             )}
           </td>
         )}
         {visibleColumns.artist.visible && (
-          <td className="border px-4 py-2 max-w-xs">
-            <div className="truncate">{song.artist}</div>
+          <td className="border-b border-gray-200 px-4 py-3 max-w-xs">
+            <div className="truncate text-gray-700">{song.artist}</div>
           </td>
         )}
         {visibleColumns.genre.visible && (
-          <td className="border px-4 py-2 max-w-xs">
-            <div className="truncate">{song.genre}</div>
+          <td className="border-b border-gray-200 px-4 py-3 max-w-xs">
+            <div className="truncate text-gray-700">{song.genre}</div>
           </td>
         )}
         {visibleColumns.tags.visible && (
-          <td className="border px-4 py-2 max-w-xs">
-            <div className="truncate">{song.tags.join(', ')}</div>
+          <td className="border-b border-gray-200 px-4 py-3 max-w-xs">
+            <div className="truncate text-gray-600">{song.tags.join(', ')}</div>
           </td>
         )}
         {visibleColumns.singingCount.visible && (
-          <td className="border px-4 py-2">
-            <div className="flex items-center gap-2">
-              <span>{song.singingCount}</span>
+          <td className="border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center justify-center gap-2">
+              <span className="font-medium text-gray-700">{song.singingCount}</span>
               <div className="flex flex-col items-center">
                 <button
                   onClick={() => handleIncreaseSingingCount(song.id)}
-                  className="text-gray-500 hover:text-gray-700 p-0 m-0 mt-1"
+                  className="text-gray-400 hover:text-gray-600 p-0 m-0 mt-1 transition-colors"
                   style={{ fontSize: '0.5rem' }}
                 >
                   ▲
                 </button>
                 <button
                   onClick={() => handleDecreaseSingingCount(song.id)}
-                  className="text-gray-500 hover:text-gray-700 p-0 m-0"
+                  className="text-gray-400 hover:text-gray-600 p-0 m-0 transition-colors"
                   style={{ fontSize: '0.5rem' }}
                 >
                   ▼
@@ -289,19 +290,32 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
           </td>
         )}
         {visibleColumns.skillLevel.visible && (
-          <td className="border px-4 py-2">{song.skillLevel || '0'}</td>
+          <td className="border-b border-gray-200 px-4 py-3 text-center font-medium text-gray-700">{song.skillLevel || '0'}</td>
         )}
-        {visibleColumns.memo.visible && (
-          <td className="border px-4 py-2">{song.memo}</td>
+        {visibleColumns.note?.visible && (
+          <td className="border-b border-gray-200 px-6 py-4 whitespace-normal break-words text-sm text-gray-600">
+            <div dangerouslySetInnerHTML={{ 
+              __html: convertUrlsToLinks(song.note) 
+            }} />
+          </td>
+        )}
+        {visibleColumns.memo?.visible && (
+          <td className="border-b border-gray-200 px-6 py-4 whitespace-normal break-words text-sm text-gray-600">
+            <div dangerouslySetInnerHTML={{ 
+              __html: convertUrlsToLinks(song.memo) 
+            }} />
+          </td>
         )}
         {visibleColumns.delete.visible && (
-          <td className="border px-4 py-2 flex justify-center">
-            <button
-              onClick={() => onDelete(song.id)}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-            >
-              削除
-            </button>
+          <td className="border-b border-gray-200 px-4 py-3">
+            <div className="flex justify-center whitespace-nowrap">
+              <button
+                onClick={() => onDelete(song.id)}
+                className="bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-3 rounded-md transition-colors shadow-sm hover:shadow whitespace-nowrap min-w-[60px]"
+              >
+                削除
+              </button>
+            </div>
           </td>
         )}
       </tr>
@@ -353,7 +367,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
     <div className="overflow-x-auto w-full">
       <table
         ref={tableRef}
-        className="whitespace-nowrap w-full table-auto"
+        className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-lg overflow-hidden"
       >
         <colgroup>
           <col style={{ width: '30px' }} />
@@ -362,11 +376,11 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
             visible && <col key={key} style={{ width: columnWidths[key] || 'auto' }} />
           ))}
         </colgroup>
-        <thead className="bg-gray-200">
+        <thead className="bg-gray-50">
           <tr>
             {/* ドラッグハンドル列 */}
             <th
-              className="px-4 py-2 relative border-r border-white"
+              className="px-4 py-3 relative border-b border-gray-200 bg-gray-50"
               style={{ width: '30px' }}
             >
               {/* ここにドラッグハンドルのアイコン等を追加可能 */}
@@ -375,7 +389,7 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
             {visibleColumns.order.visible && (
               <th
                 ref={(el) => (headerRefs.current['order'] = el)}
-                className="px-4 py-2 relative border-r border-white"
+                className="px-4 py-3 relative border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                 style={{ width: '40px' }}
               >
                 順番
@@ -387,41 +401,41 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
             )}
             {/* その他の列 */}
             {Object.entries(visibleColumns).map(([key, { label, visible }]) => {
-              if (key === 'order') return null; // 既に処理済み
+              if (key === 'order') return null;
               if (!visible) return null;
               return (
                 <th
                   key={key}
                   ref={(el) => (headerRefs.current[key] = el)}
-                  className="px-4 py-2 relative border-r border-white last:border-r-0"
+                  className="px-4 py-3 relative border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   style={{
                     width: columnWidths[key] || 'auto',
                     minWidth: '50px',
                   }}
                 >
                   <div className="flex items-center justify-center">
-                  {label}
-                  {key === 'singingCount' && (
-                    <div className="flex flex-col items-center ml-2">
-                      <button
-                        onClick={increaseAllSingingCounts}
-                        className="text-gray-500 hover:text-gray-700 p-0 m-0 mt-1"
-                        style={{ fontSize: '0.5rem' }}
-                      >
-                        ▲
-                      </button>
-                      <button
-                        onClick={decreaseAllSingingCounts}
-                        className="text-gray-500 hover:text-gray-700 p-0 m-0"
-                        style={{ fontSize: '0.5rem' }}
-                      >
-                        ▼
-                      </button>
-                    </div>
-                  )}
+                    <span className="whitespace-nowrap">{label}</span>
+                    {key === 'singingCount' && (
+                      <div className="flex flex-col items-center ml-2">
+                        <button
+                          onClick={increaseAllSingingCounts}
+                          className="text-gray-400 hover:text-gray-600 p-0 m-0 mt-1 transition-colors"
+                          style={{ fontSize: '0.5rem' }}
+                        >
+                          ▲
+                        </button>
+                        <button
+                          onClick={decreaseAllSingingCounts}
+                          className="text-gray-400 hover:text-gray-600 p-0 m-0 transition-colors"
+                          style={{ fontSize: '0.5rem' }}
+                        >
+                          ▼
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div
-                    className="absolute top-0 right-0 bottom-0 w-2 cursor-col-resize"
+                    className="absolute top-0 right-0 bottom-0 w-2 cursor-col-resize hover:bg-gray-300"
                     onMouseDown={(e) => handleMouseDown(e, key)}
                   />
                 </th>
@@ -436,14 +450,14 @@ const SetlistTable = ({ currentSongs, setCurrentSongs, currentUser, setlist, vis
         </tbody>
       </table>
       {isDragged && (
-        <div className={`fixed bottom-0 left-0 right-0 bg-customTheme-${theme}-secondary p-4 shadow-lg border-t border-customTheme-${theme}-primary flex justify-between items-center`}>
-          <div className="text-customTheme-${theme}-primary">
-            <span className="font-bold">未保存の変更があります。</span>
+        <div className={`fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg border-t border-gray-200 flex justify-between items-center z-50`}>
+          <div className="text-gray-700">
+            <span className="font-medium">未保存の変更があります。</span>
             <span className="ml-2">変更を保存するには「変更を保存」ボタンを押してください。</span>
           </div>
           <button
             onClick={onSave}
-            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors shadow-sm hover:shadow"
           >
             変更を保存
           </button>

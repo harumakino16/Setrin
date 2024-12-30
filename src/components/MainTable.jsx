@@ -8,6 +8,7 @@ import ContextMenu from './ContextMenu';
 import ColumnSettingsModal from './ColumnSettingsModal';
 import { useTheme } from '@/context/ThemeContext';
 import { sortSongs } from '../utils/sortUtils';
+import { convertUrlsToLinks } from '@/utils/textUtils';
 
 function MainTable({
   selectAll,
@@ -355,10 +356,18 @@ function MainTable({
                     </td>
                   )}
                   {visibleColumns.note.visible && (
-                    <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.note}</td>
+                    <td className="px-6 py-4 whitespace-normal break-words text-sm">
+                      <div dangerouslySetInnerHTML={{ 
+                        __html: convertUrlsToLinks(song.note) 
+                      }} />
+                    </td>
                   )}
                   {visibleColumns.memo.visible && (
-                    <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.memo}</td>
+                    <td className="px-6 py-4 whitespace-normal break-words text-sm">
+                      <div dangerouslySetInnerHTML={{ 
+                        __html: convertUrlsToLinks(song.memo) 
+                      }} />
+                    </td>
                   )}
                   {visibleColumns.actions.visible && (
                     <td className="px-6 py-4 whitespace-nowrap">

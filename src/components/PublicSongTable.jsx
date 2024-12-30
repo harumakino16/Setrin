@@ -1,5 +1,6 @@
 // components/PublicSongTable.jsx
 import React from 'react';
+import { convertUrlsToLinks } from '@/utils/textUtils';
 
 export default function PublicSongTable({ songs, visibleColumns, onRequestSort, sortConfig = { key: 'title', direction: 'ascending' }, extraAction, originalSongs }) {
   const columnLabels = [
@@ -109,6 +110,20 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                       </div>
                     </td>
                   )
+                )}
+                {visibleColumns.note?.visible && (
+                  <td className="px-6 py-4 whitespace-normal break-words text-sm">
+                    <div dangerouslySetInnerHTML={{ 
+                      __html: convertUrlsToLinks(song.note) 
+                    }} />
+                  </td>
+                )}
+                {visibleColumns.memo?.visible && (
+                  <td className="px-6 py-4 whitespace-normal break-words text-sm">
+                    <div dangerouslySetInnerHTML={{ 
+                      __html: convertUrlsToLinks(song.memo) 
+                    }} />
+                  </td>
                 )}
                 {extraAction && (
                   <td className="px-6 py-4">
