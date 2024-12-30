@@ -11,7 +11,6 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { FaSearch } from 'react-icons/fa';
 import Loading from '@/components/loading';
-import Meta from '@/components/Meta';
 
 
 export default function PublicSongList() {
@@ -281,11 +280,6 @@ export default function PublicSongList() {
 
   return (
     <NoSidebarLayout>
-      <Meta 
-        title={`${userInfo?.name || 'Loading...'} | Setlink`}
-        description={userInfo?.description || ''}
-        ogUrl={`https://setlink.vercel.app/public/${id}`}
-      />
       <div className="py-8 w-full mx-auto px-4">
         <h1 className="md:text-3xl text-2xl font-bold mb-4">
           {userInfo?.displayName || '名称未設定...'}
