@@ -49,7 +49,8 @@ function MainTable({
       singingCount: { label: '歌唱回数', visible: true, removable: true },
       skillLevel: { label: '熟練度', visible: true, removable: true },
       createdAt: { label: '追加日', visible: true, removable: true },
-      memo: { label: '備考', visible: true, removable: true },
+      note: { label: '備考', visible: true, removable: true },
+      memo: { label: 'メモ', visible: true, removable: true },
       actions: { label: '操作', visible: true, removable: true }
     };
 
@@ -352,6 +353,9 @@ function MainTable({
                         minute: '2-digit'
                       }) : '未設定'}
                     </td>
+                  )}
+                  {visibleColumns.note.visible && (
+                    <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.note}</td>
                   )}
                   {visibleColumns.memo.visible && (
                     <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.memo}</td>

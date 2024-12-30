@@ -35,5 +35,6 @@
   "columnTag5": "タグ5",
   "columnSingingCount": "歌唱回数",
   "columnSkillLevel": "熟練度",
-  "columnMemo": "備考"
+  "columnNote": "備考",
+  "columnMemo": "メモ"
 }

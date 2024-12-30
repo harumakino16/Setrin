@@ -60,7 +60,8 @@ const SetlistDetail = () => {
             tags: { label: 'タグ', visible: true, removable: true },
             singingCount: { label: '歌唱回数', visible: true, removable: true },
             skillLevel: { label: '熟練度', visible: true, removable: true },
-            memo: { label: '備考', visible: true, removable: true },
+            note: { label: '備考', visible: true, removable: true },
+            memo: { label: 'メモ', visible: true, removable: true },
             delete: { label: '削除', visible: true, removable: true }
         };
     };

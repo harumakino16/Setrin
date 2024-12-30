@@ -10,7 +10,10 @@ const useSearchCriteria = () => {
         genre: '',
         skillLevel: 0,
         skillLevelOption: '以上',
-        memo: ''
+        memo: '',
+        note: '',
+        excludedTags: '',
+        excludedGenres: ''
     };
 
     const [searchCriteria, setSearchCriteria] = useState(initialCriteria);

@@ -21,6 +21,7 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                 (song.genre && typeof song.genre === 'string' && song.genre.toLowerCase().includes(keywordLower)) ||
                 (song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower)) ||
                 (song.memo && String(song.memo).toLowerCase().includes(keywordLower)) ||
+                (song.note && String(song.note).toLowerCase().includes(keywordLower)) ||
                 (song.furigana && typeof song.furigana === 'string' && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
             );
         }
@@ -64,6 +65,13 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
             const memoLower = searchCriteria.memo.toLowerCase();
             songsData = songsData.filter(song => 
                 song.memo && String(song.memo).toLowerCase().includes(memoLower)
+            );
+        }
+
+        if (searchCriteria.note) {
+            const noteLower = searchCriteria.note.toLowerCase();
+            songsData = songsData.filter(song => 
+                song.note && String(song.note).toLowerCase().includes(noteLower)
             );
         }
 
@@ -169,7 +177,21 @@ const SearchForm = ({ currentUser, handleSearchResults, searchCriteria, setSearc
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="whitespace-nowrap">備考:</label>
-                                        <input type="text" className="border p-2 rounded mb-4" value={searchCriteria.memo} onChange={(e) => handleCriteriaChange('memo', e.target.value)} />
+                                        <input 
+                                            type="text" 
+                                            className="border p-2 rounded mb-4" 
+                                            value={searchCriteria.note} 
+                                            onChange={(e) => handleCriteriaChange('note', e.target.value)} 
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="whitespace-nowrap">メモ:</label>
+                                        <input 
+                                            type="text" 
+                                            className="border p-2 rounded mb-4" 
+                                            value={searchCriteria.memo} 
+                                            onChange={(e) => handleCriteriaChange('memo', e.target.value)} 
+                                        />
                                     </div>
                                 </div>
                             </div>

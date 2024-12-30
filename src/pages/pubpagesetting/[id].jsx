@@ -54,6 +54,7 @@ export default function PubPageSettingDetail() {
     tags: true,
     singingCount: true,
     skillLevel: true,
+    note: true,
     memo: true
   });
 
@@ -209,7 +210,8 @@ export default function PubPageSettingDetail() {
     { key: 'tags', label: 'タグ' },
     { key: 'singingCount', label: '歌唱回数' },
     { key: 'skillLevel', label: '熟練度' },
-    { key: 'memo', label: '備考' }
+    { key: 'note', label: '備考' },
+    { key: 'memo', label: 'メモ' }
   ];
 
   const handleBackToList = () => {

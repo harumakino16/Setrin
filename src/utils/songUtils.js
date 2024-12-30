@@ -22,6 +22,7 @@ export const formatSongData = (song, isNewSong = false) => {
         youtubeUrl: song.youtubeUrl,
         singingCount: parseInt(song.singingCount, 10) || 0,
         skillLevel: parseInt(song.skillLevel, 10) || 0,
+        note: song.note || '',
         memo: song.memo || '',
         furigana: song.furigana != null ? song.furigana : song.title,
         createdAt: isNewSong ? new Date() : song.createdAt,

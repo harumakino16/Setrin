@@ -24,7 +24,7 @@ const DatabaseOperation = () => {
                 });
             });
             await Promise.all(updatePromises);
-            setMessageInfo({ message: '全てのユーザーのプランがFreeに��定されました。', type: 'success' });
+            setMessageInfo({ message: '全てのユーザーのプランがFreeに設定されました。', type: 'success' });
         } catch (error) {
             setMessageInfo({ message: 'プランの設定に失敗しました。', type: 'error' });
             console.error(error);
@@ -55,7 +55,7 @@ const DatabaseOperation = () => {
                         await setDoc(pageRef, {
                             color: "blue",
                         },{merge:true});
-                        console.warn(`ユーザーID ${pageData.userId} にテー��カラーが設定されていません。`);
+                        console.warn(`ユーザーID ${pageData.userId} にテーマカラーが設定されていません。`);
                     }
                 } else {
                     console.warn(`ユーザーID ${pageData.userId} のドキュメントが存在しません。`);
@@ -163,6 +163,69 @@ const DatabaseOperation = () => {
         }
     };
 
+    const handleCreateNoteField = async () => {
+        try {
+            const usersCollection = collection(db, 'users');
+            const usersSnapshot = await getDocs(usersCollection);
+            
+            console.log(`総ユーザー数: ${usersSnapshot.size}`);
+            let processedUsers = 0;
+            let totalUpdatedSongs = 0;
+            
+            let batch = writeBatch(db);
+            let operationCount = 0;
+            
+            for (const userDoc of usersSnapshot.docs) {
+                const userId = userDoc.id;
+                
+                processedUsers++;
+                console.log(`処理中のユーザー: ${processedUsers}/${usersSnapshot.size} (${Math.round(processedUsers/usersSnapshot.size*100)}%)`);
+                
+                const songsRef = collection(db, 'users', userId, 'Songs');
+                const songsSnapshot = await getDocs(songsRef);
+                
+                for (const songDoc of songsSnapshot.docs) {
+                    const songData = songDoc.data();
+                    if (!songData.note) {
+                        // noteフィールドを追加（memoの値をコピー）
+                        batch.update(songDoc.ref, {
+                            note: songData.memo || '',
+                            memo: "",
+                        });
+                        operationCount++;
+                        totalUpdatedSongs++;
+                    }
+                    
+                    if (operationCount >= 500) {
+                        console.log('バッチをコミット中...');
+                        await batch.commit();
+                        batch = writeBatch(db);
+                        operationCount = 0;
+                        console.log('バッチコミット完了');
+                    }
+                }
+            }
+            
+            if (operationCount > 0) {
+                console.log('最終バッチをコミット中...');
+                await batch.commit();
+                console.log('最終バッチコミット完了');
+            }
+            
+            console.log(`移行完了！更新された曲の総数: ${totalUpdatedSongs}`);
+            setMessageInfo({ 
+                message: `備考(note)フィールドの作成が完了しました。${totalUpdatedSongs}曲を更新しました。`, 
+                type: 'success' 
+            });
+        } catch (error) {
+            console.error('Migration error:', error);
+            setMessageInfo({ 
+                message: 'データの移行に失敗しました: ' + error.message, 
+                type: 'error' 
+            });
+        }
+    };
+
     return (
         <Layout>
             <div className="p-5">
@@ -185,6 +248,12 @@ const DatabaseOperation = () => {
                         className="bg-purple-500 text-white px-4 py-2 rounded block w-full"
                     >
                         ユーザーアクティビティデータを移行
+                    </button>
+                    <button 
+                        onClick={handleCreateNoteField}
+                        className="bg-yellow-500 text-white px-4 py-2 rounded block w-full"
+                    >
+                        備考(note)フィールドを作成
                     </button>
                 </div>
             </div>
