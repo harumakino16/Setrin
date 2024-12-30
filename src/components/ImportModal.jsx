@@ -75,7 +75,8 @@ const ImportModal = ({ onClose }) => {
                     youtubeUrl: song['カラオケ音源のYoutubeURL'],
                     singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
                     skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
-                    memo: song['備考'] ? String(song['備考']) : '',
+                    note: song['備考'] ? String(song['備考']) : '',
+                    memo: song['メモ'] ? String(song['メモ']) : '',
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                 };
@@ -107,7 +108,8 @@ const ImportModal = ({ onClose }) => {
                     youtubeUrl: song['カラオケ音源のYoutubeURL'],
                     singingCount: song['歌った回数'] ? parseInt(song['歌った回数']) : 0,
                     skillLevel: song['熟練度'] ? parseInt(song['熟練度']) : 0,
-                    memo: song['備考'] ? String(song['備考']) : '',
+                    note: song['備考'] ? String(song['備考']) : '',
+                    memo: song['メモ'] ? String(song['メモ']) : '',
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                 };

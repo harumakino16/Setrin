@@ -19,6 +19,7 @@ export const exportToCSV = (data) => {
       song.youtubeUrl || '',
       song.singingCount || 0,
       song.skillLevel || 0,
+      song.note || '',
       song.memo || ''
     ].map(value => {
       const escaped = ('' + value).replace(/"/g, '""');

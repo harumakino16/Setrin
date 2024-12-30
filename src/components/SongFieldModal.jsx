@@ -24,6 +24,7 @@ function SongModal({ isOpen, onClose, song }) {
   const [singingCount, setSingingCount] = useState(isNewSong ? 0 : song.singingCount);
   const [skillLevel, setSkillLevel] = useState(isNewSong ? 0 : song.skillLevel);
   const [memo, setMemo] = useState(isNewSong ? '' : song.memo);
+  const [note, setNote] = useState(isNewSong ? '' : song.note);
   const [furigana, setFurigana] = useState(isNewSong ? '' : (song.furigana || ''));
   const [showDetails, setShowDetails] = useState(!isNewSong);
   const authContext = useContext(AuthContext);
@@ -65,6 +66,7 @@ function SongModal({ isOpen, onClose, song }) {
         singingCount,
         skillLevel,
         memo,
+        note,
         furigana,
         createdAt: isNewSong ? new Date() : song.createdAt,
       }, isNewSong);
@@ -133,8 +135,26 @@ function SongModal({ isOpen, onClose, song }) {
               <input type="number" value={singingCount} onChange={(e) => setSingingCount(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
               <div>熟練度</div>
               <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" />
-              <div>備考</div>
-              <textarea value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="備考" className="input bg-gray-100 p-3 rounded"></textarea>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">備考</label>
+                <textarea
+                  name="note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="備考"
+                  className="input bg-gray-100 p-3 rounded w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">メモ</label>
+                <textarea
+                  name="memo"
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                  placeholder="メモ"
+                  className="input bg-gray-100 p-3 rounded w-full"
+                />
+              </div>
             </>
           )}
         </div>

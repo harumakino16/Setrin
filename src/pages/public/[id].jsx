@@ -50,6 +50,7 @@ export default function PublicSongList() {
         (song.genre && song.genre.toLowerCase().includes(keywordLower)) ||
         (song.skillLevel && song.skillLevel.toString().toLowerCase().includes(keywordLower)) ||
         (song.memo && song.memo.toLowerCase().includes(keywordLower)) ||
+        (song.note && song.note.toLowerCase().includes(keywordLower)) ||
         (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(keywordHira))
       );
     }
@@ -203,6 +204,7 @@ export default function PublicSongList() {
         (song.genre && song.genre.toLowerCase().includes(kw)) ||
         (song.skillLevel && song.skillLevel.toString().toLowerCase().includes(kw)) ||
         (song.memo && song.memo.toLowerCase().includes(kw)) ||
+        (song.note && song.note.toLowerCase().includes(kw)) ||
         (song.furigana && convertKanaToHira(song.furigana.toLowerCase()).includes(hiraKw))
       );
       const sorted = sortSongs(furtherFiltered, sortConfig.key, sortConfig.direction);

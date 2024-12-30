@@ -12,7 +12,8 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
     tags: '',
     singingCount: '',
     skillLevel: '',
-    memo: ''
+    memo: '',
+    note: ''
   });
   const [tagUpdateMode, setTagUpdateMode] = useState('add');
 
@@ -33,6 +34,7 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
       if (formData.singingCount) updates.singingCount = parseInt(formData.singingCount);
       if (formData.skillLevel) updates.skillLevel = parseInt(formData.skillLevel);
       if (formData.memo) updates.memo = formData.memo;
+      if (formData.note) updates.note = formData.note;
 
       // タグの処理
       const newTags = formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
@@ -140,6 +142,15 @@ function BulkEditModal({ isOpen, onClose, selectedSongs, songs, refreshSongs }) 
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">備考</label>
+            <textarea
+              name="note"
+              value={formData.note}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">メモ</label>
             <textarea
               name="memo"
               value={formData.memo}

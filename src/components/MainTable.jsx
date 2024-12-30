@@ -8,6 +8,7 @@ import ContextMenu from './ContextMenu';
 import ColumnSettingsModal from './ColumnSettingsModal';
 import { useTheme } from '@/context/ThemeContext';
 import { sortSongs } from '../utils/sortUtils';
+import { convertUrlsToLinks } from '@/utils/textUtils';
 
 function MainTable({
   selectAll,
@@ -49,7 +50,8 @@ function MainTable({
       singingCount: { label: '歌唱回数', visible: true, removable: true },
       skillLevel: { label: '熟練度', visible: true, removable: true },
       createdAt: { label: '追加日', visible: true, removable: true },
-      memo: { label: '備考', visible: true, removable: true },
+      note: { label: '備考', visible: true, removable: true },
+      memo: { label: 'メモ', visible: true, removable: true },
       actions: { label: '操作', visible: true, removable: true }
     };
 
@@ -353,8 +355,19 @@ function MainTable({
                       }) : '未設定'}
                     </td>
                   )}
+                  {visibleColumns.note.visible && (
+                    <td className="px-6 py-4 whitespace-normal break-words text-sm">
+                      <div dangerouslySetInnerHTML={{ 
+                        __html: convertUrlsToLinks(song.note) 
+                      }} />
+                    </td>
+                  )}
                   {visibleColumns.memo.visible && (
-                    <td className="px-6 py-4 whitespace-normal break-words text-sm">{song.memo}</td>
+                    <td className="px-6 py-4 whitespace-normal break-words text-sm">
+                      <div dangerouslySetInnerHTML={{ 
+                        __html: convertUrlsToLinks(song.memo) 
+                      }} />
+                    </td>
                   )}
                   {visibleColumns.actions.visible && (
                     <td className="px-6 py-4 whitespace-nowrap">
