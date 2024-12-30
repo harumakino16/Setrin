@@ -10,6 +10,7 @@ import Price from '@/components/Price'
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { AuthContext } from '@/context/AuthContext';
+import Meta from '@/components/Meta';
 
 function FeatureCard({ icon: Icon, title, color, sections }) {
   return (
@@ -153,28 +154,10 @@ export default function LandingPage() {
 
   return (
     <>
-      <head>
-        <title>Setlink - Vtuberのセトリ管理ツール</title>
-        <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
-        <meta name="keywords" content="Vtuber, セトリ, YouTube, 再生リスト, 管理ツール" />
-        <meta property="og:title" content="Setlink - Vtuberのセトリ管理ツール" />
-        <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
-        <meta property="og:image" content="https://setlink.vercel.app/images/bunner.png" />
-        <meta property="og:url" content="https://www.setlink.com/lp" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://www.setlink.com/lp" />
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQ6L8VVTH3"></script>
-        <script>
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-WQ6L8VVTH3');
-          `}
-        </script>
-      </head>
+      <Meta 
+        title="Setlink - Vtuberのセトリ管理ツール"
+        ogUrl="https://setlink.vercel.app/lp"
+      />
       <div className="bg-blue-50">
         {/* Header */}
         <header className="bg-white shadow-sm fixed w-full top-0 z-50">

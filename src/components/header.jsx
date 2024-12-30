@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { db } from '@/../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
-import Head from 'next/head';
+import Meta from './Meta';
 
 const Header = ({ toggleSidebar }) => {
     const { theme } = useTheme();
@@ -30,30 +30,12 @@ const Header = ({ toggleSidebar }) => {
 
     return (
         <>
-            <Head>
-                {/* Google tag (gtag.js) */}
-                <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQ6L8VVTH3"></script>
-                <script>
-                    {`
-                        window.dataLayer = window.dataLayer || [];
-                        function gtag(){dataLayer.push(arguments);}
-                        gtag('js', new Date());
-
-                        gtag('config', 'G-WQ6L8VVTH3');
-                    `}
-                </script>
-
-                {/* Dynamic title and OGP tags */}
-                <title>{isListenerPage ? `${publicPageData?.name || 'Loading...'} | Setlink` : 'Setlink'}</title>
-                <meta property="og:title" content={isListenerPage ? `${publicPageData?.name || 'Loading...'} | Setlink` : 'Setlink'} />
-                <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
-                <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
-                <meta name="keywords" content="Vtuber, 歌枠, セトリ, YouTube, 再生リスト, 管理ツール" />
-                <meta property="og:image" content="https://setlink.vercel.app/images/bunner.png" />
-                <meta property="og:url" content={`https://setlink.vercel.app${router.asPath}`} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="Setlink" />
-            </Head>
+            {isListenerPage && (
+                <Meta 
+                    title={`${publicPageData?.name || 'Loading...'} | Setlink`}
+                    ogUrl={`https://setlink.vercel.app${router.asPath}`}
+                />
+            )}
             <header className={headerClassName}>
                 <div className="container mx-auto flex justify-between items-center h-[60px]">
                     <Link href="/">
