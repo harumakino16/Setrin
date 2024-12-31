@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
     if (!isOpen) return null;
-    console.log(children.type.name);
 
     const handleBackgroundClick = (event) => {
         //画面外をクリックした時にモーダルを閉じる
@@ -11,7 +10,7 @@ const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
         // }
     };
 
-    const containerClass = React.isValidElement(children) && children.type.name === 'Price'
+    const containerClass = React.isValidElement(children) && children.type.displayName === 'Price'
         ? "bg-white w-full rounded-lg shadow-lg relative max-h-full overflow-y-auto"
         : "bg-white p-8 rounded-lg shadow-lg relative max-h-full overflow-y-auto";
 

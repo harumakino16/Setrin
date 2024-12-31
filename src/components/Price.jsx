@@ -97,6 +97,8 @@ function Price() {
   );
 }
 
+Price.displayName = 'Price';
+
 function PlanCard({ title, price, period, features, buttonText, bannerText, bannerColor, buttonColor, buttonHoverColor, textColor = "text-gray-600", disabled = false, link = null, onClick = null, isLoading = false }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-transform hover:scale-105 flex flex-col justify-between">
