@@ -219,7 +219,7 @@ function MainTable({
         </div>
       ) : (
         <div className="overflow-x-scroll">
-          <table ref={tableRef} className="whitespace-nowrap w-full" style={{ tableLayout: 'fixed' }}>
+          <table ref={tableRef} className="whitespace-nowrap w-full rounded-lg overflow-hidden" style={{ tableLayout: 'fixed' }}>
             <colgroup>
               <col style={{ width: '50px' }} />
               {Object.entries(visibleColumns).map(([key, { visible }]) =>
@@ -230,7 +230,7 @@ function MainTable({
             </colgroup>
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', top: '2px', minWidth: '30px' }}>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
                 {Object.entries(visibleColumns).map(([key, { label, visible }]) =>

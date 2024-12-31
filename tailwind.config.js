@@ -65,7 +65,7 @@ module.exports = {
             accent: '#FF8DA1'
           },
           blue: {
-            primary: '#B6E0FF',
+            primary: '#A6D9FF',
             secondary: '#E5F3FF',
             accent: '#8DCAFF'
           },
