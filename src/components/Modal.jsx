@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 
 const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
     if (!isOpen) return null;
+    console.log(children.type.name);
 
     const handleBackgroundClick = (event) => {
         //画面外をクリックした時にモーダルを閉じる
