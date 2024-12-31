@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { db } from '../../firebaseConfig';
-import { updateDoc, doc, deleteDoc, getDoc, setDoc, onSnapshot, writeBatch, collection, getDocs, query, where } from 'firebase/firestore';
+import { updateDoc, doc, deleteDoc, getDoc, writeBatch, collection, getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import googleIcon from '../../public/images/web_light_rd_SI@4x.png';
@@ -10,12 +10,10 @@ import { useMessage } from '@/context/MessageContext';
 import Loading from '@/components/loading';
 import { deleteUser, getAuth, reauthenticateWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { useTheme } from '@/context/ThemeContext';
-import Switch from '@/components/Switch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faGlobe, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faCheck } from '@fortawesome/free-solid-svg-icons';
 import Layout from '@/pages/layout';
 import { faSignOutAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { loadStripe } from '@stripe/stripe-js';
 import H1 from '@/components/ui/h1';
 import { handleUpgradePlan } from '@/utils/stripeUtils';
 import Modal from '@/components/Modal';
@@ -25,7 +23,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 
 function Settings() {
-    const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
+    const { currentUser, loading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [selectedTheme, setSelectedTheme] = useState(currentUser?.theme || 'blue');
@@ -33,30 +31,6 @@ function Settings() {
     const { setMessageInfo } = useMessage();
     const { theme } = useTheme();
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_YOUTUBE_SCOPE}&response_type=code&prompt=consent&access_type=offline`;
-    const columnLabels = [
-        { key: 'title', label: '曲名' },
-        { key: 'artist', label: 'アーティスト' },
-        { key: 'genre', label: 'ジャンル' },
-        { key: 'youtubeUrl', label: 'YouTubeリンク' },
-        { key: 'tags', label: 'タグ' },
-        { key: 'singingCount', label: '歌唱回数' },
-        { key: 'skillLevel', label: '熟練度' }
-    ];
-    const [publicPageSettings, setPublicPageSettings] = useState({
-        enabled: false,
-        pageId: '',
-        displayName: '',
-        description: '',
-        visibleColumns: {
-            title: true,
-            artist: true,
-            genre: true,
-            youtubeUrl: true,
-            tags: true,
-            singingCount: false,
-            skillLevel: false
-        }
-    });
     const [isAccordionOpen, setIsAccordionOpen] = useState(false);
     const { upgrade_success } = router.query;
     const [cancelAt, setCancelAt] = useState(null);
@@ -602,7 +576,6 @@ function Settings() {
 }
 
 export default Settings;
-
 // ページで翻訳データを取得する部分
 export async function getStaticProps({ locale }) {
     return {
@@ -611,3 +584,4 @@ export async function getStaticProps({ locale }) {
         },
     };
 }
+
