@@ -8,13 +8,15 @@ import { AuthContext } from '@/context/AuthContext';
 import { useSongs } from '@/context/SongsContext';
 import { useTheme } from '@/context/ThemeContext';
 import Link from 'next/link';
-import { FaClipboard, FaYoutube, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaClipboard, FaYoutube, FaExternalLinkAlt, FaQuestionCircle } from 'react-icons/fa';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import H1 from '@/components/ui/h1';
 import BackButton from '@/components/BackButton';
 import RouletteContent from '@/components/roulette/RouletteContent';
 import CreateRandomSetlist from '@/components/CreateRandomSetlist';
 import { useSetlistCreation } from '@/hooks/useSetlistCreation';
+import RouletteHistory from '@/components/roulette/RouletteHistory';
+import HowToUseModal from '@/components/roulette/HowToUseModal';
 
 export default function RouletteUtawaku() {
   const { theme } = useTheme();
@@ -35,6 +37,7 @@ export default function RouletteUtawaku() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isAddSetlistOpen, setIsAddSetlistOpen] = useState(false);
+  const [showHowToUse, setShowHowToUse] = useState(false);
 
   const isReady = currentUser && songs;
 
@@ -88,17 +91,12 @@ export default function RouletteUtawaku() {
     }
   }, [setlist, songs]);
 
-  const copyToClipboard = () => {
-    if (selectedSong) {
-      navigator.clipboard.writeText(selectedSong.title);
-      setCopyMessage('コピーしました！');
-      setTimeout(() => setCopyMessage(''), 2000);
-    }
-  };
-
   const handleSetlistChange = (e) => {
     setSelectedSetlistId(e.target.value);
     setSelectedSong(null);
+    if (!e.target.value) {
+      setSetlist(null);
+    }
   };
 
   const openPopupWindow = () => {
@@ -179,12 +177,23 @@ export default function RouletteUtawaku() {
         <div className="space-y-2">
           {/* 戻るリンク */}
           <BackButton text="ツール一覧に戻る" href="/utawakutool" />
-          <H1>ルーレット歌枠</H1>
-          <p className="text-gray-600 text-sm">
-            セットリストからランダムに曲を選びます。決定ボタンを押すとYouTubeリンクが設定されている場合は自動で開きます。
-          </p>
+          <div className="flex justify-between items-center">
+            <H1>ルーレット歌枠</H1>
+            <button
+              onClick={() => setShowHowToUse(true)}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <FaQuestionCircle />
+              <span className="text-sm">使い方を見る</span>
+            </button>
+          </div>
         </div>
 
+        {/* 使い方モーダル */}
+        <HowToUseModal
+          isOpen={showHowToUse}
+          onClose={() => setShowHowToUse(false)}
+        />
 
         {/* セットリスト選択UI */}
         {isReady && (
@@ -269,6 +278,7 @@ export default function RouletteUtawaku() {
         {isReady && setlist && currentSongs.length > 0 && (
           <RouletteContent
             currentSongs={currentSongs}
+            setlist={setlist}
           />
         )}
         {/* ポップアップボタン */}
@@ -283,6 +293,10 @@ export default function RouletteUtawaku() {
             </button>
           </div>
         )}
+        {/* ルーレット履歴 */}
+        <div className="mt-4 bg-white p-6 rounded shadow-sm space-y-4">
+          <RouletteHistory setlist={setlist} />
+        </div>
 
         {showCreateModal && (
           <CreateRandomSetlist

@@ -8,16 +8,20 @@ import { collection, doc, getDocs, getDoc, setDoc, onSnapshot, updateDoc, query,
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import H1 from '@/components/ui/h1';
+import BackButton from '@/components/BackButton';
+import HowToUseRequestModal from '@/components/request/HowToUseRequestModal';
 
 export default function RequestUtawaku() {
     const { currentUser } = useContext(AuthContext);
     const { theme } = useTheme();
     const { setMessageInfo } = useMessage();
+    const [showHowToUse, setShowHowToUse] = useState(false);
 
     const [publicPages, setPublicPages] = useState([]);
     const [selectedPageId, setSelectedPageId] = useState('');
@@ -168,12 +172,24 @@ export default function RequestUtawaku() {
             <div className="p-8 space-y-8 max-w-4xl mx-auto">
                 {/* ヘッダーセクション */}
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-bold text-gray-800">リクエスト歌枠管理</h1>
-                    <p className="text-gray-600 text-sm">
-                        ここではリスナーからのリクエスト状況をリアルタイムで管理できます。<br/>
-                        リクエスト受付のオン/オフ切り替えや、届いたリクエストの確認/消化が可能です。
-                    </p>
+                    <BackButton text="ツール一覧に戻る" href="/utawakutool" />
+                    <div className="flex justify-between items-center">
+                        <H1>リクエスト歌枠管理</H1>
+                        <button
+                            onClick={() => setShowHowToUse(true)}
+                            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                        >
+                            <FontAwesomeIcon icon={faQuestionCircle} />
+                            <span className="text-sm">使い方を見る</span>
+                        </button>
+                    </div>
                 </div>
+
+                {/* 使い方モーダル */}
+                <HowToUseRequestModal
+                    isOpen={showHowToUse}
+                    onClose={() => setShowHowToUse(false)}
+                />
 
                 {/* 公開ページ選択セクション */}
                 <div className="bg-white p-6 rounded shadow-sm space-y-4">

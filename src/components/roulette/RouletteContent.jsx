@@ -1,10 +1,10 @@
 import { useState, useContext } from 'react';
 import { useTheme } from '@/context/ThemeContext';
-import { doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, increment, serverTimestamp, setDoc, collection, addDoc } from 'firebase/firestore';
 import { db } from '@/../firebaseConfig';
 import { AuthContext } from '@/context/AuthContext';
 
-export default function RouletteContent({ currentSongs, onSpin }) {
+export default function RouletteContent({ currentSongs, onSpin, setlist }) {
   const { theme } = useTheme();
   const [spinning, setSpinning] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
@@ -42,6 +42,25 @@ export default function RouletteContent({ currentSongs, onSpin }) {
       window.open(selectedSong.youtubeUrl, '_blank');
     }
     setIsDecided(true);
+    saveRouletteHistory();
+  };
+
+  const saveRouletteHistory = async () => {
+    if (!selectedSong || !currentUser) return;
+
+    try {
+      const historyRef = collection(db, 'users', currentUser.uid, 'rouletteHistory');
+      await addDoc(historyRef, {
+        songId: selectedSong.id,
+        title: selectedSong.title,
+        setlistname: setlist?.name || '未設定',
+        artist: selectedSong.artist || '',
+        youtubeUrl: selectedSong.youtubeUrl || '',
+        decidedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Failed to save roulette history:', error);
+    }
   };
 
   const activityCount = async () => {

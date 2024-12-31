@@ -48,7 +48,7 @@ export default function RoulettePopup() {
   return (
     <div className="p-4 min-h-screen bg-gray-100">
       {isReady && setlist && currentSongs.length > 0 && (
-        <RouletteContent currentSongs={currentSongs} />
+        <RouletteContent currentSongs={currentSongs} setlist={setlist} />
       )}
     </div>
   );
