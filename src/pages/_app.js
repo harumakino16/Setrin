@@ -27,7 +27,10 @@ function App({ Component, pageProps }) {
     // URLから指定された言語を優先
     const urlLocale = router.locale;
     const savedLang = localStorage.getItem('language');
+    console.log('savedLang', savedLang);
+    console.log('urlLocale', urlLocale);
     
+
     // ローカルストレージに保存がない場合はURLの言語を保存
     if (!savedLang && urlLocale) {
       localStorage.setItem('language', urlLocale);

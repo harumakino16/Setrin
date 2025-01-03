@@ -3,6 +3,7 @@ module.exports = {
   i18n: {
     defaultLocale: 'ja',
     locales: ['ja', 'zh-TW'],
-    localeDetection: true
+    localeDetection: false
   },
+  debug: true, // ← これを指定するとコンソールにデバッグログが出る
 };
