@@ -10,8 +10,8 @@ import Price from '@/components/Price'
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { AuthContext } from '@/context/AuthContext';
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import Header from '@/components/header'
+import Footer from '@/components/footer'
 
 function FeatureCard({ icon: Icon, title, color, sections }) {
   return (
