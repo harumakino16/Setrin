@@ -4,9 +4,15 @@ import NoSidebarLayout from './noSidebarLayout';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-const PrivacyPolicy = () => {
+const PrivacyPolicy = () => { 
+  const meta = {
+    title: 'プライバシーポリシー',
+    description: 'Setlinkのプライバシー ポリシーです。',
+    path: '/privacy-policy',
+    isPublic: true
+  };
   return (
-    <NoSidebarLayout>
+    <NoSidebarLayout meta={meta}>
       <div className="p-5">
         <h1 className="text-3xl font-bold mb-4">プライバシー ポリシー</h1>
       <p className="mb-4">このプライバシー ポリシーは、Setlink(以下、「本サービス」といいます。)がユーザーの情報をどのように収集、使用、保護するかについて説明します。</p>

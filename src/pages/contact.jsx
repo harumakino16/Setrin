@@ -5,9 +5,15 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Contact = () => {
   const { t } = useTranslation('common');
+  const meta = {
+    title: 'お問い合わせ',
+    description: 'Setlinkのお問い合わせフォームです。',
+    path: '/contact',
+    isPublic: true
+  };
 
   return (
-    <NoSidebarLayout>
+    <NoSidebarLayout meta={meta}>
       <ContactForm />
     </NoSidebarLayout>
   );

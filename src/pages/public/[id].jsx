@@ -7,7 +7,6 @@ import NoSidebarLayout from '../noSidebarLayout';
 import PublicSongTable from '@/components/PublicSongTable';
 import { convertKanaToHira } from '@/utils/stringUtils';
 import { useMessage } from '@/context/MessageContext';
-import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { FaSearch } from 'react-icons/fa';
 import Loading from '@/components/loading';
@@ -22,6 +21,7 @@ export default function PublicSongList() {
   const [loading, setLoading] = useState(true);
   const { setMessageInfo } = useMessage();
   const [color,setColor] = useState('blue');
+  const [pageTitle, setPageTitle] = useState('');
 
   const [userKeyword, setUserKeyword] = useState('');
 
@@ -36,6 +36,13 @@ export default function PublicSongList() {
   const [requesterName, setRequesterName] = useState('');
 
   const [isFirstTime, setIsFirstTime] = useState(false);
+  const meta = {
+    title: `${pageTitle} | Setlink`,
+    description: `${pageTitle}の公開リストページです。`,
+    path: `/public/${id}`,
+    ogImage: 'https://setlink.jp/images/bunner.png',
+    isPublic: true
+  };
 
   const filterSongs = (allSongs, criteria) => {
     let songsData = [...allSongs];
@@ -137,6 +144,7 @@ export default function PublicSongList() {
           return;
         }
         const publicPageData = publicPageSnap.data();
+        setPageTitle(publicPageData.name || '公開リスト');
 
         // 検索条件やカラム表示は初回読み込み時のみ設定
         if (!userInfo) {
@@ -281,7 +289,7 @@ export default function PublicSongList() {
   const requestMode = userInfo?.requestMode || false;
 
   return (
-    <NoSidebarLayout>
+    <NoSidebarLayout meta={meta}>
       <div className="py-8 w-full mx-auto px-4">
         <h1 className="md:text-3xl text-2xl font-bold mb-4">
           {userInfo?.displayName || '名称未設定...'}

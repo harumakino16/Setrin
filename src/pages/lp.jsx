@@ -10,6 +10,8 @@ import Price from '@/components/Price'
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { AuthContext } from '@/context/AuthContext';
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
 function FeatureCard({ icon: Icon, title, color, sections }) {
   return (
@@ -47,6 +49,15 @@ export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { currentUser } = useContext(AuthContext);
   const userCount = "1,700";
+
+  const meta = {
+    title: 'Setlink - Vtuberのセトリ管理ツール',
+    description: 'SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。',
+    keywords: 'Vtuber, セトリ, YouTube, 再生リスト, 管理ツール',
+    ogImage: 'https://setlink.jp/images/bunner.png',
+    path: '/lp',
+    isPublic: true
+  };
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -154,28 +165,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <head>
-        <title>Setlink - Vtuberのセトリ管理ツール</title>
-        <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
-        <meta name="keywords" content="Vtuber, セトリ, YouTube, 再生リスト, 管理ツール" />
-        <meta property="og:title" content="Setlink - Vtuberのセトリ管理ツール" />
-        <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
-        <meta property="og:image" content="https://setlink.jp/images/bunner.png" />
-        <meta property="og:url" content="https://www.setlink.com/lp" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://www.setlink.com/lp" />
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQ6L8VVTH3"></script>
-        <script>
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-WQ6L8VVTH3');
-          `}
-        </script>
-      </head>
+      <Header meta={meta} />
       <div className="bg-blue-50">
         {/* Header */}
         <header className="bg-white shadow-sm fixed w-full top-0 z-50">
@@ -633,48 +623,8 @@ export default function LandingPage() {
         <section id="contact" className="py-20 bg-white">
           <ContactForm />
         </section>
-
-        {/* Footer */}
-        <footer className="bg-gray-100 py-8">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Setlink</h3>
-                <p className="text-gray-500">Vtuber向けの歌枠管理ツール</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">リンク</h3>
-                <ul className="space-y-2">
-                  <li><Link href="/terms" className="text-gray-500 hover:text-customTheme-blue-primary">利用規約</Link></li>
-                  <li><Link href="/privacypolicy" className="text-gray-500 hover:text-customTheme-blue-primary">プライバシーポリシー</Link></li>
-                  <li><Link href="/tokusho" className="text-gray-500 hover:text-customTheme-blue-primary">特定商取引法に基づく表記</Link></li>
-                  <li><Link href="/contact" className="text-gray-500 hover:text-customTheme-blue-primary">お問い合わせ</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">フォローする</h3>
-                <div className="flex space-x-4">
-                  <a href="https://x.com/setlink_jp" className="text-gray-500 hover:text-customTheme-blue-primary">
-                    <span className="sr-only">X</span>
-                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                  </a>
-                  <a href="#" className="text-gray-500 hover:text-customTheme-blue-primary">
-                    <span className="sr-only">YouTube</span>
-                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clipRule="evenodd" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="mt-8 border-t border-gray-200 pt-8 text-center">
-              <p className="text-gray-500">&copy; 2023 Setlink. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
       </div>
+      <Footer />
     </>
   )
 }

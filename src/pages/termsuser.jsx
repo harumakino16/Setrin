@@ -6,8 +6,14 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const TermsOfUse = () => {
   const { t } = useTranslation('common');
+  const meta = {  
+    title: '利用規約',
+    description: 'Setlinkの利用規約です。',
+    path: '/termsuser',
+    isPublic: true
+  };
   return (
-    <NoSidebarLayout>
+    <NoSidebarLayout meta={meta}>
 
       <div className="p-5">
         <h1 className="text-3xl font-bold mb-4">利用規約</h1>

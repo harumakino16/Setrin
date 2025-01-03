@@ -7,8 +7,9 @@ import { db } from '@/../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { DEFAULT_META } from '@/constants/meta';
 
-const Header = ({ toggleSidebar }) => {
+const Header = ({ toggleSidebar, meta = {} }) => {
     const { theme } = useTheme();
     const router = useRouter();
     const [publicPageData, setPublicPageData] = useState([]);
@@ -28,31 +29,46 @@ const Header = ({ toggleSidebar }) => {
         }
     }, [isListenerPage, router.query.id]);
 
+    const isPublicPage = meta.isPublic ?? false;
+    const finalMeta = {
+        ...DEFAULT_META,
+        ...meta
+    };
+
     return (
         <>
             <Head>
-                {/* Google tag (gtag.js) */}
+                <title>{finalMeta.title}</title>
+                
+                {/* メタタグは公開ページの場合のみ表示 */}
+                {isPublicPage && (
+                    <>
+                        <meta name="description" content={finalMeta.description} />
+                        <meta name="keywords" content={finalMeta.keywords} />
+                        <meta property="og:title" content={finalMeta.title} />
+                        <meta property="og:description" content={finalMeta.description} />
+                        <meta property="og:image" content={finalMeta.ogImage} />
+                        <meta property="og:url" content={`${finalMeta.baseUrl}${finalMeta.path || ''}`} />
+                        <meta property="og:type" content="website" />
+                        <meta property="og:site_name" content="Setlink" />
+                    </>
+                )}
+
+                {/* 非公開ページの場合はnoindex */}
+                {!isPublicPage && (
+                    <meta name="robots" content="noindex, nofollow" />
+                )}
+
+                {/* Google Analytics */}
                 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQ6L8VVTH3"></script>
-                <script>
-                    {`
+                <script dangerouslySetInnerHTML={{
+                    __html: `
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
                         gtag('js', new Date());
-
                         gtag('config', 'G-WQ6L8VVTH3');
-                    `}
-                </script>
-
-                {/* Dynamic title and OGP tags */}
-                <title>{isListenerPage ? `${publicPageData.name} | Setlink` : 'Setlink'}</title>
-                <meta property="og:title" content={isListenerPage ? `${publicPageData.name} | Setlink` : 'Setlink'} />
-                <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
-                <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
-                <meta name="keywords" content="Vtuber, 歌枠, セトリ, YouTube, 再生リスト, 管理ツール" />
-                <meta property="og:image" content="https://setlink.jp/images/bunner.png" />
-                <meta property="og:url" content={`https://setlink.jp${router.asPath}`} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="Setlink" />
+                    `
+                }} />
             </Head>
             <header className={headerClassName}>
                 <div className="container mx-auto flex justify-between items-center h-[60px]">

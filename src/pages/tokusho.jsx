@@ -6,8 +6,14 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 
 const TermsOfUse = () => {
+  const meta = {    
+    title: '特定商取引法に基づく表示',
+    description: 'Setlinkの特定商取引法に基づく表示です。',
+    path: '/tokusho',
+    isPublic: true
+  };
   return (
-    <NoSidebarLayout>
+    <NoSidebarLayout meta={meta}>
       <div className="p-5">
         <h1 className="text-3xl font-bold mb-4 text-center">特定商取引法に基づく表示</h1>
         <div className="overflow-x-auto">
