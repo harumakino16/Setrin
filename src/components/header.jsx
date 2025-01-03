@@ -44,8 +44,8 @@ const Header = ({ toggleSidebar }) => {
                 </script>
 
                 {/* Dynamic title and OGP tags */}
-                <title>{isListenerPage ? `${publicPageData?.name || 'Loading...'} | Setlink` : 'Setlink'}</title>
-                <meta property="og:title" content={isListenerPage ? `${publicPageData?.name || 'Loading...'} | Setlink` : 'Setlink'} />
+                <title>{isListenerPage ? `${publicPageData.name} | Setlink` : 'Setlink'}</title>
+                <meta property="og:title" content={isListenerPage ? `${publicPageData.name} | Setlink` : 'Setlink'} />
                 <meta property="og:description" content="歌枠をもっと楽しく、もっと便利に" />
                 <meta name="description" content="SetlinkはVtuber向けに特化した歌枠サポートツールです。自分が歌える曲を簡単に管理し、公開リストを通じてリスナーからのリクエスト受付もスムーズに実現できます。これまで手間だったセットリスト作成が楽になり、リクエスト歌枠がもっと楽しくなる、歌枠をメインに活動するVtuberに最適なアプリです。" />
                 <meta name="keywords" content="Vtuber, 歌枠, セトリ, YouTube, 再生リスト, 管理ツール" />
