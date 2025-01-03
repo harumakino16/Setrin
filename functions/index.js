@@ -31,6 +31,7 @@ exports.resetMonthlyCount = onRequest(async (req, res) => {
       snapshot.forEach((doc) => {
         batch.update(usersRef.doc(doc.id), {
           'userActivity.monthlyRandomSetlistCount': 0,
+          'userActivity.monthlyPlaylistCreationCount': 0,
           'userActivity.monthlyRequestUtawakuCount': 0,
           'userActivity.monthlyRouletteCount': 0,
         });
