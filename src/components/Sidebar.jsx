@@ -24,7 +24,6 @@ const MENU = [
 export function Sidebar({ onLinkClick }) {
     const router = useRouter();
     const { currentUser, isAdmin } = useContext(AuthContext);
-    const logOut = useLogOut();
     const { setMessageInfo } = useMessage();
     const [showCreateSetlistModal, setShowCreateSetlistModal] = useState(false);
     const { theme } = useTheme();
@@ -43,31 +42,47 @@ export function Sidebar({ onLinkClick }) {
     }
 
     return (
-        <div className="sidebar w-64 min-w-[256px] flex flex-col justify-between">
+        <div className="sidebar w-64 min-w-[256px] flex flex-col justify-between min-h-screen">
             <div>
-                <div className="flex flex-col items-center py-4">
-                    <div className="text-gray-700 text-2xl font-semibold">{t('menu')}</div>
+                <div className="flex flex-col items-center py-6">
+                    <div className="text-gray-800 text-2xl font-bold tracking-tight">
+                        {t('menu')}
+                    </div>
                 </div>
-                <div className="mt-8">
-                    <ul>
+                <nav className="mt-4">
+                    <ul className="space-y-1">
                         {MENU.map((item) => (
                             <Link key={item.titleKey} href={item.path} onClick={onLinkClick}>
-                                <li className={`flex items-center text-gray-700 text-sm font-medium py-2 px-6 ${router.pathname === item.path ? 'bg-gray-200' : 'hover:bg-gray-200'} cursor-pointer gap-2`}>
-                                    <FontAwesomeIcon icon={item.iconName} />{t(item.titleKey)}
+                                <li className={`flex items-center text-gray-700 text-base py-3 px-6 transition-all duration-200 ease-in-out
+                                    ${router.pathname === item.path 
+                                        ? `bg-gray-100 text-customTheme-${theme}-primary font-bold` 
+                                        : `hover:bg-gray-50`} 
+                                    cursor-pointer`}>
+                                    <div className="w-9 flex justify-center">
+                                        <FontAwesomeIcon icon={item.iconName} className={`text-lg ${router.pathname === item.path ? `text-customTheme-${theme}-primary` : 'text-gray-500'}`} />
+                                    </div>
+                                    <span className="text-sm">{t(item.titleKey)}</span>
                                 </li>
                             </Link>
                         ))}
                         {isAdmin && (
                             <Link href="/admin/admin_dashboard" onClick={onLinkClick}>
-                                <li className="flex items-center text-gray-700 text-sm font-medium py-2 px-6 hover:bg-gray-200 cursor-pointer gap-2">
-                                    <FontAwesomeIcon icon={faUserShield} />{t('adminPage')}
+                                <li className="flex items-center text-gray-700 text-base font-medium py-3 px-6 transition-all duration-200 ease-in-out hover:bg-gray-50 hover:text-customTheme-${theme}-primary cursor-pointer">
+                                    <div className="w-9 flex justify-center">
+                                        <FontAwesomeIcon icon={faUserShield} className="text-lg text-gray-500" />
+                                    </div>
+                                    <span className="text-sm">{t('adminPage')}</span>
                                 </li>
                             </Link>
                         )}
                     </ul>
-                </div>
-                <div className="mt-4 px-6">
-                    <button onClick={handleCreateSetlist} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-3 px-4 rounded flex items-center justify-center w-full`}>
+                </nav>
+                <div className="mt-6 px-4">
+                    <button 
+                        onClick={handleCreateSetlist} 
+                        className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center w-full transition-all duration-200 hover:translate-y-[-2px]`}
+                    >
+                        <FontAwesomeIcon icon={faList} className="mr-3 text-lg" />
                         {t('createSetlist')}
                     </button>
                 </div>

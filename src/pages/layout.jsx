@@ -31,17 +31,20 @@ export default function Layout({ children }) {
         <div>
             <Header toggleSidebar={toggleSidebar} />
             <div className="bg-[#efeeea] min-h-screen">
-                <main className="md:p-4 p-2 w-full flex">
+                <main className="flex">
                     {!isListenerPage && !isMobile && <Sidebar className="hidden md:block"/>}
-                    <div className={`flex-1 ${!isListenerPage && !isMobile ? 'w-[calc(100%-256px)]' : 'w-full'}`}>
+                    <div className={`flex-1 ${!isListenerPage && !isMobile ? 'w-[calc(100%-256px)] p-4' : 'w-full p-4'}`}>
                         {children}
                     </div>
                     {!isListenerPage && isMobile && isMobileSidebarOpen && (
                         <div className="fixed inset-0 z-50 flex">
                             <div className="absolute inset-0 bg-black opacity-50" onClick={toggleSidebar}></div>
                             <div className="relative bg-white ml-auto">
-                                <button className="absolute top-4 right-3 text-gray-700" onClick={toggleSidebar}>
-                                    <FaTimes size={24} />
+                                <button 
+                                    className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800" 
+                                    onClick={toggleSidebar}
+                                >
+                                    <FaTimes size={20} />
                                 </button>
                                 <Sidebar onLinkClick={toggleSidebar} />
                             </div>
