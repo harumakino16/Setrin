@@ -10,4 +10,5 @@ services:
     environment:
       - WATCHPACK_POLLING=true
     env_file:
-      - .env 
+      - .env
+    command: npm run dev 

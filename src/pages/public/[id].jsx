@@ -10,6 +10,7 @@ import { useMessage } from '@/context/MessageContext';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { FaSearch } from 'react-icons/fa';
 import Loading from '@/components/loading';
+import { NextSeo } from 'next-seo';
 
 
 export default function PublicSongList() {
@@ -22,6 +23,8 @@ export default function PublicSongList() {
   const { setMessageInfo } = useMessage();
   const [color,setColor] = useState('blue');
   const [pageTitle, setPageTitle] = useState('');
+  const [pageDescription, setPageDescription] = useState('');
+  const [pageUrl, setPageUrl] = useState('');
 
   const [userKeyword, setUserKeyword] = useState('');
 
@@ -145,6 +148,8 @@ export default function PublicSongList() {
         }
         const publicPageData = publicPageSnap.data();
         setPageTitle(publicPageData.name || '公開リスト');
+        setPageDescription(publicPageData.description || 'Setlinkで公開されている楽曲リストです。');
+        setPageUrl(`https://setlink.jp/public/${id}`);
 
         // 検索条件やカラム表示は初回読み込み時のみ設定
         if (!userInfo) {
@@ -289,96 +294,119 @@ export default function PublicSongList() {
   const requestMode = userInfo?.requestMode || false;
 
   return (
-    <NoSidebarLayout meta={meta}>
-      <div className="py-8 w-full mx-auto px-4">
-        <h1 className="md:text-3xl text-2xl font-bold mb-4">
-          {userInfo?.displayName || '名称未設定...'}
-        </h1>
-        {userInfo?.description && (
-          <div className="mb-8 w-full">
-            <div className="bg-white p-6 rounded-lg border border-gray-200m">
-              <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                {userInfo.description}
-              </p>
+    <>
+      <NextSeo
+        title={`${pageTitle} | Setlink`}
+        description={pageDescription}
+        openGraph={{
+          title: `${pageTitle} | Setlink`,
+          description: pageDescription,
+          url: pageUrl,
+          type: 'website',
+          images: [
+            {
+              url: 'https://setlink.jp/images/bunner.png',
+              width: 1200,
+              height: 630,
+              alt: 'Setlink',
+            },
+          ],
+        }}
+        twitter={{
+          cardType: 'summary_large_image',
+        }}
+      />
+      <NoSidebarLayout meta={meta}>
+        <div className="py-8 w-full mx-auto px-4">
+          <h1 className="md:text-3xl text-2xl font-bold mb-4">
+            {userInfo?.displayName || '名称未設定...'}
+          </h1>
+          {userInfo?.description && (
+            <div className="mb-8 w-full">
+              <div className="bg-white p-6 rounded-lg border border-gray-200m">
+                <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                  {userInfo.description}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* 2次絞り込み */}
-        <div className="mb-4 relative">
-          <input
-            type="text"
-            placeholder="曲名、アーティスト、タグ、ジャンル、フリガナで絞り込み"
-            className="border p-2 pl-12 rounded w-full h-14"
-            value={userKeyword}
-            onChange={(e) => setUserKeyword(e.target.value)}
+          {/* 2次絞り込み */}
+          <div className="mb-4 relative">
+            <input
+              type="text"
+              placeholder="曲名、アーティスト、タグ、ジャンル、フリガナで絞り込み"
+              className="border p-2 pl-12 rounded w-full h-14"
+              value={userKeyword}
+              onChange={(e) => setUserKeyword(e.target.value)}
+            />
+            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+          </div>
+
+          <PublicSongTable
+            songs={displaySongs}
+            originalSongs={filteredSongs}
+            visibleColumns={userInfo?.visibleColumns}
+            onRequestSort={requestSort}
+            sortConfig={sortConfig}
+            extraAction={
+              requestMode
+                ? (song) => (
+                    <button
+                      className={`text-white bg-customTheme-${color}-primary px-2 py-1 rounded hover:opacity-80 transition-opacity duration-300`}
+                      onClick={() => handleRequestClick(song)}
+                    >
+                      リクエスト
+                    </button>
+                  )
+                : null
+            }
           />
-          <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
-        </div>
 
-        <PublicSongTable
-          songs={displaySongs}
-          originalSongs={filteredSongs}
-          visibleColumns={userInfo?.visibleColumns}
-          onRequestSort={requestSort}
-          sortConfig={sortConfig}
-          extraAction={
-            requestMode
-              ? (song) => (
-                  <button
-                    className={`text-white bg-customTheme-${color}-primary px-2 py-1 rounded hover:opacity-80 transition-opacity duration-300`}
-                    onClick={() => handleRequestClick(song)}
-                  >
-                    リクエスト
-                  </button>
-                )
-              : null
-          }
-        />
-
-        {isRequestingSong && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
-              <h2 className="text-xl font-bold mb-4">リクエスト</h2>
-              <p className="mb-4">「{requestTargetSong?.title}」をリクエストします。<br />お名前を入力してください (任意)</p>
-              <div className="flex items-center mb-4">
+          {isRequestingSong && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+                <h2 className="text-xl font-bold mb-4">リクエスト</h2>
+                <p className="mb-4">「{requestTargetSong?.title}」をリクエストします。<br />お名前を入力してください (任意)</p>
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    id="firstTimeCheck"
+                    checked={isFirstTime}
+                    onChange={(e) => setIsFirstTime(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="firstTimeCheck">初見です！</label>
+                </div>
                 <input
-                  type="checkbox"
-                  id="firstTimeCheck"
-                  checked={isFirstTime}
-                  onChange={(e) => setIsFirstTime(e.target.checked)}
-                  className="mr-2"
+                  type="text"
+                  className="border p-2 w-full rounded mb-4"
+                  placeholder="お名前（空欄で匿名）"
+                  value={requesterName}
+                  onChange={(e) => setRequesterName(e.target.value)}
                 />
-                <label htmlFor="firstTimeCheck">初見です！</label>
-              </div>
-              <input
-                type="text"
-                className="border p-2 w-full rounded mb-4"
-                placeholder="お名前（空欄で匿名）"
-                value={requesterName}
-                onChange={(e) => setRequesterName(e.target.value)}
-              />
-              
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={handleSubmitRequest}
-                  className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300`}
-                >
-                  送信
-                </button>
-                <button
-                  onClick={() => setIsRequestingSong(false)}
-                  className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto`}
-                >
-                  キャンセル
-                </button>
+                
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={handleSubmitRequest}
+                    className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300`}
+                  >
+                    送信
+                  </button>
+                  <button
+                    onClick={() => setIsRequestingSong(false)}
+                    className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto`}
+                  >
+                    キャンセル
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-      </div>
-    </NoSidebarLayout>
+        </div>
+      </NoSidebarLayout>
+    </>
   );
 }
 // 静的パスを生成するための新しいメソッド

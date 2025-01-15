@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 3000
 
 # 開発サーバー起動
-CMD ["npm", "run", "dev"] 
+CMD ["npm", "run", "dev"] npm install next-seo
