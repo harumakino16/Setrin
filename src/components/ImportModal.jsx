@@ -50,7 +50,7 @@ const ImportModal = ({ onClose }) => {
 
     const csvSchema = {
         headers: CSV_HEADERS,
-        templateData: CSV_HEADERS.join(',') + '\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,ロック,バラード,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。\n'
+        templateData: CSV_HEADERS.join(',') + '\nサンプルです。,サンプルデス,この行は削除してください。,ボカロ,楽しい,盛り上がる,夏曲,ロック,バラード,https://www.youtube.com/sample/watch?v=sample,15,5,ここは備考欄です。,ここはメモ欄です。\n'
     };
 
     const updateDatabase = async (data, mode) => {
