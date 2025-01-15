@@ -48,7 +48,7 @@ export default function LandingPage() {
   const { t } = useTranslation('common');
   const [menuOpen, setMenuOpen] = useState(false)
   const { currentUser } = useContext(AuthContext);
-  const userCount = "1,700";
+  const userCount = "2,400";
 
   const meta = {
     title: 'Setlink - Vtuberのセトリ管理ツール',

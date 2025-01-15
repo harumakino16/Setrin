@@ -41,3 +41,7 @@ next-env.d.ts
 .tmp.drivedownload
 .tmp.driveupload.json
 .tmp.drivedownload.json
+
+# Docker
+.docker/
+docker-compose.override.yml
