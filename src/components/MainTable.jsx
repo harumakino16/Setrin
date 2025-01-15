@@ -357,16 +357,22 @@ function MainTable({
                   )}
                   {visibleColumns.note.visible && (
                     <td className="px-6 py-4 whitespace-normal break-words text-sm">
-                      <div dangerouslySetInnerHTML={{ 
-                        __html: convertUrlsToLinks(song.note) 
-                      }} />
+                      <div 
+                        className="max-h-[4.5rem] overflow-y-auto whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ 
+                          __html: convertUrlsToLinks(song.note) 
+                        }} 
+                      />
                     </td>
                   )}
                   {visibleColumns.memo.visible && (
                     <td className="px-6 py-4 whitespace-normal break-words text-sm">
-                      <div dangerouslySetInnerHTML={{ 
-                        __html: convertUrlsToLinks(song.memo) 
-                      }} />
+                      <div 
+                        className="max-h-[4.5rem] overflow-y-auto whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ 
+                          __html: convertUrlsToLinks(song.memo) 
+                        }} 
+                      />
                     </td>
                   )}
                   {visibleColumns.actions.visible && (
