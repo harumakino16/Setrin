@@ -3,7 +3,7 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "../../firebaseConfig";
-import { deleteDoc, doc, collection, getDocs, writeBatch, getCountFromServer } from "firebase/firestore";
+import { deleteDoc, doc, collection, getDocs, writeBatch, getCountFromServer, updateDoc, increment } from "firebase/firestore";
 import SearchForm from "@/components/SearchForm";
 import AddSongsInSetlistModal from "@/components/AddSongsInSetlistModal";
 import MainTable from "@/components/MainTable"; // MainTableをインポート
@@ -227,22 +227,46 @@ export default function Home() {
     }
   };
 
-  const handleIncreaseSingingCount = (songId) => {
-    setSongs((prevSongs) =>
-      prevSongs.map((song) =>
-        song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
-      )
-    );
+  const handleIncreaseSingingCount = async (songId) => {
+    try {
+      // ローカルの状態を更新
+      setSongs((prevSongs) =>
+        prevSongs.map((song) =>
+          song.id === songId ? { ...song, singingCount: song.singingCount + 1 } : song
+        )
+      );
+
+      // Firestoreのsongドキュメントを更新
+      const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', songId);
+      await updateDoc(songDocRef, {
+        singingCount: increment(1)
+      });
+    } catch (error) {
+      console.error('歌唱回数の更新に失敗しました:', error);
+      setMessageInfo({ message: '歌唱回数の更新に失敗しました', type: 'error' });
+    }
   };
 
-  const handleDecreaseSingingCount = (songId) => {
-    setSongs((prevSongs) =>
-      prevSongs.map((song) =>
-        song.id === songId
-          ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) }
-          : song
-      )
-    );
+  const handleDecreaseSingingCount = async (songId) => {
+    try {
+      // ローカルの状態を更新
+      setSongs((prevSongs) =>
+        prevSongs.map((song) =>
+          song.id === songId
+            ? { ...song, singingCount: Math.max(song.singingCount - 1, 0) }
+            : song
+        )
+      );
+
+      // Firestoreのsongドキュメントを更新
+      const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', songId);
+      await updateDoc(songDocRef, {
+        singingCount: increment(-1)
+      });
+    } catch (error) {
+      console.error('歌唱回数の更新に失敗しました:', error);
+      setMessageInfo({ message: '歌唱回数の更新に失敗しました', type: 'error' });
+    }
   };
 
   // 未ログインユーザーをlpページにリダイレクト
