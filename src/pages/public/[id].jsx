@@ -287,10 +287,10 @@ export default function PublicSongList() {
         });
 
         // 通知設定を確認してメール送信
-        const userRef = doc(db, 'users', userInfo.userId);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-            const settings = userDoc.data().notificationSettings || {};
+        const pageRef = doc(db, 'users', userInfo.userId, 'publicPages', id);
+        const pageDoc = await getDoc(pageRef);
+        if (pageDoc.exists()) {
+            const settings = pageDoc.data().notificationSettings || {};
             if (settings.requestNotification && settings.email) {
                 await fetch('/api/send-request-notification', {
                     method: 'POST',

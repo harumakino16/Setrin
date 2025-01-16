@@ -165,9 +165,9 @@ export default function RequestUtawaku() {
     };
 
     const handleToggleNotification = async () => {
-        if (!currentUser) return;
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {
+        if (!currentUser || !selectedPageId) return;
+        const pageRef = doc(db, 'users', currentUser.uid, 'publicPages', selectedPageId);
+        await updateDoc(pageRef, {
             'notificationSettings.requestNotification': !notificationEnabled,
             'notificationSettings.email': currentUser.email
         });
