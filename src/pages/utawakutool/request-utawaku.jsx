@@ -119,31 +119,31 @@ export default function RequestUtawaku() {
 
         // ▼ もしこれが「リクエスト歌枠を開始する」動作に相当するなら
         if (!requestMode === true) {
-          // OFF → ON になった(開始された)
-          const userRef = doc(db, 'users', currentUser.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data().userActivity || {};
-            const lastTime = data.lastUtawakuSessionTime
-              ? data.lastUtawakuSessionTime.toDate()
-              : null;
+            // OFF → ON になった(開始された)
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const data = userSnap.data().userActivity || {};
+                const lastTime = data.lastUtawakuSessionTime
+                    ? data.lastUtawakuSessionTime.toDate()
+                    : null;
 
-            const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
-            // 3時間以上経過していなければ incrementしない
-            if (!lastTime || lastTime < threeHoursAgo) {
-              await updateDoc(userRef, {
-                'userActivity.requestUtawakuCount': increment(1),
-                'userActivity.monthlyRequestUtawakuCount': increment(1),
-                'userActivity.lastUtawakuSessionTime': serverTimestamp(),
-                'userActivity.lastActivityAt': serverTimestamp(),
-              });
-            } else {
-              // 3時間未満の場合は timeStamp だけ更新するかどうかは要件次第
-              await updateDoc(userRef, {
-                'userActivity.lastActivityAt': serverTimestamp(),
-              });
+                const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
+                // 3時間以上経過していなければ incrementしない
+                if (!lastTime || lastTime < threeHoursAgo) {
+                    await updateDoc(userRef, {
+                        'userActivity.requestUtawakuCount': increment(1),
+                        'userActivity.monthlyRequestUtawakuCount': increment(1),
+                        'userActivity.lastUtawakuSessionTime': serverTimestamp(),
+                        'userActivity.lastActivityAt': serverTimestamp(),
+                    });
+                } else {
+                    // 3時間未満の場合は timeStamp だけ更新するかどうかは要件次第
+                    await updateDoc(userRef, {
+                        'userActivity.lastActivityAt': serverTimestamp(),
+                    });
+                }
             }
-          }
         }
 
         setRequestMode(!requestMode);
@@ -172,9 +172,9 @@ export default function RequestUtawaku() {
             'notificationSettings.email': currentUser.email
         });
         setNotificationEnabled(!notificationEnabled);
-        setMessageInfo({ 
-            type: 'success', 
-            message: `リクエスト通知を${!notificationEnabled ? 'オン' : 'オフ'}にしました。` 
+        setMessageInfo({
+            type: 'success',
+            message: `リクエスト通知を${!notificationEnabled ? 'オン' : 'オフ'}にしました。`
         });
     };
 
@@ -281,28 +281,7 @@ export default function RequestUtawaku() {
                     </div>
                 </div>
 
-                {/* 通知設定セクション */}
-                <div className="bg-white p-6 rounded shadow-sm space-y-4">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800 mb-2">通知設定</h2>
-                        <p className="text-sm text-gray-600">リクエストが届いた時のメール通知設定</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="font-medium text-gray-700">メール通知</p>
-                            <p className="text-sm text-gray-500">新しいリクエストが届いた時にメールで通知します</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                checked={notificationEnabled}
-                                onChange={handleToggleNotification}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
-                </div>
+
 
                 {selectedPageId && (
                     <div className="space-y-8">
@@ -331,9 +310,29 @@ export default function RequestUtawaku() {
                                 </div>
                             </div>
                             <p className="text-sm text-gray-600">
-                                リクエスト受付中にするとリスナーは指定された公開ページから好きな曲をリクエストできます。  
+                                リクエスト受付中にするとリスナーは指定された公開ページから好きな曲をリクエストできます。
                                 停止中はリスナー側のリクエストボタンが消えます。
                             </p>
+                        </div>
+
+
+                        {/* 通知設定セクション */}
+                        <div className="bg-white p-6 rounded shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-800 mb-2">メール通知</h2>
+                                    <p className="text-sm text-gray-600">新しいリクエストが届いた時にメールで通知します</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={notificationEnabled}
+                                        onChange={handleToggleNotification}
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
                         </div>
 
                         {/* リクエスト一覧 */}
@@ -348,7 +347,7 @@ export default function RequestUtawaku() {
                             {requests.length === 0 ? (
                                 <div className="flex flex-col items-center space-y-4 py-8">
                                     <p className="text-gray-600 text-sm">
-                                        まだリクエストは届いていません。<br/>
+                                        まだリクエストは届いていません。<br />
                                         リスナーにURLを共有してリクエストを募りましょう。
                                     </p>
                                 </div>
@@ -374,8 +373,8 @@ export default function RequestUtawaku() {
                                                     day: 'numeric',
                                                     hour: '2-digit',
                                                     minute: '2-digit',
-                                                    second:'2-digit'
-                                                  })
+                                                    second: '2-digit'
+                                                })
                                                 : '不明';
                                             const isConsumed = req.consumed;
                                             return (
@@ -423,8 +422,8 @@ export default function RequestUtawaku() {
 // ページで翻訳データを取得する部分
 export async function getStaticProps({ locale }) {
     return {
-      props: {
-        ...(await serverSideTranslations(locale, ['common'])),
-      },
+        props: {
+            ...(await serverSideTranslations(locale, ['common'])),
+        },
     };
-  }
+}
