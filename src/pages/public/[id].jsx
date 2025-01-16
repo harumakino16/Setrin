@@ -269,7 +269,7 @@ export default function PublicSongList() {
   };
 
   const handleSubmitRequest = async () => {
-    if (!requestTargetSong || !requesterName) return;
+    if (!requestTargetSong) return;
     
     setIsSubmitting(true); // 送信開始時にフラグを立てる
     
@@ -279,7 +279,7 @@ export default function PublicSongList() {
         await addDoc(requestsRef, {
             songId: requestTargetSong.id,
             songTitle: requestTargetSong.title,
-            requesterName,
+            requesterName: requesterName || '匿名',
             requestedAt,
             consumed: false,
             publicPageId: id,
@@ -300,7 +300,7 @@ export default function PublicSongList() {
                     body: JSON.stringify({
                         to: settings.email,
                         songTitle: requestTargetSong.title,
-                        requesterName: requesterName,
+                        requesterName: requesterName || '匿名',
                         pageName: userInfo.displayName,
                         pageUrl: `${window.location.origin}/utawakutool/request-utawaku`,
                         isFirstTime,
