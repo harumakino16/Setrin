@@ -47,6 +47,9 @@ export default function PublicSongList() {
     isPublic: true
   };
 
+  // 送信中の状態を管理するための state を追加
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const filterSongs = (allSongs, criteria) => {
     let songsData = [...allSongs];
     const keywordLower = criteria.freeKeyword?.toLowerCase() || '';
@@ -267,7 +270,9 @@ export default function PublicSongList() {
 
   const handleSubmitRequest = async () => {
     if (!requestTargetSong || !requesterName) return;
-
+    
+    setIsSubmitting(true); // 送信開始時にフラグを立てる
+    
     try {
         const requestedAt = new Date();
         const requestsRef = collection(db, 'users', userInfo.userId, 'publicPages', id, 'requests');
@@ -287,7 +292,6 @@ export default function PublicSongList() {
         if (userDoc.exists()) {
             const settings = userDoc.data().notificationSettings || {};
             if (settings.requestNotification && settings.email) {
-                // メール通知を送信
                 await fetch('/api/send-request-notification', {
                     method: 'POST',
                     headers: {
@@ -300,7 +304,8 @@ export default function PublicSongList() {
                         pageName: userInfo.displayName,
                         pageUrl: `${window.location.origin}/utawakutool/request-utawaku`,
                         isFirstTime,
-                        requestedAt
+                        requestedAt,
+                        color,
                     }),
                 });
             }
@@ -314,6 +319,8 @@ export default function PublicSongList() {
     } catch (error) {
         console.error('リクエスト送信エラー:', error);
         setMessageInfo({ type: 'error', message: 'リクエストの送信に失敗しました。' });
+    } finally {
+        setIsSubmitting(false); // 送信完了時にフラグを戻す
     }
   };
 
@@ -417,13 +424,24 @@ export default function PublicSongList() {
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={handleSubmitRequest}
-                    className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300`}
+                    disabled={isSubmitting}
+                    className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300 relative ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                   >
-                    送信
+                    {isSubmitting ? (
+                        <>
+                            <span className="opacity-0">送信</span>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                            </div>
+                        </>
+                    ) : (
+                        '送信'
+                    )}
                   </button>
                   <button
                     onClick={() => setIsRequestingSong(false)}
-                    className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto`}
+                    disabled={isSubmitting}
+                    className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                   >
                     キャンセル
                   </button>

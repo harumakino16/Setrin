@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { to, songTitle, requesterName, pageName, pageUrl, isFirstTime, requestedAt } = req.body;
+        const { to, songTitle, requesterName, pageName, pageUrl, isFirstTime, requestedAt, color } = req.body;
 
         if (!to || !songTitle || !requesterName || !pageName || !pageUrl) {
             return res.status(400).json({ message: '必要な情報が不足しています。' });
@@ -24,9 +24,21 @@ export default async function handler(req, res) {
             second: '2-digit'
         });
 
+        // 色名から実際に使用するカラーコードへのマップを定義
+        const colorMap = {
+            pink: '#FFB6C1',
+            blue: '#A6D9FF',
+            yellow: '#FFDFA3',
+            green: '#A5F5AD',
+            orange: '#FFCBB6',
+            purple: '#E6B6FF',
+            black: '#1D2129'
+        };
+        const resolvedColor = colorMap[color] || '#A6D9FF'; // color 省略時は blue(#A6D9FF) にフォールバック
+
         const htmlContent = `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #2563eb;">新しいリクエストが届きました！</h2>
+                <h2 style="color: ${resolvedColor};">新しいリクエストが届きました！</h2>
                 <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <tr>
                         <th style="text-align: left; padding: 10px; background-color: #f3f4f6; border: 1px solid #e5e7eb;">項目</th>
@@ -54,7 +66,7 @@ export default async function handler(req, res) {
                     </tr>
                 </table>
                 <div style="margin-top: 20px;">
-                    <a href="${pageUrl}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 5px;">
+                    <a href="${pageUrl}" style="display: inline-block; padding: 10px 20px; background-color: ${resolvedColor}; color: white; text-decoration: none; border-radius: 5px;">
                         リクエストを確認する
                     </a>
                 </div>
