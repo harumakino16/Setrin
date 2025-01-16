@@ -8,31 +8,55 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { subject, content, emailAddresses } = req.body;
+        const { recipients, templateId, templateData } = req.body;
 
-        // 各メールアドレスに個別にメールを送信
-        const messages = emailAddresses.map(email => ({
-            to: email,
+        if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+            return res.status(400).json({ message: '送信先リストは必須です。' });
+        }
+
+        if (!templateId) {
+            return res.status(400).json({ message: 'テンプレートIDは必須です。' });
+        }
+
+        // 送信先リストの検証
+        const invalidEmails = recipients.filter(email => !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/));
+        if (invalidEmails.length > 0) {
+            return res.status(400).json({
+                message: '無効なメールアドレスが含まれています。',
+                invalidEmails
+            });
+        }
+
+        // 各受信者へのメッセージを作成
+        const messages = recipients.map(to => ({
+            to,
             from: {
                 email: process.env.SENDGRID_FROM_EMAIL,
                 name: 'Setlink(セトリンク)'
             },
-            subject: subject,  // メール自体の件名
-            templateId: 'd-5934fea4d0af4b6699d5013b91f20662',
-            dynamicTemplateData: {
-                email_subject: subject,  // テンプレート内での件名変数
-                subject: subject,        // 互換性のために残す
-                body: content
+            template_id: templateId,
+            dynamic_template_data: {
+                subject: templateData.subject || 'Setlinkからのお知らせ',
+                content: templateData.content,
+                ...templateData
             }
         }));
 
-        // SendGridを使用して一括送信
+        // SendGridの一括送信を使用
         await sgMail.send(messages);
-
-        res.status(200).json({ message: 'Emails sent successfully' });
+        
+        res.status(200).json({
+            message: 'メールが送信されました。',
+            sentCount: recipients.length
+        });
     } catch (error) {
-        console.error('SendGrid Error:', error);
-        console.error('Error details:', error.response?.body);
-        res.status(500).json({ message: 'Failed to send emails', error: error.message });
+        console.error('一斉メール送信エラー:', error);
+        if (error.response && error.response.body && error.response.body.errors) {
+            console.error('SendGrid エラー詳細:', error.response.body.errors);
+        }
+        res.status(500).json({
+            message: 'メールの送信に失敗しました。',
+            error: error.message
+        });
     }
 } 
