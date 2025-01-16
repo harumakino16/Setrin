@@ -31,6 +31,7 @@ export default function RequestUtawaku() {
     const [pageName, setPageName] = useState('');
     const [publicURL, setPublicURL] = useState('');
     const [ownerUserId, setOwnerUserId] = useState('');
+    const [notificationEnabled, setNotificationEnabled] = useState(false);
     const { t } = useTranslation('common');
 
     useEffect(() => {
@@ -93,6 +94,20 @@ export default function RequestUtawaku() {
         };
     }, [currentUser, selectedPageId]);
 
+    useEffect(() => {
+        if (!currentUser) return;
+        // 通知設定を取得
+        const fetchNotificationSettings = async () => {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                const settings = userDoc.data().notificationSettings || {};
+                setNotificationEnabled(settings.requestNotification || false);
+            }
+        };
+        fetchNotificationSettings();
+    }, [currentUser]);
+
     const handleToggleRequestMode = async () => {
         if (!currentUser || !selectedPageId || !ownerUserId) return;
         const pageRef = doc(db, 'users', ownerUserId, 'publicPages', selectedPageId);
@@ -147,6 +162,20 @@ export default function RequestUtawaku() {
             navigator.clipboard.writeText(publicURL);
             setMessageInfo({ type: 'success', message: 'URLをコピーしました。' });
         }
+    };
+
+    const handleToggleNotification = async () => {
+        if (!currentUser) return;
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, {
+            'notificationSettings.requestNotification': !notificationEnabled,
+            'notificationSettings.email': currentUser.email
+        });
+        setNotificationEnabled(!notificationEnabled);
+        setMessageInfo({ 
+            type: 'success', 
+            message: `リクエスト通知を${!notificationEnabled ? 'オン' : 'オフ'}にしました。` 
+        });
     };
 
     if (!currentUser) {
@@ -249,6 +278,29 @@ export default function RequestUtawaku() {
                                 <p className="text-xs text-gray-500 mt-1">このURLをリスナーに共有すると、リクエストを受け付けられます。</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* 通知設定セクション */}
+                <div className="bg-white p-6 rounded shadow-sm space-y-4">
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-800 mb-2">通知設定</h2>
+                        <p className="text-sm text-gray-600">リクエストが届いた時のメール通知設定</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="font-medium text-gray-700">メール通知</p>
+                            <p className="text-sm text-gray-500">新しいリクエストが届いた時にメールで通知します</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={notificationEnabled}
+                                onChange={handleToggleNotification}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
                     </div>
                 </div>
 

@@ -266,26 +266,54 @@ export default function PublicSongList() {
   };
 
   const handleSubmitRequest = async () => {
-    if (!requestTargetSong || !id || !userInfo?.userId) return;
+    if (!requestTargetSong || !requesterName) return;
+
     try {
-      const userId = userInfo.userId;
-      const requestsRef = collection(db, 'users', userId, 'publicPages', id, 'requests');
-      await addDoc(requestsRef, {
-        songId: requestTargetSong.id,
-        songTitle: requestTargetSong.title,
-        requesterName: requesterName.trim() || '匿名',
-        youtubeUrl: requestTargetSong.youtubeUrl || '',
-        requestedAt: new Date(),
-        publicPageId: id,
-        isFirstTime: isFirstTime
-      });
-      setMessageInfo({ type: 'success', message: 'リクエストを送信しました！' });
-      setIsRequestingSong(false);
-      setRequesterName('');
-      setIsFirstTime(false);
-    } catch (err) {
-      console.error(err);
-      alert('リクエスト送信中にエラーが発生しました。');
+        const requestedAt = new Date();
+        const requestsRef = collection(db, 'users', userInfo.userId, 'publicPages', id, 'requests');
+        await addDoc(requestsRef, {
+            songId: requestTargetSong.id,
+            songTitle: requestTargetSong.title,
+            requesterName,
+            requestedAt,
+            consumed: false,
+            publicPageId: id,
+            isFirstTime
+        });
+
+        // 通知設定を確認してメール送信
+        const userRef = doc(db, 'users', userInfo.userId);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+            const settings = userDoc.data().notificationSettings || {};
+            if (settings.requestNotification && settings.email) {
+                // メール通知を送信
+                await fetch('/api/send-request-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        to: settings.email,
+                        songTitle: requestTargetSong.title,
+                        requesterName: requesterName,
+                        pageName: userInfo.displayName,
+                        pageUrl: `${window.location.origin}/utawakutool/request-utawaku`,
+                        isFirstTime,
+                        requestedAt
+                    }),
+                });
+            }
+        }
+
+        setMessageInfo({ type: 'success', message: 'リクエストを送信しました。' });
+        setIsRequestingSong(false);
+        setRequestTargetSong(null);
+        setRequesterName('');
+        setIsFirstTime(false);
+    } catch (error) {
+        console.error('リクエスト送信エラー:', error);
+        setMessageInfo({ type: 'error', message: 'リクエストの送信に失敗しました。' });
     }
   };
 
