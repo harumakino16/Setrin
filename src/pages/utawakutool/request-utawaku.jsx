@@ -8,7 +8,7 @@ import { collection, doc, getDocs, getDoc, setDoc, onSnapshot, updateDoc, query,
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faQuestionCircle, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
@@ -28,6 +28,69 @@ export default function RequestUtawaku() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [requestMode, setRequestMode] = useState(false);
+    const [sortConfig, setSortConfig] = useState({
+        key: 'requestedAt',
+        direction: 'desc',
+        showConsumedAtBottom: false
+    });
+
+    // ソート関数
+    const sortRequests = (reqs) => {
+        let sortedReqs = [...reqs];
+        
+        sortedReqs.sort((a, b) => {
+            // 消化済みを下に表示する設定が有効な場合、最優先で適用
+            if (sortConfig.showConsumedAtBottom) {
+                if (a.consumed && !b.consumed) return 1;
+                if (!a.consumed && b.consumed) return -1;
+            }
+
+            // 同じ消化状態の場合は、選択されたカラムでソート
+            if (sortConfig.key === 'requestedAt') {
+                const dateA = a.requestedAt?.toDate() || new Date(0);
+                const dateB = b.requestedAt?.toDate() || new Date(0);
+                return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
+            }
+            if (sortConfig.key === 'songTitle') {
+                return sortConfig.direction === 'asc' 
+                    ? a.songTitle.localeCompare(b.songTitle)
+                    : b.songTitle.localeCompare(a.songTitle);
+            }
+            if (sortConfig.key === 'requesterName') {
+                const nameA = a.requesterName || '匿名';
+                const nameB = b.requesterName || '匿名';
+                return sortConfig.direction === 'asc'
+                    ? nameA.localeCompare(nameB)
+                    : nameB.localeCompare(nameA);
+            }
+            if (sortConfig.key === 'isFirstTime') {
+                return sortConfig.direction === 'asc'
+                    ? (a.isFirstTime === b.isFirstTime ? 0 : a.isFirstTime ? 1 : -1)
+                    : (a.isFirstTime === b.isFirstTime ? 0 : a.isFirstTime ? -1 : 1);
+            }
+            return 0;
+        });
+
+        return sortedReqs;
+    };
+
+    // ソート処理のハンドラー
+    const handleSort = (key) => {
+        setSortConfig(prev => ({
+            ...prev,
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
+
+    // 消化済みを下に表示する設定の切り替え
+    const toggleConsumedAtBottom = () => {
+        setSortConfig(prev => ({
+            ...prev,
+            showConsumedAtBottom: !prev.showConsumedAtBottom
+        }));
+    };
+
     const [pageName, setPageName] = useState('');
     const [publicURL, setPublicURL] = useState('');
     const [ownerUserId, setOwnerUserId] = useState('');
@@ -80,8 +143,7 @@ export default function RequestUtawaku() {
                 const q = query(requestsRef, where('publicPageId', '==', selectedPageId));
                 const unsubscribe = onSnapshot(q, (snapshot) => {
                     const reqData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    reqData.sort((a, b) => b.requestedAt?.toDate() - a.requestedAt?.toDate());
-                    setRequests(reqData);
+                    setRequests(sortRequests(reqData));
                 });
 
                 return () => unsubscribe();
@@ -150,11 +212,14 @@ export default function RequestUtawaku() {
         setMessageInfo({ type: 'success', message: `リクエスト受付を${!requestMode ? '開始' : '停止'}しました。` });
     };
 
-    const handleConsumeRequest = async (requestId) => {
+    const handleConsumeRequest = async (requestId, currentStatus) => {
         if (!selectedPageId || !requestId || !ownerUserId) return;
         const requestRef = doc(db, 'users', ownerUserId, 'publicPages', selectedPageId, 'requests', requestId);
-        await setDoc(requestRef, { consumed: true }, { merge: true });
-        setMessageInfo({ type: 'success', message: 'リクエストを消化しました。' });
+        await setDoc(requestRef, { consumed: !currentStatus }, { merge: true });
+        setMessageInfo({ 
+            type: 'success', 
+            message: currentStatus ? 'リクエストを未消化に戻しました。' : 'リクエストを消化しました。'
+        });
     };
 
     const handleCopyURL = () => {
@@ -338,7 +403,19 @@ export default function RequestUtawaku() {
                         {/* リクエスト一覧 */}
                         <div className="bg-white p-6 rounded shadow-sm">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-800">リクエスト一覧</h3>
+                                <div className="flex items-center gap-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">リクエスト一覧</h3>
+                                    <button
+                                        onClick={toggleConsumedAtBottom}
+                                        className={`px-3 py-1 text-sm rounded ${
+                                            sortConfig.showConsumedAtBottom
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : 'bg-gray-100 text-gray-700'
+                                        } hover:bg-opacity-80 transition-colors`}
+                                    >
+                                        消化済みを下へ
+                                    </button>
+                                </div>
                                 <p className="text-sm text-gray-600">
                                     {requests.length}件のリクエスト
                                 </p>
@@ -355,16 +432,80 @@ export default function RequestUtawaku() {
                                 <table className="min-w-full divide-y divide-gray-200 text-sm">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">曲名</th>
-                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">送信者</th>
-                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">初見</th>
-                                            <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">時刻</th>
+                                            <th 
+                                                className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSort('songTitle')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    曲名
+                                                    <FontAwesomeIcon 
+                                                        icon={
+                                                            sortConfig.key === 'songTitle'
+                                                                ? sortConfig.direction === 'asc'
+                                                                    ? faSortUp
+                                                                    : faSortDown
+                                                                : faSort
+                                                        }
+                                                    />
+                                                </div>
+                                            </th>
+                                            <th 
+                                                className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSort('requesterName')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    送信者
+                                                    <FontAwesomeIcon 
+                                                        icon={
+                                                            sortConfig.key === 'requesterName'
+                                                                ? sortConfig.direction === 'asc'
+                                                                    ? faSortUp
+                                                                    : faSortDown
+                                                                : faSort
+                                                        }
+                                                    />
+                                                </div>
+                                            </th>
+                                            <th 
+                                                className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSort('isFirstTime')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    初見
+                                                    <FontAwesomeIcon 
+                                                        icon={
+                                                            sortConfig.key === 'isFirstTime'
+                                                                ? sortConfig.direction === 'asc'
+                                                                    ? faSortUp
+                                                                    : faSortDown
+                                                                : faSort
+                                                        }
+                                                    />
+                                                </div>
+                                            </th>
+                                            <th 
+                                                className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSort('requestedAt')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    時刻
+                                                    <FontAwesomeIcon 
+                                                        icon={
+                                                            sortConfig.key === 'requestedAt'
+                                                                ? sortConfig.direction === 'asc'
+                                                                    ? faSortUp
+                                                                    : faSortDown
+                                                                : faSort
+                                                        }
+                                                    />
+                                                </div>
+                                            </th>
                                             <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">ステータス</th>
                                             <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase text-center">消化する</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {requests.map((req) => {
+                                        {sortRequests(requests).map((req) => {
                                             const requestedAt = req.requestedAt?.toDate();
                                             const timeStr = requestedAt
                                                 ? requestedAt.toLocaleString('ja-JP', {
@@ -400,8 +541,7 @@ export default function RequestUtawaku() {
                                                         <input
                                                             type="checkbox"
                                                             checked={isConsumed}
-                                                            onChange={() => handleConsumeRequest(req.id)}
-                                                            disabled={isConsumed}
+                                                            onChange={() => handleConsumeRequest(req.id, isConsumed)}
                                                             className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
                                                         />
                                                     </td>
