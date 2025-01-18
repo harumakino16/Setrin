@@ -11,6 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { FaSearch } from 'react-icons/fa';
 import Loading from '@/components/loading';
 import { NextSeo } from 'next-seo';
+import Cookies from 'js-cookie';
 
 
 export default function PublicSongList() {
@@ -402,7 +403,30 @@ export default function PublicSongList() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
                 <h2 className="text-xl font-bold mb-4">リクエスト</h2>
+                {(() => {
+                  const cookieKey = `request_${id}_${requestTargetSong?.id}`;
+                  const lastRequestTime = Cookies.get(cookieKey);
+                  
+                  if (lastRequestTime) {
+                    const lastTime = new Date(parseInt(lastRequestTime));
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - lastTime) / (1000 * 60));
+                    const remainingMinutes = 60 - diffMinutes;
+                    
+                    if (remainingMinutes > 0) {
+                      return (
+                        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-700">
+                          この曲は既にリクエスト済みです。<br />
+                          次のリクエストは{remainingMinutes}分後に可能になります。
+                        </div>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
                 <p className="mb-4">「{requestTargetSong?.title}」をリクエストします。<br />お名前を入力してください (任意)</p>
+                
+
                 <div className="flex items-center mb-4">
                   <input
                     type="checkbox"
@@ -422,26 +446,48 @@ export default function PublicSongList() {
                 />
                 
                 <div className="flex flex-col gap-2">
-                  <button
-                    onClick={handleSubmitRequest}
-                    disabled={isSubmitting}
-                    className={`w-full bg-customTheme-${color}-primary text-white px-4 py-3 rounded hover:opacity-80 transition-opacity duration-300 relative ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  >
-                    {isSubmitting ? (
-                        <>
+                  {(() => {
+                    const cookieKey = `request_${id}_${requestTargetSong?.id}`;
+                    const lastRequestTime = Cookies.get(cookieKey);
+                    const isDisabled = (() => {
+                      if (lastRequestTime) {
+                        const lastTime = new Date(parseInt(lastRequestTime));
+                        const now = new Date();
+                        const diffMinutes = Math.floor((now - lastTime) / (1000 * 60));
+                        return diffMinutes < 60;
+                      }
+                      return false;
+                    })();
+
+                    return (
+                      <button
+                        onClick={handleSubmitRequest}
+                        disabled={isDisabled || isSubmitting}
+                        className={`w-full px-4 py-3 rounded relative ${
+                          isDisabled
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : `bg-customTheme-${color}-primary text-white hover:opacity-80 transition-opacity duration-300`
+                        } ${isSubmitting ? 'opacity-70' : ''}`}
+                      >
+                        {isSubmitting ? (
+                          <>
                             <span className="opacity-0">送信</span>
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                             </div>
-                        </>
-                    ) : (
-                        '送信'
-                    )}
-                  </button>
+                          </>
+                        ) : (
+                          '送信'
+                        )}
+                      </button>
+                    );
+                  })()}
                   <button
                     onClick={() => setIsRequestingSong(false)}
                     disabled={isSubmitting}
-                    className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`bg-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-400 w-1/2 mx-auto ${
+                      isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
                   >
                     キャンセル
                   </button>
