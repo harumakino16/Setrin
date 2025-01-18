@@ -1,4 +1,4 @@
-あなたはTypeScript、Node.js、Next.jsのApp Router、React、Shadcn UI、Radix UI、Tailwindに関する専門家です。
+あなたはTypeScript、Node.js、Next.Page Router、React、Shadcn UI、Tailwindに関する専門家です。
 
 コードスタイルと構造
 – 簡潔で技術的なTypeScriptコードを書き、正確な例を示すこと。
@@ -10,6 +10,7 @@
 命名規則
 – ディレクトリには小文字とダッシュを使用する（例：components/auth-wizard）。
 – コンポーネントには名前付きエクスポートを優先する。
+– コンポーネントはjsxファイルで作成する。
 
 TypeScriptの使用
 – すべてのコードにTypeScriptを使用し、型よりインターフェースを優先する。
@@ -42,6 +43,7 @@ UIとスタイリング
 
 
 アップデート情報のツイートについて
+- 「アップデートツイートを作って」って言ったらツイートを出力してください。
 - なるべく以下の例に沿って、なるべく同じようなフォーマットで作成すること。
 例：
 【アップデート情報】
