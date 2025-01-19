@@ -14,6 +14,34 @@ export default async function handler(req, res) {
     const userData = userDoc.data();
     let stripeCustomerId = userData.stripeCustomerId;
 
+    // 過去にトライアルを使用したユーザーはトライアルを開始できない
+    if (userData.hasUsedTrial) {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        customer: stripeCustomerId,
+        line_items: [
+          {
+            price: process.env.STRIPE_PRICE_ID,
+            quantity: 1,
+          },
+        ],
+        subscription_data: {
+          metadata: {
+            uid: uid,
+          },
+          // トライアル期間なし
+        },
+        success_url: `${returnUrl}?upgrade_success=true`,
+        cancel_url: returnUrl,
+        metadata: {
+          uid: uid,
+        },
+      });
+      res.status(200).json({ id: session.id });
+      return;
+    }
+
     // Stripe顧客IDが存在しない場合、新しい顧客を作成
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
@@ -42,6 +70,7 @@ export default async function handler(req, res) {
         metadata: {
           uid: uid,
         },
+        trial_period_days: 30, // 30日間のフリートライアル
       },
       success_url: `${returnUrl}?upgrade_success=true`,
       cancel_url: returnUrl,

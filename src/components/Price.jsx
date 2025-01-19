@@ -15,7 +15,12 @@ function Price() {
   const [isLoading, setIsLoading] = useState(false);
 
   const isPremiumUser = currentUser?.plan === 'premium';
-  const premiumButtonText = currentUser ? (isPremiumUser ? '現在利用中' : 'プレミアムプランに移行する') : 'プレミアムプランで始める';
+  const isTrialing = currentUser?.isTrialing;
+  const premiumButtonText = currentUser ? 
+    (isPremiumUser ? 
+      (isTrialing ? '無料トライアル中' : '現在利用中') 
+      : currentUser.hasUsedTrial ? 'プレミアムプランに移行する' : 'プレミアムプランに移行する（30日間無料）') 
+    : 'プレミアムプランで始める（30日間無料）';
   const freeButtonText = currentUser?.plan === 'free' ? '現在利用中' : '無料で始める';
 
   const handleUpgradePlanClick = () => {
@@ -74,6 +79,7 @@ function Price() {
               { text: "再生リスト作成回数 無制限", available: true, highlight: true },
               { text: "セットリスト数 無制限", available: true, highlight: true },
               { text: "歌枠ツール利用可能", available: true, highlight: true },
+              { text: "30日間無料トライアル", available: true, highlight: true },
             ]}
             buttonText={premiumButtonText}
             bannerText="歌枠配信者におすすめ！"
