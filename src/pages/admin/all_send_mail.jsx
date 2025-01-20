@@ -1,104 +1,41 @@
 import { useState } from 'react';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography, FormControlLabel, Switch } from '@mui/material';
-import { Editor } from '@tinymce/tinymce-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../../firebaseConfig.js';
+import H1 from '@/components/ui/h1';
+import { Button } from '@/components/ui/button';
+import LoadingIcon from '@/components/ui/loadingIcon';
 import Layout from '@/pages/layout';
-import withAdminAuth from '@/components/withAdminAuth';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { db } from '@/../firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { Dialog } from '@headlessui/react';
 
-const AllSendMail = () => {
-    const [mailData, setMailData] = useState({
-        subject: '',
-        mailType: '',
-        content: '',
-        searchConditions: {
-            campaignMailReceive: false,
-            lastActivityDaysFrom: null,
-            lastActivityDaysTo: null,
-            userStatus: 'all',
-        }
-    });
-
-    const mailTypes = [
-        { value: 'campaign', label: 'キャンペーンメール' },
-        { value: 'update', label: 'アップデートのお知らせ' },
-        { value: 'survey', label: 'アンケート' },
-        { value: 'news', label: 'ニュースレター' }
-    ];
-
-    const handleEditorChange = (content, editor) => {
-        setMailData(prev => ({
-            ...prev,
-            content: content  // TinyMCEエディタから直接HTMLを取得
-        }));
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setMailData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const getFilteredUsers = async () => {
-        const usersRef = collection(db, 'users');
-        let q = query(usersRef);
-
-        const { searchConditions } = mailData;
-
-        // キャンペーンメール受信許可フィルター
-        if (searchConditions.campaignMailReceive) {
-            q = query(q, where('campaignMailReceive', '==', true));
-        }
-
-        // 会員ステータスフィルター
-        if (searchConditions.userStatus !== 'all') {
-            q = query(q, where('status', '==', searchConditions.userStatus));
-        }
-
-        const snapshot = await getDocs(q);
-        const users = [];
-        
-        snapshot.forEach(doc => {
-            const userData = doc.data();
-            const lastActivity = userData.lastActivityAt?.toDate();
-            
-            // 最終アクティビティの日付フィルター
-            let includeUser = true;
-            const today = new Date();
-            
-            if (searchConditions.lastActivityDaysFrom) {
-                const fromDate = new Date(today.getTime() - (searchConditions.lastActivityDaysFrom * 24 * 60 * 60 * 1000));
-                if (lastActivity > fromDate) includeUser = false;
-            }
-            
-            if (searchConditions.lastActivityDaysTo) {
-                const toDate = new Date(today.getTime() - (searchConditions.lastActivityDaysTo * 24 * 60 * 60 * 1000));
-                if (lastActivity < toDate) includeUser = false;
-            }
-
-            if (includeUser && userData.email) {
-                users.push(userData.email);
-            }
-        });
-
-        return users;
-    };
+export default function AllSendMail() {
+    const [subject, setSubject] = useState('');
+    const [content, setContent] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [sendType, setSendType] = useState('test'); // test or bulk
+    const [result, setResult] = useState('');
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setResult('');
 
         try {
-            const emailAddresses = await getFilteredUsers();
+            // titleタグから件名を抽出
+            const titleMatch = content.match(/<title>(.*?)<\/title>/);
+            const extractedSubject = titleMatch ? titleMatch[1] : subject;
 
-            if (emailAddresses.length === 0) {
-                alert('送信対象のユーザーが見つかりませんでした。');
-                return;
+            let recipients = [];
+
+            if (sendType === 'test') {
+                recipients = ['harumakiafeli@gmail.com'];
+            } else {
+                // Firebaseから全ユーザーのメールアドレスを取得
+                const querySnapshot = await getDocs(collection(db, 'users'));
+                recipients = querySnapshot.docs
+                    .map(doc => doc.data().email)
+                    .filter(email => email); // nullやundefinedを除外
             }
-
-            console.log('Sending subject:', mailData.subject); // デバッグ用
 
             const response = await fetch('/api/send-bulk-mail', {
                 method: 'POST',
@@ -106,176 +43,159 @@ const AllSendMail = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    subject: mailData.subject,
-                    content: mailData.content,
-                    emailAddresses
-                }),
+                    recipients,
+                    templateId: 'd-5934fea4d0af4b6699d5013b91f20662',
+                    templateData: {
+                        subject: extractedSubject,
+                        content
+                    }
+                })
             });
 
-            if (response.ok) {
-                alert(`${emailAddresses.length}件のメールの送信を開始しました`);
-                setMailData({
-                    subject: '',
-                    mailType: '',
-                    content: '',
-                    searchConditions: {
-                        campaignMailReceive: false,
-                        lastActivityDaysFrom: null,
-                        lastActivityDaysTo: null,
-                        userStatus: 'all',
-                    }
-                });
-            } else {
-                throw new Error('メール送信に失敗しました');
-            }
+            const data = await response.json();
+            setResult(data.message);
         } catch (error) {
             console.error('Error:', error);
-            alert('エラーが発生しました: ' + error.message);
+            setResult('エラーが発生しました: ' + error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const renderSearchConditions = () => (
-        <Box sx={{ mt: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-                送信対象ユーザーの条件
-            </Typography>
-            
-            <FormControl component="fieldset" sx={{ mt: 2 }}>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={mailData.searchConditions.campaignMailReceive}
-                            onChange={(e) => handleSearchConditionChange('campaignMailReceive', e.target.checked)}
-                        />
-                    }
-                    label="キャンペーンメール受信許可ユーザーのみ"
-                />
-            </FormControl>
-
-            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                <TextField
-                    type="number"
-                    label="最終アクティビティ（○日以前）"
-                    value={mailData.searchConditions.lastActivityDaysFrom || ''}
-                    onChange={(e) => handleSearchConditionChange('lastActivityDaysFrom', e.target.value)}
-                    fullWidth
-                    helperText="空欄の場合は制限なし"
-                />
-                <TextField
-                    type="number"
-                    label="最終アクティビティ（○日以内）"
-                    value={mailData.searchConditions.lastActivityDaysTo || ''}
-                    onChange={(e) => handleSearchConditionChange('lastActivityDaysTo', e.target.value)}
-                    fullWidth
-                    helperText="空欄の場合は制限なし"
-                />
-            </Box>
-
-            <FormControl fullWidth sx={{ mt: 2 }}>
-                <InputLabel>会員ステータス</InputLabel>
-                <Select
-                    value={mailData.searchConditions.userStatus}
-                    onChange={(e) => handleSearchConditionChange('userStatus', e.target.value)}
-                    label="会員ステータス"
-                >
-                    <MenuItem value="all">すべて</MenuItem>
-                    <MenuItem value="free">フリー会員</MenuItem>
-                    <MenuItem value="premium">プレミアム会員</MenuItem>
-                </Select>
-            </FormControl>
-        </Box>
-    );
-
-    const handleSearchConditionChange = (field, value) => {
-        setMailData(prev => ({
-            ...prev,
-            searchConditions: {
-                ...prev.searchConditions,
-                [field]: value
-            }
-        }));
+    const handlePreview = (e) => {
+        e.preventDefault();
+        setIsPreviewOpen(true);
     };
 
     return (
         <Layout>
-            <Box sx={{ maxWidth: 800, margin: '0 auto', padding: 3 }}>
-                <Typography variant="h4" gutterBottom>
-                    一括メール送信
-                </Typography>
+            <div className="container mx-auto px-4 py-8">
+                <H1>一斉メール送信</H1>
 
-                <form onSubmit={handleSubmit}>
-                    <TextField
-                        fullWidth
-                        label="件名"
-                        name="subject"
-                        value={mailData.subject}
-                        onChange={handleInputChange}
-                        margin="normal"
-                        required
-                    />
+                <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+                    <div className="space-y-4">
+                        <div className="flex space-x-4">
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="test"
+                                    checked={sendType === 'test'}
+                                    onChange={(e) => setSendType(e.target.value)}
+                                    className="mr-2"
+                                />
+                                テストメール送信
+                            </label>
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="bulk"
+                                    checked={sendType === 'bulk'}
+                                    onChange={(e) => setSendType(e.target.value)}
+                                    className="mr-2"
+                                />
+                                一括送信
+                            </label>
+                        </div>
 
-                    <FormControl fullWidth margin="normal" required>
-                        <InputLabel>メールの種類</InputLabel>
-                        <Select
-                            name="mailType"
-                            value={mailData.mailType}
-                            onChange={handleInputChange}
-                            label="メールの種類"
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                件名（HTML内のtitleタグがある場合はそちらが優先されます）
+                            </label>
+                            <input
+                                type="text"
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                本文 (HTML形式)
+                            </label>
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                rows={10}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center space-x-4">
+                        <Button
+                            type="button"
+                            onClick={handlePreview}
+                            variant="outline"
+                            className="w-full sm:w-auto"
                         >
-                            {mailTypes.map((type) => (
-                                <MenuItem key={type.value} value={type.value}>
-                                    {type.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                            プレビュー
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full sm:w-auto"
+                        >
+                            {isLoading ? <LoadingIcon /> : '送信'}
+                        </Button>
+                    </div>
 
-                    <Box sx={{ mt: 2, mb: 2 }}>
-                        <Editor
-                            apiKey={process.env.NEXT_PUBLIC_TINYMCE_KEY}
-                            init={{
-                                height: 500,
-                                menubar: true,
-                                plugins: [
-                                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                ],
-                                toolbar: 'undo redo | blocks | ' +
-                                    'bold italic forecolor | alignleft aligncenter ' +
-                                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                                    'removeformat | help',
-                                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }',
-                            }}
-                            value={mailData.content}
-                            onEditorChange={handleEditorChange}
-                        />
-                    </Box>
-
-                    {renderSearchConditions()}
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        fullWidth
-                        sx={{ mt: 2 }}
-                    >
-                        送信する
-                    </Button>
+                    {result && (
+                        <div className="mt-4 p-4 rounded-md bg-green-50 text-green-700">
+                            {result}
+                        </div>
+                    )}
                 </form>
-            </Box>
+
+                {/* プレビューモーダル */}
+                <Dialog
+                    open={isPreviewOpen}
+                    onClose={() => setIsPreviewOpen(false)}
+                    className="relative z-50"
+                >
+                    <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+                    
+                    <div className="fixed inset-0 flex items-center justify-center p-4">
+                        <Dialog.Panel className="mx-auto max-w-4xl w-full bg-white rounded-lg shadow-xl">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <Dialog.Title className="text-lg font-medium">
+                                        メールプレビュー
+                                    </Dialog.Title>
+                                    <button
+                                        onClick={() => setIsPreviewOpen(false)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        <span className="sr-only">閉じる</span>
+                                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <div className="mb-4">
+                                    <h3 className="text-sm font-medium text-gray-700">件名:</h3>
+                                    <p className="mt-1">
+                                        {content.match(/<title>(.*?)<\/title>/)?.[1] || subject}
+                                    </p>
+                                </div>
+
+                                <div className="border rounded-lg">
+                                    <div className="bg-gray-50 p-4 rounded-t-lg border-b">
+                                        <h3 className="text-sm font-medium text-gray-700">本文プレビュー:</h3>
+                                    </div>
+                                    <div 
+                                        className="p-4 max-h-[60vh] overflow-auto"
+                                        dangerouslySetInnerHTML={{ __html: content }}
+                                    />
+                                </div>
+                            </div>
+                        </Dialog.Panel>
+                    </div>
+                </Dialog>
+            </div>
         </Layout>
     );
-};
-
-export default withAdminAuth(AllSendMail);
-
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
 }
