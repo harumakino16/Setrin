@@ -1,7 +1,7 @@
 import withAdminAuth from '@/components/withAdminAuth';
 import { useState, useEffect } from 'react';
 import { db } from '@/../firebaseConfig';
-import { collection, getDocs,getCountFromServer } from 'firebase/firestore';
+import { collection, getDocs, getCountFromServer } from 'firebase/firestore';
 import Link from 'next/link';
 import Layout from '@/pages/layout';
 import { useTranslation } from 'next-i18next';
@@ -16,13 +16,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
-  const [recentActivities, setRecentActivities] = useState([]);
   const [userCount, setUserCount] = useState(0);
   const { t } = useTranslation('common');
-
-  const fetchRecentActivities = async () => {
-    // 最近のアクティビティを取得するロジック
-  };
 
   const fetchUserCount = async () => {
     try {
@@ -34,12 +29,18 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    fetchRecentActivities();
     fetchUserCount();
   }, []);
 
   const adminMenuItems = [
-  {
+    {
+      title: 'KPI分析',
+      description: '各種KPI指標の分析と確認',
+      icon: ChartBarIcon,
+      href: '/admin/kpi',
+      color: 'bg-indigo-500',
+    },
+    {
       title: 'アクティブユーザー',
       description: '現在アクティブなユーザーを確認します',
       icon: UserIcon,
@@ -60,7 +61,6 @@ const AdminDashboard = () => {
       href: '/admin/database_operation',
       color: 'bg-green-500',
     },
-    
     {
       title: 'テスト環境',
       description: '各種機能のテストを行います',
@@ -85,19 +85,19 @@ const AdminDashboard = () => {
           <p className="text-gray-600 mt-2">システムの概要と主要な管理機能にアクセスできます</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600">総ユーザー数</p>
                 <h3 className="text-2xl font-bold">{userCount}</h3>
               </div>
-              <ChartBarIcon className="h-8 w-8 text-blue-500" />
+              <UserGroupIcon className="h-8 w-8 text-blue-500" />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {adminMenuItems.map((item) => (
             <Link href={item.href} key={item.title}>
               <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer">
@@ -109,18 +109,6 @@ const AdminDashboard = () => {
               </div>
             </Link>
           ))}
-        </div>
-
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">最近のアクティビティ</h2>
-          <div className="space-y-4">
-            {recentActivities.map(activity => (
-              <div key={activity.id} className="border-b pb-4">
-                <p className="text-gray-600">{activity.description}</p>
-                <span className="text-sm text-gray-500">{activity.timestamp}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </Layout>
