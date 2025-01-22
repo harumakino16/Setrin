@@ -7,6 +7,7 @@ import Layout from '@/pages/layout';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withAdminAuth from '@/components/withAdminAuth';
+import { Timestamp } from 'firebase/firestore';
 
 const DatabaseOperation = () => {
     const [userId, setUserId] = useState('');
@@ -226,6 +227,70 @@ const DatabaseOperation = () => {
         }
     };
 
+    const handleCreateSampleMetrics = async () => {
+        try {
+            let batch = writeBatch(db);
+            let operationCount = 0;
+            
+            // 過去3ヶ月分のデータを生成
+            const now = new Date();
+            const startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1); // 3ヶ月前の1日
+
+            for (let d = new Date(startDate); d <= now; d.setDate(d.getDate() + 1)) {
+                const date = new Date(d);
+                const dayOfMonth = date.getDate();
+                
+                // 基準値を設定（日付が進むにつれて少しずつ増加）
+                const baseNewUsers = 5 + Math.floor(dayOfMonth / 3);
+                const baseAdUsers = 3 + Math.floor(dayOfMonth / 4);
+                const basePaidUsers = 20 + Math.floor(dayOfMonth / 2);
+                const baseMAU = 100 + dayOfMonth * 2;
+
+                // ランダムな変動を加える
+                const metricsData = {
+                    date: date,
+                    newUsers: baseNewUsers + Math.floor(Math.random() * 5),
+                    adUsers: baseAdUsers + Math.floor(Math.random() * 3),
+                    mau: baseMAU + Math.floor(Math.random() * 20),
+                    paidUsers: basePaidUsers + Math.floor(Math.random() * 5),
+                    adPaidUsers: Math.floor(baseAdUsers * 0.4) + Math.floor(Math.random() * 2),
+                    createdAt: Timestamp.fromDate(date)
+                };
+
+                // adConversionRateを計算
+                metricsData.adConversionRate = 
+                    metricsData.adUsers > 0 
+                        ? (metricsData.adPaidUsers / metricsData.adUsers) * 100 
+                        : 0;
+
+                const docRef = doc(collection(db, 'metrics'));
+                batch.set(docRef, metricsData);
+                operationCount++;
+
+                if (operationCount >= 500) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                    operationCount = 0;
+                }
+            }
+
+            if (operationCount > 0) {
+                await batch.commit();
+            }
+
+            setMessageInfo({ 
+                message: 'サンプルのメトリクスデータが作成されました。', 
+                type: 'success' 
+            });
+        } catch (error) {
+            console.error('Error creating sample metrics:', error);
+            setMessageInfo({ 
+                message: 'メトリクスデータの作成に失敗しました: ' + error.message, 
+                type: 'error' 
+            });
+        }
+    };
+
     return (
         <Layout>
             <div className="p-5">
@@ -254,6 +319,12 @@ const DatabaseOperation = () => {
                         className="bg-yellow-500 text-white px-4 py-2 rounded block w-full"
                     >
                         備考(note)フィールドを作成
+                    </button>
+                    <button 
+                        onClick={handleCreateSampleMetrics}
+                        className="bg-pink-500 text-white px-4 py-2 rounded block w-full"
+                    >
+                        サンプルメトリクスデータを作成
                     </button>
                 </div>
             </div>
