@@ -1,13 +1,22 @@
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 
-export const registerUserInFirestore = async (user) => {
-    const userRef = doc(db, "users", user.uid);
-    await setDoc(userRef, {
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        createdAt: serverTimestamp(),
-        plan: 'free'
-    }, { merge: true });
+export const registerUserInFirestore = async (userData) => {
+    const { uid, email, displayName, signUpSource } = userData;
+
+    try {
+        const userRef = doc(db, 'users', uid);
+        await setDoc(userRef, {
+            email,
+            displayName,
+            signUpSource,
+            createdAt: serverTimestamp(),
+            lastActivityAt: serverTimestamp(),
+            plan: 'free',
+            theme: 'blue',
+        });
+    } catch (error) {
+        console.error('Error registering user:', error);
+        throw error;
+    }
 };
