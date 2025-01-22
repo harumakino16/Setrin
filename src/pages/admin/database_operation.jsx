@@ -226,6 +226,85 @@ const DatabaseOperation = () => {
         }
     };
 
+    const handleAddYoutubeUrlToRequests = async () => {
+        try {
+            // 最初にpublicPagesコレクションから直接取得
+            const publicPagesRef = collection(db, 'publicPages');
+            const publicPagesSnapshot = await getDocs(publicPagesRef);
+            
+            console.log(`総ページ数: ${publicPagesSnapshot.size}`);
+            let processedPages = 0;
+            let totalUpdatedRequests = 0;
+            
+            let batch = writeBatch(db);
+            let operationCount = 0;
+            
+            // ページごとに処理
+            for (const pageDoc of publicPagesSnapshot.docs) {
+                const pageData = pageDoc.data();
+                const userId = pageData.userId; // publicPagesドキュメントにはuserIdが含まれている
+                const pageId = pageDoc.id;
+                
+                processedPages++;
+                
+                // requestsコレクションを取得
+                const requestsRef = collection(db, 'users', userId, 'publicPages', pageId, 'requests');
+                const requestsSnapshot = await getDocs(requestsRef);
+                
+                if (!requestsSnapshot.empty) {
+                    console.log(`処理中のページ: ${processedPages}/${publicPagesSnapshot.size} (${Math.round(processedPages/publicPagesSnapshot.size*100)}%) - リクエスト数: ${requestsSnapshot.size}`);
+                    
+                    // リクエストごとに処理
+                    for (const requestDoc of requestsSnapshot.docs) {
+                        const requestData = requestDoc.data();
+                        
+                        if (requestData.songId && !requestData.youtubeUrl) {
+                            const songRef = doc(db, 'users', userId, 'Songs', requestData.songId);
+                            const songDoc = await getDoc(songRef);
+                            
+                            if (songDoc.exists()) {
+                                const songData = songDoc.data();
+                                if (songData.youtubeUrl) {
+                                    batch.update(requestDoc.ref, {
+                                        youtubeUrl: songData.youtubeUrl
+                                    });
+                                    operationCount++;
+                                    totalUpdatedRequests++;
+                                }
+                            }
+                        }
+                        
+                        if (operationCount >= 500) {
+                            console.log('バッチをコミット中...');
+                            await batch.commit();
+                            batch = writeBatch(db);
+                            operationCount = 0;
+                            console.log('バッチコミット完了');
+                        }
+                    }
+                }
+            }
+            
+            if (operationCount > 0) {
+                console.log('最終バッチをコミット中...');
+                await batch.commit();
+                console.log('最終バッチコミット完了');
+            }
+            
+            console.log(`移行完了！更新されたリクエストの総数: ${totalUpdatedRequests}`);
+            setMessageInfo({ 
+                message: `リクエストへのYouTube URL追加が完了しました。${totalUpdatedRequests}件のリクエストを更新しました。`, 
+                type: 'success' 
+            });
+        } catch (error) {
+            console.error('Migration error:', error);
+            setMessageInfo({ 
+                message: 'YouTubeURLの追加に失敗しました: ' + error.message, 
+                type: 'error' 
+            });
+        }
+    };
+
     return (
         <Layout>
             <div className="p-5">
@@ -254,6 +333,12 @@ const DatabaseOperation = () => {
                         className="bg-yellow-500 text-white px-4 py-2 rounded block w-full"
                     >
                         備考(note)フィールドを作成
+                    </button>
+                    <button 
+                        onClick={handleAddYoutubeUrlToRequests}
+                        className="bg-pink-500 text-white px-4 py-2 rounded block w-full"
+                    >
+                        リクエストにYouTube URLを追加
                     </button>
                 </div>
             </div>
