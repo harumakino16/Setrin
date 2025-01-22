@@ -272,7 +272,7 @@ export default function PublicSongList() {
   const handleSubmitRequest = async () => {
     if (!requestTargetSong) return;
     
-    setIsSubmitting(true); // 送信開始時にフラグを立てる
+    setIsSubmitting(true);
     
     try {
         const requestedAt = new Date();
@@ -280,6 +280,7 @@ export default function PublicSongList() {
         await addDoc(requestsRef, {
             songId: requestTargetSong.id,
             songTitle: requestTargetSong.title,
+            youtubeUrl: requestTargetSong.youtubeUrl || '',
             requesterName: requesterName || '匿名',
             requestedAt,
             consumed: false,
@@ -321,7 +322,7 @@ export default function PublicSongList() {
         console.error('リクエスト送信エラー:', error);
         setMessageInfo({ type: 'error', message: 'リクエストの送信に失敗しました。' });
     } finally {
-        setIsSubmitting(false); // 送信完了時にフラグを戻す
+        setIsSubmitting(false);
     }
   };
 
