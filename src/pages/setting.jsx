@@ -20,6 +20,7 @@ import Modal from '@/components/Modal';
 import Price from '@/components/Price';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { PREMIUM_PLAN_PRICE } from '@/constants';
 
 
 function Settings() {
@@ -272,7 +273,11 @@ function Settings() {
     };
 
     const handleCancelPlan = async () => {
-        if (window.confirm(`本当にプレミアムプランをキャンセルしますか？\n(プランをキャンセルしても${new Date(currentUser.planUpdatedAt.toDate().getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}までは利用できます。)`)) {
+        const confirmMessage = isTrialing
+            ? `無料トライアル中のキャンセルです。${trialEndDate.toLocaleDateString('ja-JP')}までは有料機能を利用できます。\n\n本当にプレミアムプランをキャンセルしますか？`
+            : `キャンセルしても${new Date(currentUser.nextPaymentAt).toLocaleDateString('ja-JP')}までは有料機能を利用できます。\n\n本当にプレミアムプランをキャンセルしますか？`;
+
+        if (window.confirm(confirmMessage)) {
             try {
                 const response = await fetch('/api/cancel-subscription', {
                     method: 'POST',
@@ -305,6 +310,10 @@ function Settings() {
         router.push(router.pathname, router.asPath, { locale: lang });
     };
 
+    const isPremiumUser = currentUser?.plan === 'premium';
+    const isTrialing = currentUser?.isTrialing;
+    const trialEndDate = currentUser?.trialEndDate?.toDate();
+
     return (
         <Layout>
             <div className="flex justify-between items-center p-8 pb-4 border-b">
@@ -319,22 +328,31 @@ function Settings() {
             </div>
 
             <div className="max-w-4xl mx-auto p-8">
-                
-
                 <section className="mb-12">
                     <h2 className="text-xl font-bold mb-4">プラン設定</h2>
                     <div className="bg-white shadow-lg rounded-lg p-6">
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                            <div>
+                            <div className="space-y-2 flex-1 text-center md:text-left">
                                 <p className="text-lg font-medium">
                                     現在のプラン: 
                                     <span className={`ml-2 ${currentUser.plan === 'premium' ? 'text-green-600' : 'text-gray-600'}`}>
                                         {currentUser.plan === 'premium' ? 'プレミアム' : 'フリー'}
                                     </span>
                                 </p>
+                                {isTrialing && (
+                                    <div className="text-blue-600">
+                                        <p>無料トライアル期間は残り{Math.ceil((trialEndDate - new Date()) / (1000 * 60 * 60 * 24))}日です</p>
+                                        {!cancelAt && (
+                                            <p className="text-sm">{trialEndDate.toLocaleDateString('ja-JP')}から月額料金({PREMIUM_PLAN_PRICE.toLocaleString()}円)が発生します</p>
+                                        )}
+                                    </div>
+                                )}
                                 {cancelAt && (
                                     <p className="text-sm text-gray-600">
-                                        プレミアムプランは {new Date(cancelAt).toLocaleDateString()} に自動解約されます
+                                        {isTrialing 
+                                            ? `トライアル期間終了後（${trialEndDate.toLocaleDateString('ja-JP')}）に自動解約されます`
+                                            : `プレミアムプランは${new Date(cancelAt).toLocaleDateString('ja-JP')}に自動解約されます`
+                                        }
                                     </p>
                                 )}
                             </div>
@@ -345,7 +363,7 @@ function Settings() {
                                 >
                                     プレミアムプランにアップグレード
                                 </button>
-                            ) : (
+                            ) : !cancelAt && (
                                 <button
                                     onClick={handleCancelPlan}
                                     className="text-red-500 hover:text-red-700 py-2 px-4 rounded-lg border border-red-500 hover:bg-red-50 transition-colors duration-200"
@@ -356,8 +374,6 @@ function Settings() {
                         </div>
                     </div>
                 </section>
-
-                
 
                 <section className="mb-12">
                     <h2 className="text-xl font-bold mb-4">プロフィール設定</h2>

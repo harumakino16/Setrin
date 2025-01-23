@@ -23,10 +23,22 @@ export default async function handler(req, res) {
         const subscriptions = await stripe.subscriptions.list({
             customer: stripeCustomerId,
             status: 'active',
+            limit: 1,
         });
 
+        // トライアル中のサブスクリプションも取得
         if (!subscriptions.data || subscriptions.data.length === 0) {
-            throw new Error('アクティブなサブスクリプションが見つかりません。');
+            const trialSubscriptions = await stripe.subscriptions.list({
+                customer: stripeCustomerId,
+                status: 'trialing',
+                limit: 1,
+            });
+
+            if (!trialSubscriptions.data || trialSubscriptions.data.length === 0) {
+                throw new Error('アクティブなサブスクリプションが見つかりません。');
+            }
+
+            subscriptions.data = trialSubscriptions.data;
         }
 
         const subscriptionId = subscriptions.data[0].id;
