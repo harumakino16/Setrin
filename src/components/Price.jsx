@@ -56,7 +56,6 @@ function Price() {
               { text: `公開リスト${FREE_PLAN_MAX_PUBLIC_PAGES}個`, available: true },
               { text: `再生リスト作成回数 ${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回/月`, available: true },
               { text: `セットリスト数 ${FREE_PLAN_MAX_SETLISTS}個`, available: true },
-              { text: "基本的な歌枠ツール利用可能", available: true },
             ]}
             buttonText={freeButtonText}
             bannerText="まずはここから！"
