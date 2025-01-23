@@ -1,7 +1,6 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
-const { collection, query, where, getDocs, orderBy } = require("firebase/firestore");
 
 admin.initializeApp();
 
@@ -53,8 +52,24 @@ exports.resetMonthlyCount = onRequest(async (req, res) => {
   }
 });
 
-// KPI指標を集計して保存するスケジュール関数
-exports.aggregateKpiMetrics = onSchedule("0 0 * * *", async (event) => { // 毎日0時に実行
+// スケジュール実行用
+exports.aggregateKpiMetrics = onSchedule("0 0 * * *", async (event) => {
+  await aggregateKpiMetricsLogic();
+});
+
+// HTTP リクエストで実行用
+exports.aggregateKpiMetricsHttp = onRequest(async (req, res) => {
+  try {
+    await aggregateKpiMetricsLogic();
+    res.status(200).send('KPI metrics aggregation completed successfully');
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send(`Error: ${error.message}`);
+  }
+});
+
+// 実際の処理を行う関数
+async function aggregateKpiMetricsLogic() {
   const db = admin.firestore();
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -141,12 +156,11 @@ exports.aggregateKpiMetrics = onSchedule("0 0 * * *", async (event) => { // 毎�
     });
 
     console.log('KPI metrics aggregation and email sending completed successfully');
-    return null;
   } catch (error) {
     console.error('Error in aggregateKpiMetrics:', error);
     throw error;
   }
-});
+}
 
 // 月次サマリーを生成して送信する関数
 exports.generateMonthlySummary = onSchedule("0 0 1 * *", async (event) => { // 毎月1日の0時に実行
@@ -157,14 +171,13 @@ exports.generateMonthlySummary = onSchedule("0 0 1 * *", async (event) => { // �
 
   try {
     // 前月のデータを取得
-    const metricsRef = collection(db, 'metrics');
-    const monthlyQuery = query(
-      metricsRef,
-      where('date', '>=', lastMonth),
-      where('date', '<=', lastMonthEnd),
-      orderBy('date', 'asc')
-    );
-    const monthlySnap = await getDocs(monthlyQuery);
+    const metricsRef = db.collection('metrics');
+    const monthlyQuery = metricsRef
+      .where('date', '>=', lastMonth)
+      .where('date', '<=', lastMonthEnd)
+      .orderBy('date', 'asc');
+    
+    const monthlySnap = await monthlyQuery.get();
     const monthlyData = monthlySnap.docs.map(doc => doc.data());
 
     // 前年同月のデータを取得
@@ -173,13 +186,12 @@ exports.generateMonthlySummary = onSchedule("0 0 1 * *", async (event) => { // �
     const lastYearEnd = new Date(lastMonthEnd);
     lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
 
-    const yearlyQuery = query(
-      metricsRef,
-      where('date', '>=', lastYear),
-      where('date', '<=', lastYearEnd),
-      orderBy('date', 'asc')
-    );
-    const yearlySnap = await getDocs(yearlyQuery);
+    const yearlyQuery = metricsRef
+      .where('date', '>=', lastYear)
+      .where('date', '<=', lastYearEnd)
+      .orderBy('date', 'asc');
+    
+    const yearlySnap = await yearlyQuery.get();
     const yearlyData = yearlySnap.docs.map(doc => doc.data());
 
     // サマリーデータを計算
