@@ -17,6 +17,7 @@ import CreateRandomSetlist from '@/components/CreateRandomSetlist';
 import { useSetlistCreation } from '@/hooks/useSetlistCreation';
 import RouletteHistory from '@/components/roulette/RouletteHistory';
 import HowToUseModal from '@/components/roulette/HowToUseModal';
+import PremiumCheck from '@/components/PremiumCheck';
 
 export default function RouletteUtawaku() {
   const { theme } = useTheme();
@@ -171,148 +172,150 @@ export default function RouletteUtawaku() {
 
 
   return (
-    <Layout>
-      <div className="p-8 space-y-8 max-w-4xl mx-auto">
-        {/* ヘッダーセクション */}
-        <div className="space-y-2">
-          {/* 戻るリンク */}
-          <BackButton text="ツール一覧に戻る" href="/utawakutool" />
-          <div className="flex justify-between items-center">
-            <H1>ルーレット歌枠</H1>
-            <button
-              onClick={() => setShowHowToUse(true)}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <FaQuestionCircle />
-              <span className="text-sm">使い方を見る</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 使い方モーダル */}
-        <HowToUseModal
-          isOpen={showHowToUse}
-          onClose={() => setShowHowToUse(false)}
-        />
-
-        {/* セットリスト選択UI */}
-        {isReady && (
-          <div className="bg-white p-6 rounded shadow-sm space-y-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-800 mb-2">セットリスト選択</h2>
-              <p className="text-sm text-gray-600">どのセットリストから選びますか？</p>
+    <PremiumCheck>
+      <Layout>
+        <div className="p-8 space-y-8 max-w-4xl mx-auto">
+          {/* ヘッダーセクション */}
+          <div className="space-y-2">
+            {/* 戻るリンク */}
+            <BackButton text="ツール一覧に戻る" href="/utawakutool" />
+            <div className="flex justify-between items-center">
+              <H1>ルーレット歌枠</H1>
+              <button
+                onClick={() => setShowHowToUse(true)}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                <FaQuestionCircle />
+                <span className="text-sm">使い方を見る</span>
+              </button>
             </div>
-            {setlists.length > 0 && (
-              <>
-                <select
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  value={selectedSetlistId}
-                  onChange={handleSetlistChange}
-                >
-                  <option value="">選択してください</option>
-                  {setlists.map(sl => (
-                    <option key={sl.id} value={sl.id}>{sl.name}</option>
-                  ))}
-                </select>
+          </div>
 
-                <div className="border-t pt-4 mt-4">
-                  <button
-                    onClick={() => setIsAddSetlistOpen(!isAddSetlistOpen)}
-                    className="text-customTheme-${theme}-primary hover:text-customTheme-${theme}-accent text-sm flex items-center gap-1 w-full"
-                  >
-                    <span className="text-xs transform transition-transform duration-200" style={{ 
-                      display: 'inline-block',
-                      transform: isAddSetlistOpen ? 'rotate(90deg)' : 'rotate(0deg)'
-                    }}>
-                      ▶
-                    </span>
-                    セットリストを追加する
-                  </button>
+          {/* 使い方モーダル */}
+          <HowToUseModal
+            isOpen={showHowToUse}
+            onClose={() => setShowHowToUse(false)}
+          />
 
-                  {isAddSetlistOpen && (
-                    <div className="mt-4 space-y-3 pl-4">
-                      <button 
-                        onClick={() => setShowCreateModal(true)}
-                        className={`block w-full bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-accent transition-colors`}
-                      >
-                        条件を絞ったリストを作成する
-                      </button>
-                      <button 
-                        onClick={createFullSetlist}
-                        className={`block w-full bg-white border-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary px-4 py-2 rounded hover:bg-gray-50 transition-colors`}
-                      >
-                        持ち歌全曲を含めたリストを作成する
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-
-            {setlists.length === 0 && (
-              <div className="text-center space-y-4">
-                <p className="text-gray-600">セットリストがまだ作成されていません。</p>
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => setShowCreateModal(true)}
-                    className={`block w-full bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-accent transition-colors`}
-                  >
-                    条件を絞ったリストを作成する
-                  </button>
-                  <button 
-                    onClick={createFullSetlist}
-                    className={`block w-full bg-white border-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary px-4 py-2 rounded hover:bg-gray-50 transition-colors`}
-                  >
-                    持ち歌全曲を含めたリストを作成する
-                  </button>
-                  <p className="text-sm text-gray-500 mt-2">
-                    ※ セットリストを作成すると、ルーレットで使用できるようになります
-                  </p>
-                </div>
+          {/* セットリスト選択UI */}
+          {isReady && (
+            <div className="bg-white p-6 rounded shadow-sm space-y-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">セットリスト選択</h2>
+                <p className="text-sm text-gray-600">どのセットリストから選びますか？</p>
               </div>
-            )}
-          </div>
-        )}
+              {setlists.length > 0 && (
+                <>
+                  <select
+                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    value={selectedSetlistId}
+                    onChange={handleSetlistChange}
+                  >
+                    <option value="">選択してください</option>
+                    {setlists.map(sl => (
+                      <option key={sl.id} value={sl.id}>{sl.name}</option>
+                    ))}
+                  </select>
 
-        {/* ルーレットコンテンツ */}
-        {isReady && setlist && currentSongs.length > 0 && (
-          <RouletteContent
-            currentSongs={currentSongs}
-            setlist={setlist}
-          />
-        )}
-        {/* ポップアップボタン */}
-        {isReady && setlist && currentSongs.length > 0 && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={openPopupWindow}
-              className="text-customTheme-${theme}-primary hover:text-customTheme-${theme}-accent text-sm inline-flex items-center gap-1"
-            >
-              <span>ルーレットを別ウィンドウで開く</span>
-              <FaExternalLinkAlt className="text-xs" />
-            </button>
+                  <div className="border-t pt-4 mt-4">
+                    <button
+                      onClick={() => setIsAddSetlistOpen(!isAddSetlistOpen)}
+                      className="text-customTheme-${theme}-primary hover:text-customTheme-${theme}-accent text-sm flex items-center gap-1 w-full"
+                    >
+                      <span className="text-xs transform transition-transform duration-200" style={{ 
+                        display: 'inline-block',
+                        transform: isAddSetlistOpen ? 'rotate(90deg)' : 'rotate(0deg)'
+                      }}>
+                        ▶
+                      </span>
+                      セットリストを追加する
+                    </button>
+
+                    {isAddSetlistOpen && (
+                      <div className="mt-4 space-y-3 pl-4">
+                        <button 
+                          onClick={() => setShowCreateModal(true)}
+                          className={`block w-full bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-accent transition-colors`}
+                        >
+                          条件を絞ったリストを作成する
+                        </button>
+                        <button 
+                          onClick={createFullSetlist}
+                          className={`block w-full bg-white border-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary px-4 py-2 rounded hover:bg-gray-50 transition-colors`}
+                        >
+                          持ち歌全曲を含めたリストを作成する
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {setlists.length === 0 && (
+                <div className="text-center space-y-4">
+                  <p className="text-gray-600">セットリストがまだ作成されていません。</p>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => setShowCreateModal(true)}
+                      className={`block w-full bg-customTheme-${theme}-primary text-white px-4 py-2 rounded hover:bg-customTheme-${theme}-accent transition-colors`}
+                    >
+                      条件を絞ったリストを作成する
+                    </button>
+                    <button 
+                      onClick={createFullSetlist}
+                      className={`block w-full bg-white border-2 border-customTheme-${theme}-primary text-customTheme-${theme}-primary px-4 py-2 rounded hover:bg-gray-50 transition-colors`}
+                    >
+                      持ち歌全曲を含めたリストを作成する
+                    </button>
+                    <p className="text-sm text-gray-500 mt-2">
+                      ※ セットリストを作成すると、ルーレットで使用できるようになります
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ルーレットコンテンツ */}
+          {isReady && setlist && currentSongs.length > 0 && (
+            <RouletteContent
+              currentSongs={currentSongs}
+              setlist={setlist}
+            />
+          )}
+          {/* ポップアップボタン */}
+          {isReady && setlist && currentSongs.length > 0 && (
+            <div className="mt-4 text-center">
+              <button
+                onClick={openPopupWindow}
+                className="text-customTheme-${theme}-primary hover:text-customTheme-${theme}-accent text-sm inline-flex items-center gap-1"
+              >
+                <span>ルーレットを別ウィンドウで開く</span>
+                <FaExternalLinkAlt className="text-xs" />
+              </button>
+            </div>
+          )}
+          {/* ルーレット履歴 */}
+          <div className="mt-4 bg-white p-6 rounded shadow-sm space-y-4">
+            <RouletteHistory setlist={setlist} />
           </div>
-        )}
-        {/* ルーレット履歴 */}
-        <div className="mt-4 bg-white p-6 rounded shadow-sm space-y-4">
-          <RouletteHistory setlist={setlist} />
+
+          {showCreateModal && (
+            <CreateRandomSetlist
+              isOpen={showCreateModal}
+              onClose={() => setShowCreateModal(false)}
+              onComplete={(newSetlistId) => {
+                setShowCreateModal(false);
+                setSelectedSetlistId(newSetlistId);
+                setSuccessMessage('セットリストを作成しました！');
+                setTimeout(() => setSuccessMessage(''), 3000);
+                setIsAddSetlistOpen(false);
+              }}
+            />
+          )}
         </div>
-
-        {showCreateModal && (
-          <CreateRandomSetlist
-            isOpen={showCreateModal}
-            onClose={() => setShowCreateModal(false)}
-            onComplete={(newSetlistId) => {
-              setShowCreateModal(false);
-              setSelectedSetlistId(newSetlistId);
-              setSuccessMessage('セットリストを作成しました！');
-              setTimeout(() => setSuccessMessage(''), 3000);
-              setIsAddSetlistOpen(false);
-            }}
-          />
-        )}
-      </div>
-    </Layout>
+      </Layout>
+    </PremiumCheck>
   );
 }
 

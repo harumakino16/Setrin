@@ -1,6 +1,7 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
+const functions = require('firebase-functions');
 
 admin.initializeApp();
 
@@ -288,4 +289,82 @@ function generateAnalysisAndSuggestions(summary) {
 
   return analysis.join('\n');
 }
+
+// リクエストモード無効化の実際の処理を行う関数
+async function disableRequestModeLogic() {
+  try {
+    // フリープランユーザーを取得
+    const usersSnapshot = await admin.firestore()
+      .collection('users')
+      .where('plan', '==', 'free')
+      .get();
+
+    const batch = admin.firestore().batch();
+    const processedUsers = [];
+
+    for (const userDoc of usersSnapshot.docs) {
+      const userId = userDoc.id;
+      
+      // ユーザーの公開ページを取得
+      const publicPagesSnapshot = await admin.firestore()
+        .collection('users')
+        .doc(userId)
+        .collection('publicPages')
+        .get();
+
+      // 各公開ページのrequestModeをfalseに設定
+      publicPagesSnapshot.docs.forEach(pageDoc => {
+        batch.update(pageDoc.ref, { requestMode: false });
+      });
+
+      processedUsers.push(userId);
+    }
+
+    // バッチ処理を実行
+    await batch.commit();
+
+    console.log(`Successfully disabled request mode for ${processedUsers.length} users`);
+    return processedUsers.length;
+  } catch (error) {
+    console.error('Error disabling request mode:', error);
+    throw error;
+  }
+}
+
+// スケジュール実行用
+exports.disableRequestModeForFreePlanUsers = onSchedule({
+  schedule: '0 0 1 2 *',  // 2月1日の0:00に実行
+  timeZone: 'Asia/Tokyo',
+  retryCount: 3,
+  memory: '256MiB'
+}, async (event) => {
+  try {
+    // 2025年のみ実行
+    const currentYear = new Date().getFullYear();
+    if (currentYear !== 2025) {
+      console.log('This function should only run in 2025');
+      return null;
+    }
+
+    await disableRequestModeLogic();
+    return null;
+  } catch (error) {
+    console.error('Error in scheduled disableRequestMode:', error);
+    return null;
+  }
+});
+
+// HTTPリクエストで実行用（テスト用）
+exports.disableRequestModeHttp = onRequest({
+  memory: '256MiB',
+  timeoutSeconds: 120
+}, async (req, res) => {
+  try {
+    const processedCount = await disableRequestModeLogic();
+    res.status(200).send(`Successfully disabled request mode for ${processedCount} users`);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send(`Error disabling request mode: ${error.message}`);
+  }
+});
 

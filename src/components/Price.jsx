@@ -51,7 +51,7 @@ function Price() {
               { text: `公開リスト${FREE_PLAN_MAX_PUBLIC_PAGES}個`, available: true },
               { text: `再生リスト作成回数 ${FREE_PLAN_MAX_YOUTUBE_PLAYLISTS}回/月`, available: true },
               { text: `セットリスト数 ${FREE_PLAN_MAX_SETLISTS}個`, available: true },
-              { text: "歌枠ツール現在無料で利用可能", available: true },
+              { text: "基本的な歌枠ツール利用可能", available: true },
             ]}
             buttonText={freeButtonText}
             bannerText="まずはここから！"
@@ -73,7 +73,7 @@ function Price() {
               { text: `公開リスト${PREMIUM_PLAN_MAX_PUBLIC_PAGES}個`, available: true, highlight: true },
               { text: "再生リスト作成回数 無制限", available: true, highlight: true },
               { text: "セットリスト数 無制限", available: true, highlight: true },
-              { text: "歌枠ツール利用可能", available: true, highlight: true },
+              { text: "全ての歌枠ツール利用可能（リクエスト・ルーレット機能含む）", available: true, highlight: true },
             ]}
             buttonText={premiumButtonText}
             bannerText="歌枠配信者におすすめ！"
