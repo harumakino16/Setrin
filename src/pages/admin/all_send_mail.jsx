@@ -15,6 +15,20 @@ export default function AllSendMail() {
     const [result, setResult] = useState('');
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+    const extractTitleFromContent = (htmlContent) => {
+        const titleMatch = htmlContent.match(/<title>(.*?)<\/title>/);
+        return titleMatch ? titleMatch[1] : '';
+    };
+
+    const handleContentChange = (e) => {
+        const newContent = e.target.value;
+        setContent(newContent);
+        const extractedTitle = extractTitleFromContent(newContent);
+        if (extractedTitle) {
+            setSubject(extractedTitle);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -116,7 +130,7 @@ export default function AllSendMail() {
                             </label>
                             <textarea
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
+                                onChange={handleContentChange}
                                 rows={10}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required
@@ -143,7 +157,11 @@ export default function AllSendMail() {
                     </div>
 
                     {result && (
-                        <div className="mt-4 p-4 rounded-md bg-green-50 text-green-700">
+                        <div className={`mt-4 p-4 rounded-md ${
+                            result.includes('送信されました')
+                                ? 'bg-green-50 text-green-700'
+                                : 'bg-red-50 text-red-700'
+                        }`}>
                             {result}
                         </div>
                     )}
