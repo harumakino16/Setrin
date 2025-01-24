@@ -35,11 +35,8 @@ export default function AllSendMail() {
         setResult('');
 
         try {
-            // titleタグから件名を抽出
             const titleMatch = content.match(/<title>(.*?)<\/title>/);
             const extractedSubject = titleMatch ? titleMatch[1] : subject;
-
-            // HTMLの本文部分のみを抽出
             const bodyContent = content.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || content;
             const cleanContent = bodyContent.replace(/<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>|<body[^>]*>|<\/body>/gi, '').trim();
 
@@ -48,30 +45,59 @@ export default function AllSendMail() {
             if (sendType === 'test') {
                 recipients = ['harumakiafeli@gmail.com'];
             } else {
-                // Firebaseから全ユーザーのメールアドレスを取得
                 const querySnapshot = await getDocs(collection(db, 'users'));
                 recipients = querySnapshot.docs
                     .map(doc => doc.data().email)
-                    .filter(email => email); // nullやundefinedを除外
+                    .filter(email => email);
             }
 
-            const response = await fetch('/api/send-bulk-mail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    recipients,
-                    templateId: 'd-5934fea4d0af4b6699d5013b91f20662',
-                    templateData: {
-                        subject: extractedSubject,
-                        content: cleanContent
-                    }
-                })
-            });
+            // 配列を1000件ずつのチャンクに分割
+            const chunkSize = 1000;
+            const chunks = [];
+            for (let i = 0; i < recipients.length; i += chunkSize) {
+                chunks.push(recipients.slice(i, i + chunkSize));
+            }
 
-            const data = await response.json();
-            setResult(data.message);
+            let successCount = 0;
+            let errorCount = 0;
+
+            // チャンクごとに順次送信
+            for (let i = 0; i < chunks.length; i++) {
+                try {
+                    const response = await fetch('/api/send-bulk-mail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            recipients: chunks[i],
+                            templateId: 'd-5934fea4d0af4b6699d5013b91f20662',
+                            templateData: {
+                                subject: extractedSubject,
+                                content: cleanContent
+                            }
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        successCount += chunks[i].length;
+                    } else {
+                        errorCount += chunks[i].length;
+                    }
+
+                    // 各チャンク送信後に進捗を表示
+                    setResult(`送信中... ${successCount}件完了 (${errorCount}件エラー)`);
+
+                    // APIレート制限を考慮して少し待機
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                    console.error('Chunk error:', error);
+                    errorCount += chunks[i].length;
+                }
+            }
+
+            setResult(`送信されました: ${successCount}件送信成功、${errorCount}件送信失敗`);
         } catch (error) {
             console.error('Error:', error);
             setResult('エラーが発生しました: ' + error.message);
