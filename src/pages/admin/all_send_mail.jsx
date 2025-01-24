@@ -79,17 +79,32 @@ export default function AllSendMail() {
                         })
                     });
 
-                    const data = await response.json();
+                    // レスポンスの処理を改善
                     if (response.ok) {
-                        successCount += chunks[i].length;
+                        try {
+                            const data = await response.json();
+                            successCount += chunks[i].length;
+                        } catch (jsonError) {
+                            console.error('JSON parse error:', jsonError);
+                            successCount += chunks[i].length; // レスポンスがOKの場合は成功とみなす
+                        }
                     } else {
+                        // エラーレスポンスの処理
+                        let errorMessage = '';
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.message || '不明なエラーが発生しました';
+                        } catch (jsonError) {
+                            errorMessage = await response.text() || 'エラーが発生しました';
+                        }
+                        console.error('API error:', errorMessage);
                         errorCount += chunks[i].length;
                     }
 
-                    // 各チャンク送信後に進捗を表示
+                    // 進捗表示を更新
                     setResult(`送信中... ${successCount}件完了 (${errorCount}件エラー)`);
 
-                    // APIレート制限を考慮して少し待機
+                    // APIレート制限対策
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 } catch (error) {
                     console.error('Chunk error:', error);
