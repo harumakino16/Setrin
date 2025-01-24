@@ -24,6 +24,38 @@ const ToolCard = ({ title, description, icon: Icon, href, color, isReady, isPrem
 
     const [isHovered, setIsHovered] = useState(false);
 
+    // プレミアムユーザー向けのアクティブなツールカード
+    if (isPremiumOnly && userIsPremium) {
+        return (
+            <Link 
+                href={`/utawakutool/${href}`}
+                className="relative bg-white border border-yellow-200 rounded-lg shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-102 hover:shadow-xl"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
+                {/* ヘッダー部分 */}
+                <div className="bg-yellow-500 p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Icon className="text-white text-2xl" />
+                            <h2 className="text-white font-bold text-lg">
+                                {title}
+                            </h2>
+                        </div>
+                        <FaCrown className="text-white text-sm" />
+                    </div>
+                </div>
+
+                {/* メインコンテンツ */}
+                <div className="p-6">
+                    <p className="text-gray-700 mb-4">{description}</p>
+                   
+                </div>
+            </Link>
+        );
+    }
+
+    // プレミアム機能の非アクティブカード（非プレミアムユーザー向け）
     if (isDisabled && premiumMessage === "プレミアム会員限定機能") {
         return (
             <div 
@@ -32,7 +64,7 @@ const ToolCard = ({ title, description, icon: Icon, href, color, isReady, isPrem
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* ヘッダー部分 */}
-                <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 p-3 flex items-center justify-between">
+                <div className="bg-yellow-500 p-3 flex items-center justify-between">
                     <div className="flex items-center">
                         <Icon className="text-white text-2xl mr-2" />
                         <h2 className="text-white font-bold">{title}</h2>
@@ -47,11 +79,23 @@ const ToolCard = ({ title, description, icon: Icon, href, color, isReady, isPrem
                         <div className="space-y-2">
                             <div className="flex items-center text-gray-700">
                                 <FaCheck className="text-green-500 mr-2" />
-                                <span>リスナーとの交流が活発に</span>
+                                {href === 'request-utawaku' ? (
+                                    <span>リスナーとの交流がもっと深まる</span>
+                                ) : href === 'roulette-utawaku' ? (
+                                    <span>ランダム選曲で配信にドキドキ感を</span>
+                                ) : (
+                                    <span>リスナーとのインタラクションが活発に</span>
+                                )}
                             </div>
                             <div className="flex items-center text-gray-700">
                                 <FaCheck className="text-green-500 mr-2" />
-                                <span>配信を盛り上げる新しい演出として</span>
+                                {href === 'request-utawaku' ? (
+                                    <span>リクエスト管理でスムーズな進行</span>
+                                ) : href === 'roulette-utawaku' ? (
+                                    <span>配信を盛り上げる新しい演出として</span>
+                                ) : (
+                                    <span>配信を盛り上げる新しい演出として</span>
+                                )}
                             </div>
                             <div className="flex items-center text-gray-700">
                                 <FaCheck className="text-green-500 mr-2" />
@@ -64,7 +108,7 @@ const ToolCard = ({ title, description, icon: Icon, href, color, isReady, isPrem
                     <div className={`mt-6 transition-all duration-300 ${isHovered ? 'transform translate-y-0 opacity-100' : 'transform translate-y-2 opacity-90'}`}>
                         <button
                             onClick={onUpgradeClick}
-                            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:from-yellow-400 hover:to-yellow-300 transition-all duration-300 shadow-lg hover:shadow-xl"
+                            className="w-full bg-yellow-500 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-yellow-400 transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
                             プレミアムで利用する
                             <FaArrowRight />
@@ -78,6 +122,7 @@ const ToolCard = ({ title, description, icon: Icon, href, color, isReady, isPrem
         );
     }
 
+    // 通常のツールカード（AI歌枠など）
     return (
         <Link href={isDisabled ? '#' : `/utawakutool/${href}`} className={`relative flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm ${isDisabled ? 'pointer-events-none' : 'hover:bg-gray-100 transition-colors duration-200'}`}>
             <div className="flex items-center">
