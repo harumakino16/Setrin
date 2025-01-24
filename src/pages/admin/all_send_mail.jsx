@@ -39,6 +39,10 @@ export default function AllSendMail() {
             const titleMatch = content.match(/<title>(.*?)<\/title>/);
             const extractedSubject = titleMatch ? titleMatch[1] : subject;
 
+            // HTMLの本文部分のみを抽出
+            const bodyContent = content.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || content;
+            const cleanContent = bodyContent.replace(/<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>|<body[^>]*>|<\/body>/gi, '').trim();
+
             let recipients = [];
 
             if (sendType === 'test') {
@@ -61,7 +65,7 @@ export default function AllSendMail() {
                     templateId: 'd-5934fea4d0af4b6699d5013b91f20662',
                     templateData: {
                         subject: extractedSubject,
-                        content
+                        content: cleanContent
                     }
                 })
             });
