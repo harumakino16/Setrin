@@ -51,8 +51,8 @@ export default function AllSendMail() {
                     .filter(email => email);
             }
 
-            // 配列を1000件ずつのチャンクに分割
-            const chunkSize = 1000;
+            // チャンクサイズを小さくする
+            const chunkSize = 100;
             const chunks = [];
             for (let i = 0; i < recipients.length; i += chunkSize) {
                 chunks.push(recipients.slice(i, i + chunkSize));
@@ -79,40 +79,29 @@ export default function AllSendMail() {
                         })
                     });
 
-                    // レスポンスの処理を改善
+                    // レスポンス処理を改善
+                    const responseData = await response.text();
                     if (response.ok) {
-                        try {
-                            const data = await response.json();
-                            successCount += chunks[i].length;
-                        } catch (jsonError) {
-                            console.error('JSON parse error:', jsonError);
-                            successCount += chunks[i].length; // レスポンスがOKの場合は成功とみなす
-                        }
+                        successCount += chunks[i].length;
                     } else {
-                        // エラーレスポンスの処理
-                        let errorMessage = '';
-                        try {
-                            const errorData = await response.json();
-                            errorMessage = errorData.message || '不明なエラーが発生しました';
-                        } catch (jsonError) {
-                            errorMessage = await response.text() || 'エラーが発生しました';
-                        }
-                        console.error('API error:', errorMessage);
+                        console.error('API error:', responseData);
                         errorCount += chunks[i].length;
                     }
 
                     // 進捗表示を更新
                     setResult(`送信中... ${successCount}件完了 (${errorCount}件エラー)`);
 
-                    // APIレート制限対策
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // APIレート制限対策の待機時間を増やす
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                 } catch (error) {
                     console.error('Chunk error:', error);
                     errorCount += chunks[i].length;
+                    // エラー時も待機
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                 }
             }
 
-            setResult(`送信されました: ${successCount}件送信成功、${errorCount}件送信失敗`);
+            setResult(`送信完了: ${successCount}件送信成功、${errorCount}件送信失敗`);
         } catch (error) {
             console.error('Error:', error);
             setResult('エラーが発生しました: ' + error.message);
