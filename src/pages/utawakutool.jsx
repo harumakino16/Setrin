@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import Modal from '@/components/Modal';
 import Price from '@/components/Price';
 
-const PREMIUM_FEATURE_START_DATE = new Date('2025-01-01T00:00:00+09:00');
+const PREMIUM_FEATURE_START_DATE = new Date('2025-02-01T00:00:00+09:00');
 
 const ToolCard = ({ title, description, icon: Icon, href, color, isReady, isPremiumOnly, userIsPremium, onUpgradeClick }) => {
     const isAfterFeatureStartDate = useMemo(() => {
