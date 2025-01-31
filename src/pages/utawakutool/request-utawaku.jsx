@@ -715,27 +715,15 @@ export default function RequestUtawaku() {
                                                     </div>
 
                                                     {/* 日付情報 */}
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div className="bg-gray-50 rounded-lg p-4">
-                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">最後に歌った日</h4>
-                                                            <p className="text-gray-700">
-                                                                {songInfo.lastSungAt ? (
-                                                                    songInfo.lastSungAt.toDate().toLocaleDateString('ja-JP')
-                                                                ) : (
-                                                                    <span className="text-gray-400">未設定</span>
-                                                                )}
-                                                            </p>
-                                                        </div>
-                                                        <div className="bg-gray-50 rounded-lg p-4">
-                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">登録日</h4>
-                                                            <p className="text-gray-700">
-                                                                {songInfo.createdAt ? (
-                                                                    songInfo.createdAt.toDate().toLocaleDateString('ja-JP')
-                                                                ) : (
-                                                                    <span className="text-gray-400">未設定</span>
-                                                                )}
-                                                            </p>
-                                                        </div>
+                                                    <div className="bg-gray-50 rounded-lg p-4">
+                                                        <h4 className="text-sm font-semibold text-gray-600 mb-1">登録日</h4>
+                                                        <p className="text-gray-700">
+                                                            {songInfo.createdAt ? (
+                                                                songInfo.createdAt.toDate().toLocaleDateString('ja-JP')
+                                                            ) : (
+                                                                <span className="text-gray-400">未設定</span>
+                                                            )}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             ) : (
