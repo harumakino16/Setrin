@@ -20,6 +20,8 @@ const ManageUsers = () => {
   const [page, setPage] = useState(1);
   const usersPerPage = 50;
   const [searchUserId, setSearchUserId] = useState('');
+  const [searchEmail, setSearchEmail] = useState('');
+  const [searchDisplayName, setSearchDisplayName] = useState('');
 
   const [visibleColumns, setVisibleColumns] = useState({
     userId: true,
@@ -143,9 +145,11 @@ const ManageUsers = () => {
 
     let sortedUsers = [...users];
     
-    if (searchUserId) {
+    if (searchUserId || searchEmail || searchDisplayName) {
       sortedUsers = sortedUsers.filter(user => 
-        user.id.toLowerCase().includes(searchUserId.toLowerCase())
+        (searchUserId && user.id.toLowerCase().includes(searchUserId.toLowerCase())) ||
+        (searchEmail && user.email?.toLowerCase().includes(searchEmail.toLowerCase())) ||
+        (searchDisplayName && user.displayName?.toLowerCase().includes(searchDisplayName.toLowerCase()))
       );
     }
 
@@ -167,7 +171,7 @@ const ManageUsers = () => {
     const startIndex = (page - 1) * usersPerPage;
     const endIndex = startIndex + usersPerPage;
     setDisplayUsers(sortedUsers.slice(startIndex, endIndex));
-  }, [users, sortField, sortDirection, page, searchUserId]);
+  }, [users, sortField, sortDirection, page, searchUserId, searchEmail, searchDisplayName]);
 
   useEffect(() => {
     fetchUsers();
@@ -195,13 +199,27 @@ const ManageUsers = () => {
     <Layout>
       <div className="p-5">
         <h1 className="text-3xl font-bold mb-4">ユーザー管理</h1>
-        <div className="mb-4">
+        <div className="mb-4 flex gap-4">
           <input
             type="text"
             value={searchUserId}
             onChange={(e) => setSearchUserId(e.target.value)}
             placeholder="ユーザーIDで検索..."
-            className="px-4 py-2 border rounded-lg"
+            className="px-4 py-2 border rounded-lg w-1/3"
+          />
+          <input
+            type="text"
+            value={searchEmail}
+            onChange={(e) => setSearchEmail(e.target.value)}
+            placeholder="メールアドレスで検索..."
+            className="px-4 py-2 border rounded-lg w-1/3"
+          />
+          <input
+            type="text"
+            value={searchDisplayName}
+            onChange={(e) => setSearchDisplayName(e.target.value)}
+            placeholder="表示名で検索..."
+            className="px-4 py-2 border rounded-lg w-1/3"
           />
         </div>
         <div className="mb-4">
