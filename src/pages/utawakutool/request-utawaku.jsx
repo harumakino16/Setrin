@@ -8,7 +8,7 @@ import { collection, doc, getDocs, getDoc, setDoc, onSnapshot, updateDoc, query,
 import { useTheme } from '@/context/ThemeContext';
 import { useMessage } from '@/context/MessageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faQuestionCircle, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faQuestionCircle, faSort, faSortUp, faSortDown, faEye } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
@@ -34,6 +34,10 @@ export default function RequestUtawaku() {
         direction: 'desc',
         showConsumedAtBottom: false
     });
+
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [songInfo, setSongInfo] = useState(null);
 
     // ソート関数
     const sortRequests = (reqs) => {
@@ -244,6 +248,47 @@ export default function RequestUtawaku() {
         });
     };
 
+    // 曲情報を取得する関数
+    const fetchSongInfo = async (userId, songId) => {
+        if (!userId || !songId) {
+            console.log('Missing userId or songId:', { userId, songId });
+            return;
+        }
+        try {
+            console.log('Fetching song info:', { userId, songId });
+            // songIdが小文字で来る可能性があるので、大文字に変換
+            const songRef = doc(db, 'users', userId, 'Songs', songId.toString());
+            const songDoc = await getDoc(songRef);
+            console.log('Song doc exists:', songDoc.exists(), songDoc.data());
+            if (songDoc.exists()) {
+                setSongInfo(songDoc.data());
+            }
+        } catch (error) {
+            console.error('Error fetching song info:', error);
+            setMessageInfo({ type: 'error', message: '曲情報の取得に失敗しました。' });
+        }
+    };
+
+    // モーダルを開く時に曲情報も取得
+    const handleOpenDetail = async (req) => {
+        console.log('Opening detail for request:', req);
+        setSelectedRequest(req);
+        setShowDetailModal(true);
+        setSongInfo(null); // リセット
+        if (req.songId && ownerUserId) {
+            await fetchSongInfo(ownerUserId, req.songId);
+        } else {
+            console.log('Missing songId or ownerUserId:', { songId: req.songId, ownerUserId });
+        }
+    };
+
+    // モーダルを閉じる時
+    const handleCloseDetail = () => {
+        setShowDetailModal(false);
+        setSelectedRequest(null);
+        setSongInfo(null);
+    };
+
     if (!currentUser) {
         return (
             <Layout>
@@ -448,6 +493,7 @@ export default function RequestUtawaku() {
                                                         />
                                                     </div>
                                                 </th>
+                                                <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">詳細</th>
                                                 <th 
                                                     className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
                                                     onClick={() => handleSort('requesterName')}
@@ -526,6 +572,14 @@ export default function RequestUtawaku() {
                                                                 req.songTitle
                                                             )}
                                                         </td>
+                                                        <td className="px-4 py-2">
+                                                            <button
+                                                                onClick={() => handleOpenDetail(req)}
+                                                                className="text-gray-500 hover:text-gray-700 transition-colors"
+                                                            >
+                                                                <FontAwesomeIcon icon={faEye} />
+                                                            </button>
+                                                        </td>
                                                         <td className="px-4 py-2 text-gray-700">{req.requesterName || '匿名'}</td>
                                                         <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{req.isFirstTime ? '初見' : '常連'}</td>
                                                         <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{timeStr}</td>
@@ -549,6 +603,148 @@ export default function RequestUtawaku() {
                                             })}
                                         </tbody>
                                     </table>
+                                )}
+
+                                {/* 詳細情報モーダル */}
+                                {showDetailModal && selectedRequest && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div className="bg-white rounded-lg p-8 max-w-xl w-full mx-4 relative overflow-y-auto max-h-[90vh]">
+                                            <button
+                                                onClick={handleCloseDetail}
+                                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                                            >
+                                                <span className="text-xl">✕</span>
+                                            </button>
+
+                                            {/* タイトルと曲名 */}
+                                            <div className="mb-6">
+                                                <h3 className="text-2xl font-bold text-gray-800 mb-2">{selectedRequest.songTitle}</h3>
+                                                {songInfo?.furigana && (
+                                                    <p className="text-sm text-gray-500">{songInfo.furigana}</p>
+                                                )}
+                                            </div>
+
+                                            <div className="mb-6">
+                                                <h4 className="text-lg font-semibold text-gray-700 border-b pb-2">登録曲情報</h4>
+                                            </div>
+
+                                            {/* 曲情報セクション */}
+                                            {songInfo ? (
+                                                <div className="space-y-6">
+                                                    {/* 基本情報 */}
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        {/* アーティスト */}
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">アーティスト</h4>
+                                                            <p className="text-gray-700">
+                                                                {songInfo.artist || <span className="text-gray-400">未設定</span>}
+                                                            </p>
+                                                        </div>
+                                                        {/* ジャンル */}
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">ジャンル</h4>
+                                                            <p className="text-gray-700">
+                                                                {songInfo.genre || <span className="text-gray-400">未設定</span>}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* YouTube URL */}
+                                                    {songInfo.youtubeUrl && (
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">YouTube URL</h4>
+                                                            <a
+                                                                href={songInfo.youtubeUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 hover:text-blue-800 hover:underline break-all"
+                                                            >
+                                                                {songInfo.youtubeUrl}
+                                                            </a>
+                                                        </div>
+                                                    )}
+
+                                                    {/* 歌唱情報 */}
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        {/* 歌った回数 */}
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">歌った回数</h4>
+                                                            <p className="text-gray-700">
+                                                                {songInfo.singingCount ? `${songInfo.singingCount}回` : <span className="text-gray-400">0回</span>}
+                                                            </p>
+                                                        </div>
+                                                        {/* 熟練度 */}
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">熟練度</h4>
+                                                            <p className="text-gray-700">
+                                                                {songInfo.skillLevel || <span className="text-gray-400">未設定</span>}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* タグセクション */}
+                                                    <div>
+                                                        <h4 className="text-sm font-semibold text-gray-600 mb-2">タグ</h4>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {songInfo.tags && songInfo.tags.length > 0 ? (
+                                                                songInfo.tags.map((tag, index) => (
+                                                                    <span key={index} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+                                                                        {tag}
+                                                                    </span>
+                                                                ))
+                                                            ) : (
+                                                                <span className="text-gray-400">未設定</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* メモセクション */}
+                                                    <div className="bg-gray-50 rounded-lg p-4">
+                                                        <h4 className="text-sm font-semibold text-gray-600 mb-2">メモ</h4>
+                                                        <p className="text-gray-700 whitespace-pre-wrap">
+                                                            {songInfo.memo || <span className="text-gray-400">未設定</span>}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* 備考セクション */}
+                                                    <div className="bg-gray-50 rounded-lg p-4">
+                                                        <h4 className="text-sm font-semibold text-gray-600 mb-2">備考</h4>
+                                                        <p className="text-gray-700 whitespace-pre-wrap">
+                                                            {songInfo.note || <span className="text-gray-400">未設定</span>}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* 日付情報 */}
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">最後に歌った日</h4>
+                                                            <p className="text-gray-700">
+                                                                {songInfo.lastSungAt ? (
+                                                                    songInfo.lastSungAt.toDate().toLocaleDateString('ja-JP')
+                                                                ) : (
+                                                                    <span className="text-gray-400">未設定</span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <h4 className="text-sm font-semibold text-gray-600 mb-1">登録日</h4>
+                                                            <p className="text-gray-700">
+                                                                {songInfo.createdAt ? (
+                                                                    songInfo.createdAt.toDate().toLocaleDateString('ja-JP')
+                                                                ) : (
+                                                                    <span className="text-gray-400">未設定</span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">
+                                                    登録済みの曲情報はありません
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
