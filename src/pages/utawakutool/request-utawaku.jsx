@@ -473,136 +473,140 @@ export default function RequestUtawaku() {
                                         </p>
                                     </div>
                                 ) : (
-                                    <table className="min-w-full divide-y divide-gray-200 text-sm">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th 
-                                                    className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
-                                                    onClick={() => handleSort('songTitle')}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        曲名
-                                                        <FontAwesomeIcon 
-                                                            icon={
-                                                                sortConfig.key === 'songTitle'
-                                                                    ? sortConfig.direction === 'asc'
-                                                                        ? faSortUp
-                                                                        : faSortDown
-                                                                    : faSort
-                                                            }
-                                                        />
-                                                    </div>
-                                                </th>
-                                                <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">詳細</th>
-                                                <th 
-                                                    className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
-                                                    onClick={() => handleSort('requesterName')}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        送信者
-                                                        <FontAwesomeIcon 
-                                                            icon={
-                                                                sortConfig.key === 'requesterName'
-                                                                    ? sortConfig.direction === 'asc'
-                                                                        ? faSortUp
-                                                                        : faSortDown
-                                                                    : faSort
-                                                            }
-                                                        />
-                                                    </div>
-                                                </th>
-                                                <th 
-                                                    className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
-                                                    onClick={() => handleSort('isFirstTime')}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        初見
-                                                        <FontAwesomeIcon 
-                                                            icon={
-                                                                sortConfig.key === 'isFirstTime'
-                                                                    ? sortConfig.direction === 'asc'
-                                                                        ? faSortUp
-                                                                        : faSortDown
-                                                                    : faSort
-                                                            }
-                                                        />
-                                                    </div>
-                                                </th>
-                                                <th 
-                                                    className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
-                                                    onClick={() => handleSort('requestedAt')}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        時刻
-                                                        <FontAwesomeIcon 
-                                                            icon={
-                                                                sortConfig.key === 'requestedAt'
-                                                                    ? sortConfig.direction === 'asc'
-                                                                        ? faSortUp
-                                                                        : faSortDown
-                                                                    : faSort
-                                                            }
-                                                        />
-                                                    </div>
-                                                </th>
-                                                <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase">ステータス</th>
-                                                <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase text-center">消化する</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                            {sortRequests(requests).map((req) => {
-                                                const requestedAt = req.requestedAt?.toDate();
-                                                const timeStr = requestedAt
-                                                    ? requestedAt.toLocaleString('ja-JP', {
-                                                        year: 'numeric',
-                                                        month: 'numeric',
-                                                        day: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
-                                                        second: '2-digit'
-                                                    })
-                                                    : '不明';
-                                                const isConsumed = req.consumed;
-                                                return (
-                                                    <tr key={req.id} className="hover:bg-gray-50 transition-colors">
-                                                        <td className="px-4 py-2 text-gray-700 max-w-[200px] truncate" title={req.songTitle}>
-                                                            {req.youtubeUrl ? (
-                                                                <Link href={req.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{req.songTitle}</Link>
-                                                            ) : (
-                                                                req.songTitle
-                                                            )}
-                                                        </td>
-                                                        <td className="px-4 py-2">
-                                                            <button
-                                                                onClick={() => handleOpenDetail(req)}
-                                                                className="text-gray-500 hover:text-gray-700 transition-colors"
-                                                            >
-                                                                <FontAwesomeIcon icon={faEye} />
-                                                            </button>
-                                                        </td>
-                                                        <td className="px-4 py-2 text-gray-700">{req.requesterName || '匿名'}</td>
-                                                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{req.isFirstTime ? '初見' : '常連'}</td>
-                                                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{timeStr}</td>
-                                                        <td className="px-4 py-2">
-                                                            {isConsumed ? (
-                                                                <span className="inline-block px-2 py-1 text-xs text-white bg-gray-500 rounded">消化済み</span>
-                                                            ) : (
-                                                                <span className="inline-block px-2 py-1 text-xs text-white bg-green-500 rounded">未消化</span>
-                                                            )}
-                                                        </td>
-                                                        <td className="px-4 text-center py-2 text-gray-700">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={isConsumed}
-                                                                onChange={() => handleConsumeRequest(req.id, isConsumed)}
-                                                                className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
-                                                            />
-                                                        </td>
+                                    <div className="relative">
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200 text-sm whitespace-nowrap">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th 
+                                                            className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100 min-w-[180px] max-w-[300px]"
+                                                            onClick={() => handleSort('songTitle')}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                曲名
+                                                                <FontAwesomeIcon 
+                                                                    icon={
+                                                                        sortConfig.key === 'songTitle'
+                                                                            ? sortConfig.direction === 'asc'
+                                                                                ? faSortUp
+                                                                                : faSortDown
+                                                                            : faSort
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase min-w-[50px]">詳細</th>
+                                                        <th 
+                                                            className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100 min-w-[120px]"
+                                                            onClick={() => handleSort('requesterName')}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                送信者
+                                                                <FontAwesomeIcon 
+                                                                    icon={
+                                                                        sortConfig.key === 'requesterName'
+                                                                            ? sortConfig.direction === 'asc'
+                                                                                ? faSortUp
+                                                                                : faSortDown
+                                                                            : faSort
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </th>
+                                                        <th 
+                                                            className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100 min-w-[80px]"
+                                                            onClick={() => handleSort('isFirstTime')}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                初見
+                                                                <FontAwesomeIcon 
+                                                                    icon={
+                                                                        sortConfig.key === 'isFirstTime'
+                                                                            ? sortConfig.direction === 'asc'
+                                                                                ? faSortUp
+                                                                                : faSortDown
+                                                                            : faSort
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </th>
+                                                        <th 
+                                                            className="px-4 py-2 text-left font-bold text-gray-500 uppercase cursor-pointer hover:bg-gray-100 min-w-[160px]"
+                                                            onClick={() => handleSort('requestedAt')}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                時刻
+                                                                <FontAwesomeIcon 
+                                                                    icon={
+                                                                        sortConfig.key === 'requestedAt'
+                                                                            ? sortConfig.direction === 'asc'
+                                                                                ? faSortUp
+                                                                                : faSortDown
+                                                                            : faSort
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left font-bold text-gray-500 uppercase min-w-[100px]">ステータス</th>
+                                                        <th className="sticky right-0 px-4 py-2 text-left font-bold text-gray-500 uppercase text-center min-w-[80px] bg-gray-50">消化する</th>
                                                     </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {sortRequests(requests).map((req) => {
+                                                        const requestedAt = req.requestedAt?.toDate();
+                                                        const timeStr = requestedAt
+                                                            ? requestedAt.toLocaleString('ja-JP', {
+                                                                year: 'numeric',
+                                                                month: 'numeric',
+                                                                day: 'numeric',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                second: '2-digit'
+                                                            })
+                                                            : '不明';
+                                                        const isConsumed = req.consumed;
+                                                        return (
+                                                            <tr key={req.id} className="hover:bg-gray-50 transition-colors">
+                                                                <td className="px-4 py-2 text-gray-700 truncate max-w-[300px]" title={req.songTitle}>
+                                                                    {req.youtubeUrl ? (
+                                                                        <Link href={req.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{req.songTitle}</Link>
+                                                                    ) : (
+                                                                        req.songTitle
+                                                                    )}
+                                                                </td>
+                                                                <td className="px-4 py-2">
+                                                                    <button
+                                                                        onClick={() => handleOpenDetail(req)}
+                                                                        className="text-gray-500 hover:text-gray-700 transition-colors"
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faEye} />
+                                                                    </button>
+                                                                </td>
+                                                                <td className="px-4 py-2 text-gray-700">{req.requesterName || '匿名'}</td>
+                                                                <td className="px-4 py-2 text-gray-700">{req.isFirstTime ? '初見' : '常連'}</td>
+                                                                <td className="px-4 py-2 text-gray-700">{timeStr}</td>
+                                                                <td className="px-4 py-2">
+                                                                    {isConsumed ? (
+                                                                        <span className="inline-block px-2 py-1 text-xs text-white bg-gray-500 rounded">消化済み</span>
+                                                                    ) : (
+                                                                        <span className="inline-block px-2 py-1 text-xs text-white bg-green-500 rounded">未消化</span>
+                                                                    )}
+                                                                </td>
+                                                                <td className="sticky right-0 px-4 text-center py-2 text-gray-700 bg-white">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={isConsumed}
+                                                                        onChange={() => handleConsumeRequest(req.id, isConsumed)}
+                                                                        className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 )}
 
                                 {/* 詳細情報モーダル */}
