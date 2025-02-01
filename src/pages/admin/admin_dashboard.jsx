@@ -13,6 +13,7 @@ import {
   UserIcon,
   BeakerIcon,
   EnvelopeIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
@@ -39,6 +40,13 @@ const AdminDashboard = () => {
       icon: ChartBarIcon,
       href: '/admin/kpi',
       color: 'bg-indigo-500',
+    },
+    {
+      title: '経費管理',
+      description: '経費の入力と残高管理',
+      icon: BanknotesIcon,
+      href: '/admin/expenses',
+      color: 'bg-teal-500',
     },
     {
       title: 'アクティブユーザー',

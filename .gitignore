@@ -45,3 +45,12 @@ next-env.d.ts
 # Docker
 .docker/
 docker-compose.override.yml
+
+# Firebase設定
+firebase/firestore.rules
+.firebaserc
+firebase/firestore.indexes.json
+
+# 環境変数
+.env*
+!.env.example
