@@ -88,14 +88,14 @@ async function aggregateKpiMetricsLogic() {
     // 2. 広告からの新規登録者数を集計
     const adUsersQuery = await db.collection('users')
       .where('createdAt', '>=', monthStart)
-      .where('signUpSource', '==', 'ad')
+      .where('isAd', '==', true)
       .count()
       .get();
     const adUsersCount = adUsersQuery.data().count;
 
     // 3. MAUを集計
     const mauQuery = await db.collection('users')
-      .where('userActivity.lastActivityAt', '>=', thirtyDaysAgo)
+      .where('lastActivityAt', '>=', thirtyDaysAgo)
       .count()
       .get();
     const mauCount = mauQuery.data().count;
@@ -109,11 +109,24 @@ async function aggregateKpiMetricsLogic() {
 
     // 5. 広告からの有料会員数を集計
     const adPaidUsersQuery = await db.collection('users')
-      .where('signUpSource', '==', 'ad')
+      .where('isAd', '==', true)
       .where('plan', '==', 'premium')
       .count()
       .get();
     const adPaidUsersCount = adPaidUsersQuery.data().count;
+
+    // 6. 登録ソース別の集計
+    const signUpSources = ['twitter', 'google', 'youtube', 'direct'];
+    const sourceMetrics = {};
+    
+    for (const source of signUpSources) {
+      const sourceQuery = await db.collection('users')
+        .where('createdAt', '>=', monthStart)
+        .where('signUpSource', '==', source)
+        .count()
+        .get();
+      sourceMetrics[source] = sourceQuery.data().count;
+    }
 
     // 集計データを作成
     const metricsData = {
@@ -124,6 +137,7 @@ async function aggregateKpiMetricsLogic() {
       paidUsers: paidUsersCount,
       adPaidUsers: adPaidUsersCount,
       adConversionRate: adUsersCount > 0 ? (adPaidUsersCount / adUsersCount) * 100 : 0,
+      signUpSources: sourceMetrics,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
@@ -143,6 +157,12 @@ async function aggregateKpiMetricsLogic() {
 ・広告からの新規登録者数（当月）: ${adUsersCount}名
 ・広告からの有料会員数: ${adPaidUsersCount}名
 ・広告からの有料会員化率: ${metricsData.adConversionRate.toFixed(1)}%
+
+■ 登録ソース別集計
+・Twitter: ${sourceMetrics.twitter}名
+・Google: ${sourceMetrics.google}名
+・YouTube: ${sourceMetrics.youtube}名
+・直接アクセス: ${sourceMetrics.direct}名
 
 ※ このメールは自動送信されています。
     `;

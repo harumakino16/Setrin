@@ -175,7 +175,42 @@ const KpiDashboard = ({ dateRange }) => {
     };
   };
 
+  const prepareSourceChartData = () => {
+    if (!historicalData) return null;
+
+    return {
+      labels: historicalData.map(d => new Date(d.date.seconds * 1000).toLocaleDateString('ja-JP')),
+      datasets: [
+        {
+          label: 'Twitter',
+          data: historicalData.map(d => d.signUpSources?.twitter || 0),
+          borderColor: 'rgb(29, 161, 242)',
+          tension: 0.1
+        },
+        {
+          label: 'Google',
+          data: historicalData.map(d => d.signUpSources?.google || 0),
+          borderColor: 'rgb(234, 67, 53)',
+          tension: 0.1
+        },
+        {
+          label: 'YouTube',
+          data: historicalData.map(d => d.signUpSources?.youtube || 0),
+          borderColor: 'rgb(255, 0, 0)',
+          tension: 0.1
+        },
+        {
+          label: '直接アクセス',
+          data: historicalData.map(d => d.signUpSources?.direct || 0),
+          borderColor: 'rgb(107, 114, 128)',
+          tension: 0.1
+        }
+      ]
+    };
+  };
+
   const chartData = prepareChartData();
+  const sourceChartData = prepareSourceChartData();
 
   return (
     <div className="space-y-6">
@@ -218,11 +253,105 @@ const KpiDashboard = ({ dateRange }) => {
         />
       </div>
 
+      {/* 登録ソース別の分析を追加 */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold mb-4">登録ソース分析</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-600">Twitter</h4>
+            <p className="text-2xl font-bold mt-1">{metrics?.signUpSources?.twitter || 0}</p>
+            {previousPeriodData?.[0]?.signUpSources?.twitter && (
+              <p className={`text-sm mt-1 ${
+                (metrics?.signUpSources?.twitter - previousPeriodData[0].signUpSources.twitter) >= 0 
+                ? 'text-green-600' 
+                : 'text-red-600'
+              }`}>
+                前期比: {calculateGrowthRate(
+                  metrics?.signUpSources?.twitter,
+                  previousPeriodData[0].signUpSources.twitter
+                )}%
+              </p>
+            )}
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-600">Google</h4>
+            <p className="text-2xl font-bold mt-1">{metrics?.signUpSources?.google || 0}</p>
+            {previousPeriodData?.[0]?.signUpSources?.google && (
+              <p className={`text-sm mt-1 ${
+                (metrics?.signUpSources?.google - previousPeriodData[0].signUpSources.google) >= 0 
+                ? 'text-green-600' 
+                : 'text-red-600'
+              }`}>
+                前期比: {calculateGrowthRate(
+                  metrics?.signUpSources?.google,
+                  previousPeriodData[0].signUpSources.google
+                )}%
+              </p>
+            )}
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-600">YouTube</h4>
+            <p className="text-2xl font-bold mt-1">{metrics?.signUpSources?.youtube || 0}</p>
+            {previousPeriodData?.[0]?.signUpSources?.youtube && (
+              <p className={`text-sm mt-1 ${
+                (metrics?.signUpSources?.youtube - previousPeriodData[0].signUpSources.youtube) >= 0 
+                ? 'text-green-600' 
+                : 'text-red-600'
+              }`}>
+                前期比: {calculateGrowthRate(
+                  metrics?.signUpSources?.youtube,
+                  previousPeriodData[0].signUpSources.youtube
+                )}%
+              </p>
+            )}
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-600">直接アクセス</h4>
+            <p className="text-2xl font-bold mt-1">{metrics?.signUpSources?.direct || 0}</p>
+            {previousPeriodData?.[0]?.signUpSources?.direct && (
+              <p className={`text-sm mt-1 ${
+                (metrics?.signUpSources?.direct - previousPeriodData[0].signUpSources.direct) >= 0 
+                ? 'text-green-600' 
+                : 'text-red-600'
+              }`}>
+                前期比: {calculateGrowthRate(
+                  metrics?.signUpSources?.direct,
+                  previousPeriodData[0].signUpSources.direct
+                )}%
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* メインKPIのトレンドグラフ */}
       {chartData && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold mb-4">トレンド分析</h3>
+          <h3 className="text-lg font-semibold mb-4">主要KPIトレンド</h3>
           <div className="h-80">
             <Line data={chartData} options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+                }
+              }
+            }} />
+          </div>
+        </div>
+      )}
+
+      {/* 登録ソース別のトレンドグラフ */}
+      {sourceChartData && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-4">登録ソース別トレンド</h3>
+          <div className="h-80">
+            <Line data={sourceChartData} options={{
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
