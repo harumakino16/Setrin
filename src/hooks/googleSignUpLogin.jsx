@@ -1,99 +1,95 @@
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { doc, writeBatch, serverTimestamp, getDoc } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
-import { registerUserInFirestore } from '@/utils/firebaseUtils';
-import { useMessage } from '@/context/MessageContext';
-import { useRouter } from 'next/router';
-import { useContext } from 'react';
-import { AuthContext } from '@/context/AuthContext';
+// googleSignUpLogin.jsx
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import { registerUserInFirestore } from "@/utils/firebaseUtils";
+import { useMessage } from "@/context/MessageContext";
+import { useRouter } from "next/router";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 const useGoogleSignUpLogin = () => {
-    const { setCurrentUser } = useContext(AuthContext);
-    const { setMessageInfo } = useMessage();
-    const router = useRouter();
+  const { setCurrentUser } = useContext(AuthContext);
+  const { setMessageInfo } = useMessage();
+  const router = useRouter();
 
-    // UTMパラメータを取得する関数
-    const getUtmParams = () => {
-        const utmSource = router.query.utm_source;
-        const utmMedium = router.query.utm_medium;
-        const utmCampaign = router.query.utm_campaign;
-
-        return {
-            utmSource,
-            utmMedium,
-            utmCampaign
-        };
+  // UTMパラメータを取得する関数
+  const getUtmParams = () => {
+    // router.query のキーは小文字で取得されることが多いので注意
+    const { utm_source, utm_medium, utm_campaign } = router.query;
+    return {
+      utmSource: utm_source,
+      utmMedium: utm_medium,
+      utmCampaign: utm_campaign,
     };
+  };
 
-    // リファラー情報を取得する関数
-    const getReferrer = () => {
-        if (typeof document !== 'undefined') {
-            return document.referrer || 'direct';
-        }
-        return 'direct';
-    };
+  // リファラー情報を取得する関数
+  const getReferrer = () => {
+    if (typeof document !== "undefined") {
+      return document.referrer || "direct";
+    }
+    return "direct";
+  };
 
-    // サインアップソースを判定する関数
-    const determineSignUpSource = () => {
-        const { utmSource, utmMedium } = getUtmParams();
-        const referrer = getReferrer();
+  // 流入元(signUpSource)の決定 (UTMパラメータがあればそれを、なければリファラー)
+  const determineSignUpSource = () => {
+    const { utmSource } = getUtmParams();
+    return utmSource ? utmSource : getReferrer();
+  };
 
-        // UTMパラメータがある場合はそれを優先
-        if (utmSource) {
-            if (utmSource.includes('ad') || utmMedium === 'cpc') {
-                return 'ad';
-            }
-            return utmSource;
-        }
+  // 広告経由かどうか(isAd)の判定
+  // utm_source に「ad」が含まれている、または utm_medium が "cpc" なら広告経由と判定
+  const determineIsAd = () => {
+    const { utmSource, utmMedium } = getUtmParams();
+    if (utmSource) {
+      if (
+        utmSource.toLowerCase().includes("ad") ||
+        (utmMedium && utmMedium.toLowerCase() === "cpc")
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
 
-        // リファラーに基づいて判定
-        if (referrer.includes('google')) {
-            return 'google_organic';
-        } else if (referrer.includes('twitter')) {
-            return 'twitter';
-        } else if (referrer.includes('facebook')) {
-            return 'facebook';
-        }
+  const handleGoogleSignUpLogin = async () => {
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
 
-        return 'direct';
-    };
+      const signUpSource = determineSignUpSource();
+      const isAd = determineIsAd();
 
-    const handleGoogleSignUpLogin = async () => {
-        const auth = getAuth();
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+      if (!userDoc.exists()) {
+        // 新規ユーザーの場合は、isAd と signUpSource の両方を明示的に保存
+        await registerUserInFirestore({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          signUpSource: signUpSource, // 例："twitter"
+          isAd: isAd,               // true または false
+          createdAt: serverTimestamp(),
+          lastActivityAt: serverTimestamp(),
+        });
+        setMessageInfo({ message: "アカウントが作成されました", type: "success" });
+      } else {
+        setCurrentUser(user);
+        setMessageInfo({ message: "ログインしました", type: "success" });
+      }
+      router.push("/");
+    } catch (error) {
+      console.error("Google login error:", error);
+      setMessageInfo({ message: "Googleログインに失敗しました", type: "error" });
+    }
+  };
 
-            const userRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userRef);
-
-            // サインアップソースを取得
-            const signUpSource = determineSignUpSource();
-
-            if (!userDoc.exists()) {
-                // 新規ユーザーの場合
-                await registerUserInFirestore({
-                    ...user,
-                    signUpSource: signUpSource,
-                    createdAt: serverTimestamp(),
-                    lastActivityAt: serverTimestamp()
-                });
-                setMessageInfo({ message: 'アカウントが作成されました', type: 'success' });
-            } else {
-                // 既存ユーザーの場合
-                setCurrentUser(user);
-                setMessageInfo({ message: 'ログインしました', type: 'success' });
-            }
-
-            router.push('/');
-        } catch (error) {
-            console.error('Google login error:', error);
-            setMessageInfo({ message: 'Googleログインに失敗しました', type: 'error' });
-        }
-    };
-
-    return { handleGoogleSignUpLogin };
+  return { handleGoogleSignUpLogin };
 };
 
 export default useGoogleSignUpLogin;

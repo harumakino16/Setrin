@@ -1,15 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useContext } from 'react'
+import { useState, useContext, useMemo } from 'react'
+import { useRouter } from 'next/router'
 import { Music, Youtube, List, Shuffle, Users, Wand2, Shield, Lock, Settings } from 'lucide-react'
 import Image from 'next/image'
 import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, PREMIUM_PLAN_PRICE } from '@/constants'
 import ContactForm from '@/components/ContactForm'
 import Price from '@/components/Price'
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { AuthContext } from '@/context/AuthContext';
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { AuthContext } from '@/context/AuthContext'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 
@@ -19,7 +20,7 @@ function FeatureCard({ icon: Icon, title, color, sections }) {
       <div className={`bg-gradient-to-r ${color} text-white p-4 rounded-xl inline-block mb-6 group-hover:scale-110 transition-transform duration-300`}>
         <Icon className="w-8 h-8" />
       </div>
-      <h3 className={`text-2xl font-bold mb-6`}style={{ color: color }}>
+      <h3 className="text-2xl font-bold mb-6" style={{ color: color }}>
         {title}
       </h3>
       <div className="space-y-6">
@@ -46,9 +47,24 @@ function FeatureCard({ icon: Icon, title, color, sections }) {
 
 export default function LandingPage() {
   const { t } = useTranslation('common');
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const userCount = "2,400";
+  const router = useRouter();
+
+  // 現在の URL から utm パラメータを取得する
+  const { utm_source, utm_medium, utm_campaign, utm_content } = router.query;
+
+  // 取得した utm パラメータがあれば、ログインリンク用のクエリ文字列を生成
+  const loginQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    if (utm_source) params.set('utm_source', utm_source);
+    if (utm_medium) params.set('utm_medium', utm_medium);
+    if (utm_campaign) params.set('utm_campaign', utm_campaign);
+    if (utm_content) params.set('utm_content', utm_content);
+    const qs = params.toString();
+    return qs ? `?${qs}` : "";
+  }, [utm_source, utm_medium, utm_campaign]);
 
   const meta = {
     title: 'Setlink - Vtuberのセトリ管理ツール',
@@ -64,7 +80,8 @@ export default function LandingPage() {
   const handleGetStarted = (e) => {
     e.preventDefault();
     if (!currentUser) {
-      window.location.href = '/login';
+      // ログイン時にクエリ文字列を付与してリダイレクト
+      window.location.href = `/login${loginQuery}`;
       return;
     }
     window.location.href = '/dashboard';
@@ -207,13 +224,29 @@ export default function LandingPage() {
             `}>
               <nav className="h-full md:h-auto">
                 <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 p-8 md:p-0">
-                  <li><Link href="#features" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>特徴</Link></li>
-                  <li><Link href="#pricing" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>料金</Link></li>
-                  <li><Link href="#faq" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>FAQ</Link></li>
-                  <li><Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>お問い合わせ</Link></li>
+                  <li>
+                    <Link href="#features" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>
+                      特徴
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#pricing" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>
+                      料金
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#faq" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>
+                      FAQ
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#contact" className="text-gray-500 hover:text-customTheme-blue-primary block" onClick={closeMenu}>
+                      お問い合わせ
+                    </Link>
+                  </li>
                   <li className="md:hidden">
                     <Link 
-                      href="/login" 
+                      href={`/login${loginQuery}`} 
                       className="bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors block text-center"
                       onClick={closeMenu}
                     >
@@ -226,7 +259,7 @@ export default function LandingPage() {
 
             {/* デスクトップ用ログインボタン */}
             <Link 
-              href="/login" 
+              href={`/login${loginQuery}`}
               className="hidden md:block bg-customTheme-blue-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               {currentUser ? 'マイページへ' : '今すぐ無料で始める・ログイン'}
@@ -272,7 +305,7 @@ export default function LandingPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                   <Link 
-                    href="/login"
+                    href={`/login${loginQuery}`}
                     onClick={handleGetStarted}
                     className="bg-gradient-to-r from-customTheme-blue-primary to-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
                   >
@@ -317,7 +350,6 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="text-center mb-12">
-
               {/* Vtuber画像を追加 */}
               <div className="relative w-48 h-48 mx-auto -mb-12">
                 <Image
@@ -329,7 +361,6 @@ export default function LandingPage() {
                   priority={true}
                 />
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
                 <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-red-400 transform hover:-translate-y-1 transition-all duration-300">
                   <div className="flex items-center mb-6">
@@ -451,7 +482,6 @@ export default function LandingPage() {
               <h2 className="text-4xl font-bold mt-6 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-customTheme-blue-primary to-blue-600">
                 充実の機能で歌枠配信をサポート
               </h2>
-
               {/* Vtuber画像を追加 */}
               <div className="relative w-48 h-48 mx-auto my-8">
                 <Image
@@ -463,7 +493,6 @@ export default function LandingPage() {
                   priority={true}
                 />
               </div>
-
               <p className="text-xl text-gray-600 mx-auto leading-relaxed">
                 曲管理からリクエスト対応まで、歌枠配信に必要な全ての機能が揃っています。
                 <span className="block mt-2 text-gray-600">
@@ -471,7 +500,6 @@ export default function LandingPage() {
                 </span>
               </p>
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {features.map((feature, index) => (
                 <FeatureCard
@@ -486,7 +514,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* セキュリティ・プライバシーセクションを追加 */}
+        {/* セキュリティ・プライバシーセクション */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -495,7 +523,6 @@ export default function LandingPage() {
               </span>
               <h2 className="text-4xl font-bold mt-4 mb-8">セキュリティ・プライバシー</h2>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
                 <div className="text-4xl text-customTheme-blue-primary mb-4">
@@ -508,7 +535,6 @@ export default function LandingPage() {
                   <li>• セッション管理</li>
                 </ul>
               </div>
-
               <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
                 <div className="text-4xl text-customTheme-blue-primary mb-4">
                   <Lock className="mx-auto" />
@@ -520,7 +546,6 @@ export default function LandingPage() {
                   <li>• アクセス制御機能</li>
                 </ul>
               </div>
-
               <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
                 <div className="text-4xl text-customTheme-blue-primary mb-4">
                   <Settings className="mx-auto" />
@@ -536,7 +561,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 用実績セクション */}
+        {/* 利用実績セクション */}
         <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -563,7 +588,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="">
+        <section id="pricing">
           <Price />
         </section>
 
@@ -626,7 +651,7 @@ export default function LandingPage() {
       </div>
       <Footer />
     </>
-  )
+  );
 }
 
 export async function getStaticProps({ locale }) {
@@ -636,7 +661,3 @@ export async function getStaticProps({ locale }) {
     },
   };
 }
-
-// PricingCard Component
-
-
