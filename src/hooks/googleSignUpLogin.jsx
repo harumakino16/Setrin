@@ -27,7 +27,24 @@ const useGoogleSignUpLogin = () => {
   // リファラー情報を取得する関数
   const getReferrer = () => {
     if (typeof document !== "undefined") {
-      return document.referrer || "direct";
+      const referrer = document.referrer;
+      // 特定のドメインからの流入を変換
+      if (referrer === "https://setlink.jp/lp") {
+        return "direct";
+      }
+      if (referrer === "https://t.co/") {
+        return "twitter";
+      }
+      if (referrer === "https://www.youtube.com/") {
+        return "youtube";
+      }
+      if (referrer === "https://www.bing.com/") {
+        return "bing";
+      }
+      if (referrer === "https://www.google.com/") {
+        return "google";
+      }
+      return referrer || "direct";
     }
     return "direct";
   };
