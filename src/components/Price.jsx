@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { handleUpgradePlan } from '@/utils/stripeUtils';
 import { useRouter } from 'next/router';
 import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, FREE_PLAN_MAX_SETLISTS, PREMIUM_PLAN_PRICE, FREE_PLAN_MAX_PUBLIC_PAGES, PREMIUM_PLAN_MAX_PUBLIC_PAGES } from '@/constants';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,6 +13,20 @@ function Price() {
   const { currentUser } = useAuthContext();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  // クエリパラメータを取得
+  const { utm_source, utm_medium, utm_campaign, utm_content } = router.query;
+
+  // ログインリンク用のクエリ文字列を生成
+  const loginQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    if (utm_source) params.set('utm_source', utm_source);
+    if (utm_medium) params.set('utm_medium', utm_medium);
+    if (utm_campaign) params.set('utm_campaign', utm_campaign);
+    if (utm_content) params.set('utm_content', utm_content);
+    const qs = params.toString();
+    return qs ? `?${qs}` : "";
+  }, [utm_source, utm_medium, utm_campaign, utm_content]);
 
   const isPremiumUser = currentUser?.plan === 'premium';
   const isTrialing = currentUser?.isTrialing;
@@ -34,7 +48,7 @@ function Price() {
   };
 
   const handleFreeButtonClick = () => {
-    router.push('/login');
+    router.push(`/login${loginQuery}`);
   };
 
   return (
@@ -63,7 +77,7 @@ function Price() {
             buttonColor="bg-[#bbe0ff]"
             buttonHoverColor="hover:bg-[#a5d4ff]"
             disabled={currentUser?.plan === 'free'}
-            link={currentUser?.plan === 'free' ? null : undefined}
+            link={currentUser?.plan === 'free' ? null : `/login${loginQuery}`}
             onClick={currentUser?.plan === 'free' ? null : handleFreeButtonClick}
           />
 
