@@ -17,7 +17,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "firebase-admin": "^13.0.2",
-    "firebase-functions": "^6.2.0"
+    "firebase-functions": "^6.3.1"
   },
   "private": true
 }

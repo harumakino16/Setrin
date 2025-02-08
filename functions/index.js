@@ -115,17 +115,36 @@ async function aggregateKpiMetricsLogic() {
       .get();
     const adPaidUsersCount = adPaidUsersQuery.data().count;
 
-    // 6. 登録ソース別の集計
+    // 6. 登録ソース別の集計（広告とオーガニック）
     const signUpSources = ['twitter', 'google', 'youtube', 'direct'];
-    const sourceMetrics = {};
+    const sourceMetrics = {
+      ad: {
+        total: adUsersCount,
+        referrers: {}
+      },
+      organic: {}
+    };
     
+    // 広告経由のリファラー別集計
+    for (const source of signUpSources) {
+      const adSourceQuery = await db.collection('users')
+        .where('createdAt', '>=', monthStart)
+        .where('signUpSource', '==', source)
+        .where('isAd', '==', true)
+        .count()
+        .get();
+      sourceMetrics.ad.referrers[source] = adSourceQuery.data().count;
+    }
+    
+    // オーガニック集計
     for (const source of signUpSources) {
       const sourceQuery = await db.collection('users')
         .where('createdAt', '>=', monthStart)
         .where('signUpSource', '==', source)
+        .where('isAd', '==', false)
         .count()
         .get();
-      sourceMetrics[source] = sourceQuery.data().count;
+      sourceMetrics.organic[source] = sourceQuery.data().count;
     }
 
     // 集計データを作成
@@ -151,18 +170,27 @@ async function aggregateKpiMetricsLogic() {
 ■ ユーザー数
 ・新規登録者数（当月）: ${newUsersCount}名
 ・MAU: ${mauCount}名
-・有料会員数: ${paidUsersCount}名
+・有料会員数(トータル): ${paidUsersCount}名
 
 ■ 広告効果
 ・広告からの新規登録者数（当月）: ${adUsersCount}名
-・広告からの有料会員数: ${adPaidUsersCount}名
+・広告からの有料会員数(トータル): ${adPaidUsersCount}名
 ・広告からの有料会員化率: ${metricsData.adConversionRate.toFixed(1)}%
 
 ■ 登録ソース別集計
-・Twitter: ${sourceMetrics.twitter}名
-・Google: ${sourceMetrics.google}名
-・YouTube: ${sourceMetrics.youtube}名
-・直接アクセス: ${sourceMetrics.direct}名
+【広告経由】
+・合計: ${sourceMetrics.ad.total}名
+・Twitter広告: ${sourceMetrics.ad.referrers.twitter}名
+・Google広告: ${sourceMetrics.ad.referrers.google}名
+・YouTube広告: ${sourceMetrics.ad.referrers.youtube}名
+・直接アクセス: ${sourceMetrics.ad.referrers.direct}名
+
+【オーガニック】
+・Twitter: ${sourceMetrics.organic.twitter}名
+・Google: ${sourceMetrics.organic.google}名
+・YouTube: ${sourceMetrics.organic.youtube}名
+・直接アクセス: ${sourceMetrics.organic.direct}名
+
 
 ※ このメールは自動送信されています。
     `;
@@ -170,11 +198,14 @@ async function aggregateKpiMetricsLogic() {
     // メール送信
     await admin.firestore().collection('mail').add({
       to: 'harumakino16@yahoo.co.jp',
+      cc: ['koita@soundworksk.net'],
       message: {
-        subject: `【KPI Report】${today.toLocaleDateString('ja-JP')}の集計結果`,
+        subject: `【Setlink KPIレポート】${today.toLocaleDateString('ja-JP')}の集計結果`,
         text: emailContent
-      }
+      },
+      from: 'Setlink <setlink.contact@gmail.com>'
     });
+
 
     console.log('KPI metrics aggregation and email sending completed successfully');
   } catch (error) {
@@ -221,10 +252,12 @@ exports.generateMonthlySummary = onSchedule("0 0 1 * *", async (event) => { // �
     // メール送信
     await admin.firestore().collection('mail').add({
       to: 'harumakino16@yahoo.co.jp',
+      cc: ['koita@soundworksk.net'],
       message: {
         subject: `【月次レポート】${lastMonth.getFullYear()}年${lastMonth.getMonth() + 1}月のKPIサマリー`,
         text: generateMonthlyEmailContent(monthlySummary)
-      }
+      },
+      from: 'Setlink <setlink.contact@gmail.com>'
     });
 
     console.log('Monthly summary generated and sent successfully');
