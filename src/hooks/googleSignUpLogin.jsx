@@ -7,6 +7,7 @@ import { useMessage } from "@/context/MessageContext";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
+import { trackTwitterEvent, TWITTER_EVENTS } from '@/utils/trackingUtils';
 
 const useGoogleSignUpLogin = () => {
   const { setCurrentUser } = useContext(AuthContext);
@@ -95,6 +96,14 @@ const useGoogleSignUpLogin = () => {
           lastActivityAt: serverTimestamp(),
         });
         setMessageInfo({ message: "アカウントが作成されました", type: "success" });
+
+        // X広告トラッキング
+        if (isAd) {
+          trackTwitterEvent(TWITTER_EVENTS.SIGN_UP, {
+            source: signUpSource,
+            user_id: user.uid
+          });
+        }
       } else {
         setCurrentUser(user);
         setMessageInfo({ message: "ログインしました", type: "success" });
