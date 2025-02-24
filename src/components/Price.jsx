@@ -7,8 +7,6 @@ import { FREE_PLAN_MAX_SONGS, FREE_PLAN_MAX_YOUTUBE_PLAYLISTS, FREE_PLAN_MAX_SET
 import { useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { trackTwitterEvent, TWITTER_EVENTS } from '@/utils/trackingUtils';
-
 
 function Price() {
   const { currentUser } = useAuthContext();
@@ -52,24 +50,11 @@ function Price() {
     router.push(`/login${loginQuery}`);
   };
 
-  // プレミアムプランボタンクリック時のトラッキング
+  // プレミアムプランボタンクリック時の処理
   const handlePremiumClick = async () => {
     setIsLoading(true);
-    
-    // X広告トラッキング
-    if (determineIsAd()) {
-      trackTwitterEvent(TWITTER_EVENTS.PREMIUM_CLICK);
-    }
-
     try {
       await handleUpgradePlan(currentUser, router);
-      // 課金成功時のトラッキング
-      if (determineIsAd()) {
-        trackTwitterEvent(TWITTER_EVENTS.PREMIUM_CONVERSION, {
-          value: PREMIUM_PLAN_PRICE,
-          currency: 'JPY'
-        });
-      }
     } catch (error) {
       console.error('Upgrade error:', error);
     } finally {
