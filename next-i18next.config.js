@@ -5,5 +5,6 @@ module.exports = {
     locales: ['ja', 'zh-TW'],
     localeDetection: false
   },
-  debug: true, // ← これを指定するとコンソールにデバッグログが出る
+  debug: process.env.NODE_ENV === 'development',
+  reloadOnPrerender: process.env.NODE_ENV === 'development'
 };

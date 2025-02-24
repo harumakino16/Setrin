@@ -13,7 +13,7 @@ const nextConfig = {
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
     FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
   },
-  i18n, // ここでi18n設定を適用する
+  i18n,
 };
 
 export default nextConfig;
