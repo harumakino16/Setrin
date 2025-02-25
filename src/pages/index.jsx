@@ -193,19 +193,19 @@ export default function Home() {
 
   // CSVエクスポート用のヘッダー（列名）
   const headers = [
-    { label: t('columnSongTitle'), key: "title" },
-    { label: t('columnFurigana'), key: "furigana" },
-    { label: t('columnArtist'), key: "artist" },
-    { label: t('columnYoutube'), key: "youtubeUrl" },
-    { label: t('columnGenre'), key: "genre" },
-    { label: t('columnTag1'), key: "tag1" },
-    { label: t('columnTag2'), key: "tag2" },
-    { label: t('columnTag3'), key: "tag3" },
-    { label: t('columnTag4'), key: "tag4" },
-    { label: t('columnTag5'), key: "tag5" },
-    { label: t('columnSingingCount'), key: "singingCount" },
-    { label: t('columnSkillLevel'), key: "skillLevel" },
-    { label: t('columnMemo'), key: "memo" }
+    { label: t('songTitle'), key: "title" },
+    { label: t('furigana'), key: "furigana" },
+    { label: t('artist'), key: "artist" },
+    { label: t('youtube'), key: "youtubeUrl" },
+    { label: t('genre'), key: "genre" },
+    { label: t('tag1'), key: "tag1" },
+    { label: t('tag2'), key: "tag2" },
+    { label: t('tag3'), key: "tag3" },
+    { label: t('tag4'), key: "tag4" },
+    { label: t('tag5'), key: "tag5" },
+    { label: t('singingCount'), key: "singingCount" },
+    { label: t('skillLevel'), key: "skillLevel" },
+    { label: t('memo'), key: "memo" }
   ];
 
   const handleAddToSetlist = (songIds) => {
@@ -285,13 +285,13 @@ export default function Home() {
     <Layout>
       <div className="flex flex-col sm:flex-row w-full">
         <div className="flex-grow w-full p-0 sm:p-4">
-          <CtaComponent
+          {/* <CtaComponent
             title="リクエスト歌枠ツールを使ってみよう"
             description="リクエスト歌枠ツールが実装されました。下のボタンをクリックするとリクエスト歌枠管理ページへ移動できます。リクエスト歌枠ツールでは、リスナーからのリクエストを受付・停止したり、届いたリクエストを確認・消化して管理することができます。"
             buttonText="リクエスト歌枠ツールへ移動する"
             buttonLink="/utawakutool/request-utawaku"
             ctaId="request-mode-cta"
-          />
+          /> */}
           <SearchForm
             currentUser={currentUser}
             handleSearchResults={handleSearchResults}
