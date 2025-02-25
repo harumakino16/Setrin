@@ -36,5 +36,20 @@
   "singingCount": "歌唱回数",
   "skillLevel": "熟練度",
   "note": "備考",
-  "memo": "メモ"
+  "memo": "メモ",
+
+  "freeKeyword": "フリーキーワード",
+  "searchByKeyword": "キーワードで検索",
+  "filter": "絞り込み",
+  "advancedSearch": "詳細検索",
+  "orLess": "以下",
+  "orMore": "以上",
+  "tag": "タグ",
+  "commaSeparatedMaxFiveTags": "カンマ区切りで最大5つまで",
+  "maxFiveTags": "タグは最大5つまでです。",
+  "exclude": "除外",
+  "excludeTags": "除外タグ",
+  "excludeGenres": "除外ジャンル",
+  "commaSeparatedExcludeTags": "カンマ区切りでタグを除外",
+  "commaSeparatedExcludeGenres": "カンマ区切りでジャンルを除外"
 }

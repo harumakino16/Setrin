@@ -35,6 +35,22 @@
     "tag5": "標籤5",
     "singingCount": "演唱次數",
     "skillLevel": "熟練度",
-    "memo": "備註"
-  }
+    "note": "備註",
+    "memo": "備註",
+
+    "freeKeyword": "關鍵詞搜索",
+    "searchByKeyword": "輸入關鍵詞搜索",
+    "filter": "篩選",
+    "advancedSearch": "高級搜索",
+    "orLess": "以下",
+    "orMore": "以上",
+    "tag": "標籤",
+    "commaSeparatedMaxFiveTags": "逗號分隔，最多5個",
+    "maxFiveTags": "標籤最多只能有5個。",
+    "exclude": "排除",
+    "excludeTags": "排除標籤",
+    "excludeGenres": "排除類別",
+    "commaSeparatedExcludeTags": "逗號分隔排除標籤",
+    "commaSeparatedExcludeGenres": "逗號分隔排除類別"
+}
   
