@@ -9,6 +9,7 @@ import { formatSongData } from '../utils/songUtils';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { FREE_PLAN_MAX_SONGS } from '@/constants';
 import { useSongs } from '../context/SongsContext';
+import { useTranslation } from 'next-i18next';
 
 const isKatakana = (str) => {
   return /^[ァ-ヶー　]*$/.test(str || '');
@@ -34,11 +35,12 @@ function SongModal({ isOpen, onClose, song }) {
   const [furiganaError, setFuriganaError] = useState(false);
   const { songs } = useSongs();
   const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
+  const { t } = useTranslation('common');
 
   const handleSaveSong = async () => {
     if (furigana && !isKatakana(furigana)) {
       setFuriganaError(true);
-      setMessageInfo({ message: 'フリガナはカタカナのみで入力してください。', type: 'error' });
+      setMessageInfo({ message: t('furiganaKatakanaOnly'), type: 'error' });
       return;
     }
 
@@ -51,7 +53,7 @@ function SongModal({ isOpen, onClose, song }) {
     }
 
     if (isNewSong && songs.length >= FREE_PLAN_MAX_SONGS) {
-      setMessageInfo({ message: `曲の追加が無料プランの上限(${FREE_PLAN_MAX_SONGS})を超えています。`, type: 'error' });
+      setMessageInfo({ message: t('freePlanSongLimitExceeded', { count: FREE_PLAN_MAX_SONGS }), type: 'error' });
       return;
     }
 
@@ -76,16 +78,16 @@ function SongModal({ isOpen, onClose, song }) {
         if (isNewSong) {
           const userSongsCollection = collection(db, 'users', currentUser.uid, 'Songs');
           await addDoc(userSongsCollection, songData);
-          setMessageInfo({ message: '曲を追加しました', type: 'success' });
+          setMessageInfo({ message: t('songAdded'), type: 'success' });
         } else {
           const songDocRef = doc(db, 'users', currentUser.uid, 'Songs', song.id);
           await updateDoc(songDocRef, songData);
-          setMessageInfo({ message: '曲を更新しました', type: 'success' });
+          setMessageInfo({ message: t('songUpdated'), type: 'success' });
         }
         onClose();
       } catch (error) {
-        console.error('曲の更新に失敗しました', error);
-        setMessageInfo({ message: isNewSong ? '曲の追加に失敗しました' : '曲の更新に失敗しました', type: 'error' });
+        console.error(t('songUpdateFailed'), error);
+        setMessageInfo({ message: isNewSong ? t('songAddFailed') : t('songUpdateFailed'), type: 'error' });
       }
     } catch (error) {
       setMessageInfo({ message: error.message, type: 'error' });
@@ -99,14 +101,14 @@ function SongModal({ isOpen, onClose, song }) {
       {showDuplicateConfirm ? (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">重複確認</h3>
-            <p className="mb-6">{`${title}/${artist} は既に存在します。登録しますか？`}</p>
+            <h3 className="text-lg font-bold mb-4">{t('duplicateConfirmation')}</h3>
+            <p className="mb-6">{t('songArtistAlreadyExists', { title, artist })}</p>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowDuplicateConfirm(false)}
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
               >
-                キャンセル
+                {t('cancel')}
               </button>
               <button
                 onClick={() => {
@@ -115,25 +117,25 @@ function SongModal({ isOpen, onClose, song }) {
                 }}
                 className={`px-4 py-2 bg-customTheme-${theme}-primary text-white rounded hover:bg-customTheme-${theme}-accent`}
               >
-                登録する
+                {t('register')}
               </button>
             </div>
           </div>
         </div>
       ) : (
         <div className="flex flex-col space-y-3 md:w-[500px]">
-          <h2 className="text-xl font-bold mb-4">{isNewSong ? '新規曲登録' : '編集画面'}</h2>
+          <h2 className="text-xl font-bold mb-4">{isNewSong ? t('newSongRegistration') : t('editScreen')}</h2>
           <div className="flex flex-col space-y-3">
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="曲名" className="input bg-gray-100 p-3 rounded" />
-            <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="アーティスト" className="input bg-gray-100 p-3 rounded" />
-            <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="カラオケ音源のYoutube URL" className="input bg-gray-100 p-3 rounded" />
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('songTitle')} className="input bg-gray-100 p-3 rounded" />
+            <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={t('artist')} className="input bg-gray-100 p-3 rounded" />
+            <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder={t('youtubeUrlPlaceholder')} className="input bg-gray-100 p-3 rounded" />
 
             {isNewSong && (
               <button
                 onClick={() => setShowDetails(!showDetails)}
                 className="flex items-center justify-between w-full p-2 rounded text-gray-500"
               >
-                詳細入力
+                {t('detailsInput')}
                 {showDetails ? <FaChevronUp /> : <FaChevronDown />}
               </button>
             )}
@@ -148,36 +150,36 @@ function SongModal({ isOpen, onClose, song }) {
                       setFurigana(newValue);
                       setFuriganaError(newValue && !isKatakana(newValue));
                     }}
-                    placeholder="曲名フリガナ（カタカナのみ）"
+                    placeholder={t('songFuriganaKatakanaOnly')}
                     className={`input bg-gray-100 p-3 w-full rounded ${furiganaError ? 'border-red-500' : ''}`}
                   />
                   {furiganaError && (
-                    <p className="text-red-500 text-sm mt-1">フリガナはカタカナのみで入力してください</p>
+                    <p className="text-red-500 text-sm mt-1">{t('furiganaKatakanaOnly')}</p>
                   )}
                 </div>
-                <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="タグ (カンマ区切り)" className="input bg-gray-100 p-3 rounded" />
-                <input type="text" value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="ジャンル" className="input bg-gray-100 p-3 rounded" />
-                <div>歌唱回数</div>
-                <input type="number" value={singingCount} onChange={(e) => setSingingCount(e.target.value)} placeholder="歌唱回数" className="input bg-gray-100 p-3 rounded" />
-                <div>熟練度</div>
-                <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder="熟練度" className="input bg-gray-100 p-3 rounded" />
+                <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder={t('tagsCommaSeparated')} className="input bg-gray-100 p-3 rounded" />
+                <input type="text" value={genre} onChange={(e) => setGenre(e.target.value)} placeholder={t('genre')} className="input bg-gray-100 p-3 rounded" />
+                <div>{t('singingCount')}</div>
+                <input type="number" value={singingCount} onChange={(e) => setSingingCount(e.target.value)} placeholder={t('singingCount')} className="input bg-gray-100 p-3 rounded" />
+                <div>{t('skillLevel')}</div>
+                <input type="number" value={skillLevel} onChange={(e) => setSkillLevel(e.target.value)} placeholder={t('skillLevel')} className="input bg-gray-100 p-3 rounded" />
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">備考</label>
+                  <label className="block text-sm font-medium mb-1">{t('note')}</label>
                   <textarea
                     name="note"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder="備考"
+                    placeholder={t('note')}
                     className="input bg-gray-100 p-3 rounded w-full"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">メモ</label>
+                  <label className="block text-sm font-medium mb-1">{t('memo')}</label>
                   <textarea
                     name="memo"
                     value={memo}
                     onChange={(e) => setMemo(e.target.value)}
-                    placeholder="メモ"
+                    placeholder={t('memo')}
                     className="input bg-gray-100 p-3 rounded w-full"
                   />
                 </div>
@@ -185,7 +187,7 @@ function SongModal({ isOpen, onClose, song }) {
             )}
           </div>
           <button onClick={handleSaveSong} className={`button bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold p-3 rounded mt-3`}>
-            {isNewSong ? '曲を追加する' : '編集完了'}
+            {isNewSong ? t('addSong') : t('editComplete')}
           </button>
         </div>
       )}

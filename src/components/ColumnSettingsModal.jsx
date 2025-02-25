@@ -1,11 +1,14 @@
 import React from 'react';
 import Modal from '@/components/Modal';
+import { useTranslation } from 'next-i18next';
 
 const ColumnSettingsModal = ({ isOpen, onClose, visibleColumns, toggleColumnVisibility }) => {
+  const { t } = useTranslation('common');
+  
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">列の表示設定</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">{t('columnDisplaySettings')}</h2>
         <div className="">
           {Object.entries(visibleColumns).map(([key, { label, visible, removable }]) => (
             <div 
@@ -51,7 +54,7 @@ const ColumnSettingsModal = ({ isOpen, onClose, visibleColumns, toggleColumnVisi
             onClick={onClose}
             className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors w-full"
           >
-            完了
+            {t('done')}
           </button>
         </div>
       </div>

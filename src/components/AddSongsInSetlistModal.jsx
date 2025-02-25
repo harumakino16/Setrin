@@ -6,6 +6,8 @@ import fetchUsersSetlists from '../hooks/fetchSetlists';
 import { useMessage } from '../context/MessageContext';
 import { AuthContext } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from 'next-i18next';
+
 function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser }) {
 
     const [selectedSetlists, setSelectedSetlists] = useState([]);
@@ -13,6 +15,8 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
     const { setMessageInfo } = useMessage();
     const { setlists } = fetchUsersSetlists(currentUser);
     const { theme } = useTheme();
+    const { t } = useTranslation('common');
+    
     const handleCheckboxChange = (setlistId) => {
         setSelectedSetlists(prev => {
             if (prev.includes(setlistId)) {
@@ -38,17 +42,17 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
 
         try {
             await batch.commit();
-            setMessageInfo({ message: '曲がセットリストに追加されました。', type: 'success' });
+            setMessageInfo({ message: t('songsAddedToSetlist'), type: 'success' });
         } catch (error) {
             
-            setMessageInfo({ message: '曲の追加に失敗しました。', type: 'error' });
+            setMessageInfo({ message: t('failedToAddSongs'), type: 'error' });
         }
         onClose();
     };
 
     const handleCreateAndAddSongsToNewSetlist = async () => {
         if (newSetlistName.trim() === '') {
-            setMessageInfo({ message: 'セットリスト名を入力してください。', type: 'error' });
+            setMessageInfo({ message: t('pleaseEnterSetlistName'), type: 'error' });
             return;
         }
 
@@ -60,22 +64,22 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
                 createdAt: serverTimestamp()
             });
 
-            setMessageInfo({ message: '新しいセットリストが作成され、曲が追加されました。', type: 'success' });
+            setMessageInfo({ message: t('newSetlistCreatedAndSongsAdded'), type: 'success' });
             onClose();
         } catch (error) {
             
-            setMessageInfo({ message: '新しいセットリストの作成に失敗しました。', type: 'error' });
+            setMessageInfo({ message: t('failedToCreateNewSetlist'), type: 'error' });
         }
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <div className={`overflow-y-auto p-6 max-w-2xl mx-auto ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
-                <h2 className="text-2xl font-bold mb-6 pb-2 border-b">セットリストに曲を追加</h2>
+                <h2 className="text-2xl font-bold mb-6 pb-2 border-b">{t('addSongsToSetlist')}</h2>
                 
                 {setlists.length > 0 && (
                     <div className="mb-8">
-                        <h3 className="text-lg font-semibold mb-4">既存のセットリスト</h3>
+                        <h3 className="text-lg font-semibold mb-4">{t('existingSetlists')}</h3>
                         <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
                             {setlists.map(setlist => (
                                 <li key={setlist.id} 
@@ -111,19 +115,19 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
-                                選択したセットリストに追加
+                                {t('addToSelectedSetlists')}
                             </div>
                         </button>
                     </div>
                 )}
 
                 <div className="pt-6 border-t">
-                    <h3 className="text-lg font-semibold mb-4">新しいセットリストを作成</h3>
+                    <h3 className="text-lg font-semibold mb-4">{t('createNewSetlist')}</h3>
                     <input
                         type="text"
                         value={newSetlistName}
                         onChange={(e) => setNewSetlistName(e.target.value)}
-                        placeholder="セットリスト名を入力"
+                        placeholder={t('enterSetlistName')}
                         className={`w-full px-4 py-3 rounded-lg border ${
                             theme === 'dark' 
                                 ? 'bg-gray-800 border-gray-700 text-white' 
@@ -144,7 +148,7 @@ function AddSongsInSetlistModal({ isOpen, selectedSongs, onClose, currentUser })
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            新規セットリストを作成
+                            {t('createNewSetlist')}
                         </div>
                     </button>
                 </div>

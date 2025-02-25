@@ -9,6 +9,8 @@ import ColumnSettingsModal from './ColumnSettingsModal';
 import { useTheme } from '@/context/ThemeContext';
 import { sortSongs } from '../utils/sortUtils';
 import { convertUrlsToLinks } from '@/utils/textUtils';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 function MainTable({
   selectAll,
@@ -27,6 +29,9 @@ function MainTable({
 }) {
   const { songs } = useSongs();
   const { theme } = useTheme();
+  const { t } = useTranslation('common');
+  const router = useRouter();
+  const { locale } = router;
   const recordsPerPage = 30;
   const [currentPage, setCurrentPage] = useState(1);
   const [currentSongs, setCurrentSongs] = useState([]);
@@ -42,17 +47,17 @@ function MainTable({
 
   const getInitialVisibleColumns = () => {
     const defaultColumns = {
-      title: { label: '曲名', visible: true, removable: true },
-      artist: { label: 'アーティスト', visible: true, removable: true },
-      genre: { label: 'ジャンル', visible: true, removable: true },
-      tags: { label: 'タグ', visible: true, removable: true },
-      youtubeUrl: { label: 'YouTube', visible: true, removable: true },
-      singingCount: { label: '歌唱回数', visible: true, removable: true },
-      skillLevel: { label: '熟練度', visible: true, removable: true },
-      createdAt: { label: '追加日', visible: true, removable: true },
-      note: { label: '備考', visible: true, removable: true },
-      memo: { label: 'メモ', visible: true, removable: true },
-      actions: { label: '操作', visible: true, removable: true }
+      title: { label: 'songTitle', displayLabel: '', visible: true, removable: true },
+      artist: { label: 'artist', displayLabel: '', visible: true, removable: true },
+      genre: { label: 'genre', displayLabel: '', visible: true, removable: true },
+      tags: { label: 'tag', displayLabel: '', visible: true, removable: true },
+      youtubeUrl: { label: 'YouTube', displayLabel: 'YouTube', visible: true, removable: true },
+      singingCount: { label: 'singingCount', displayLabel: '', visible: true, removable: true },
+      skillLevel: { label: 'skillLevel', displayLabel: '', visible: true, removable: true },
+      createdAt: { label: 'addedDate', displayLabel: '', visible: true, removable: true },
+      note: { label: 'note', displayLabel: '', visible: true, removable: true },
+      memo: { label: 'memo', displayLabel: '', visible: true, removable: true },
+      actions: { label: 'actions', displayLabel: '', visible: true, removable: true }
     };
 
     if (typeof window !== 'undefined') {
@@ -61,7 +66,18 @@ function MainTable({
         try {
           const parsedColumns = JSON.parse(saved);
           // 新しいカラムがLocalStorageに存在しない場合、デフォルト値をマージする
-          return { ...defaultColumns, ...parsedColumns };
+          // 既存のカラムの場合は、visibleとremovableのみを引き継ぎ、labelとdisplayLabelはデフォルト値を使用する
+          const mergedColumns = { ...defaultColumns };
+          Object.keys(parsedColumns).forEach(key => {
+            if (mergedColumns[key]) {
+              mergedColumns[key] = { 
+                ...mergedColumns[key], 
+                visible: parsedColumns[key].visible !== undefined ? parsedColumns[key].visible : mergedColumns[key].visible,
+                removable: parsedColumns[key].removable !== undefined ? parsedColumns[key].removable : mergedColumns[key].removable
+              };
+            }
+          });
+          return mergedColumns;
         } catch (error) {
           console.error('Error parsing visibleColumns from localStorage:', error);
           return defaultColumns;
@@ -73,11 +89,28 @@ function MainTable({
 
   const [visibleColumns, setVisibleColumns] = useState(getInitialVisibleColumns);
 
+  // 翻訳が読み込まれた後にカラム名を更新
+  useEffect(() => {
+    console.log('Translation updated, updating column labels. Current locale:', locale);
+    setVisibleColumns(prev => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach(key => {
+        if (key !== 'youtubeUrl') { // YouTubeは翻訳しない
+          updated[key].displayLabel = t(updated[key].label);
+        }
+      });
+      return updated;
+    });
+  }, [t, locale]);
+
+  // コンポーネントマウント時にLocalStorageをクリアする（一時的な対応）
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('mainTableVisibleColumns', JSON.stringify(visibleColumns));
+      // 古いフォーマットのデータを削除
+      localStorage.removeItem('mainTableVisibleColumns');
+      console.log('Cleared localStorage for mainTableVisibleColumns');
     }
-  }, [visibleColumns]);
+  }, []);
 
   useEffect(() => {
     const indexOfLastRecord = currentPage * recordsPerPage;
@@ -208,13 +241,26 @@ function MainTable({
     setCurrentSongs(sortedSongs);
   };
 
+  // LocalStorageに保存する際は、displayLabelを除外する
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // displayLabelを除外したオブジェクトを作成
+      const storageColumns = {};
+      Object.keys(visibleColumns).forEach(key => {
+        const { displayLabel, ...rest } = visibleColumns[key];
+        storageColumns[key] = rest;
+      });
+      localStorage.setItem('mainTableVisibleColumns', JSON.stringify(storageColumns));
+    }
+  }, [visibleColumns]);
+
   return (
     <div>
       {currentSongs.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-gray-500 mb-4">まだ曲が登録されていません</p>
+          <p className="text-gray-500 mb-4">{t('noSongsRegistered')}</p>
           <button onClick={() => setModalState({ ...modalState, addSong: true })} className={`bg-customTheme-${theme}-primary hover:bg-customTheme-${theme}-accent text-white font-bold py-2 px-4 rounded`}>
-            曲を追加する
+            {t('addSong')}
           </button>
         </div>
       ) : (
@@ -233,7 +279,7 @@ function MainTable({
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r" style={{ position: 'relative', minWidth: '30px' }}>
                   <input className="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 cursor-pointer" type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                 </th>
-                {Object.entries(visibleColumns).map(([key, { label, visible }]) =>
+                {Object.entries(visibleColumns).map(([key, { label, visible, displayLabel }]) =>
                   visible && (
                     <th
                       ref={el => { headerRefs.current[key] = el; }}
@@ -241,7 +287,11 @@ function MainTable({
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative border-r"
                     >
                       <div className="flex items-center cursor-pointer header-content" onClick={() => requestSort(key)}>
-                        <span>{label}</span>
+                        <span>
+                          {key === 'youtubeUrl' 
+                            ? label 
+                            : (displayLabel || t(label))}
+                        </span>
                         <FontAwesomeIcon
                           icon={
                             sortConfig.key === key
@@ -314,7 +364,7 @@ function MainTable({
                           <FontAwesomeIcon icon={faYoutube} size="lg" />
                         </a>
                       ) : (
-                        "未登録"
+                        t('notRegistered')
                       )}
                     </td>
                   )}
@@ -352,7 +402,7 @@ function MainTable({
                         day: '2-digit',
                         hour: '2-digit',
                         minute: '2-digit'
-                      }) : '未設定'}
+                      }) : t('notSet')}
                     </td>
                   )}
                   {visibleColumns.note.visible && (
@@ -377,8 +427,8 @@ function MainTable({
                   )}
                   {visibleColumns.actions.visible && (
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <button onClick={() => handleEditSong(song.id)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">編集</button>
-                      <button onClick={() => handleDeleteSong(song.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">削除</button>
+                      <button onClick={() => handleEditSong(song.id)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">{t('edit')}</button>
+                      <button onClick={() => handleDeleteSong(song.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">{t('delete')}</button>
                     </td>
                   )}
                 </tr>

@@ -1,0 +1,37 @@
+日本語,英語,繁体字中国語,繁体字中国語修正
+Setlinkへようこそ,Welcome to Setlink,Setlink歡迎,歡迎使用Setlink
+歌枠をもっと楽しく、もっと便利に,Make singing streams more fun and more convenient,讓歌唱直播更有趣、更便利,
+メニュー,Menu,選單,
+曲リスト,Song List,曲目列表,歌曲列表
+セットリスト,Setlist,曲目清單,
+公開リスト管理,Public List Management,公開清單管理,
+歌枠ツール,Singing Tools,歌回直播工具,歌唱直播工具
+ダッシュボード,Dashboard,數據分析,
+設定,Settings,設定,
+管理者ページ,Admin Page,管理者頁面,
+セトリを作る,Create Setlist,創建曲目清單,
+曲が削除され、セットリストが更新されました。,"Song has been deleted, setlist updated.",曲目已刪除，曲目清單已更新。,歌曲已刪除，曲目清單已更新。
+曲の削除に失敗しました。,Failed to delete song.,刪除曲目失敗。,
+選択された曲が削除され、セットリストが更新されました。,"Selected songs have been deleted, setlist updated.",所選曲目已刪除，曲目清單已更新。,所選歌曲已刪除，曲目清單已更新。
+無料プランでは{{FREE_PLAN_MAX_SONGS}}曲まで追加できます。有料プランにアップグレードしますか？,You can add up to {{FREE_PLAN_MAX_SONGS}} songs with the free plan. Upgrade to the paid plan?,免費方案可添加 {{FREE_PLAN_MAX_SONGS}} 首歌曲。是否升級為付費方案？,
+{{count}}件選択中,{{count}} items selected,已選擇 {{count}} 項,
+セットリストに追加,Add to Setlist,添加至曲目清單,
+一括編集,Bulk Edit,批量編輯,
+まとめて削除,Delete Multiple,批量刪除,
+曲を追加する,Add Song,新增曲目,新增歌曲
+列の表示,Show Columns,顯示欄位,
+エクスポート,Export,匯出,
+一括編集が完了しました,Bulk edit completed,批量編輯完成,
+曲名,Song Title,曲目名稱,歌曲名稱
+フリガナ,Furigana,假名標註,拼音備註
+アーティスト,Artist,歌手,
+YouTube,YouTube,YouTube,
+ジャンル,Genre,類型,類別
+タグ1,Tag 1,標籤1,
+タグ2,Tag 2,標籤2,
+タグ3,Tag 3,標籤3,
+タグ4,Tag 4,標籤4,
+タグ5,Tag 5,標籤5,
+歌唱回数,Times Sung,演唱次數,
+熟練度,Skill Level,熟練度,
+備考,Note,備註,
