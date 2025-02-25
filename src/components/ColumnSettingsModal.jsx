@@ -44,7 +44,7 @@ const ColumnSettingsModal = ({ isOpen, onClose, visibleColumns, toggleColumnVisi
                   ${removable ? 'text-gray-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'}
                 `}
               >
-                {label}
+                {key === 'youtubeUrl' ? 'YouTube' : t(label)}
               </label>
             </div>
           ))}
