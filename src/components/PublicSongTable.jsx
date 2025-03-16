@@ -40,15 +40,20 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
       <div className="overflow-x-auto">
         <table className="min-w-full whitespace-nowrap divide-y divide-gray-200" style={{ tableLayout: 'fixed' }}>
           <colgroup>
+            {extraAction && <col style={{ width: '120px' }} />}
             {columnLabels.map(({ key }) =>
               visibleColumns?.[key] && (
                 <col key={key} style={{ width: '250px' }} />
               )
             )}
-            {extraAction && <col style={{ width: '120px' }} />}
           </colgroup>
           <thead className="bg-gray-50">
             <tr>
+              {extraAction && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  リクエスト
+                </th>
+              )}
               {columnLabels.map(({ key, label }) =>
                 visibleColumns?.[key] && (
                   <th
@@ -66,16 +71,16 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                   </th>
                 )
               )}
-              {extraAction && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  リクエスト
-                </th>
-              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {songs.map((song, index) => (
               <tr key={song.id || index}>
+                {extraAction && (
+                  <td className="px-6 py-4">
+                    {extraAction(song)}
+                  </td>
+                )}
                 {columnLabels.map(({ key }) =>
                   visibleColumns?.[key] && (
                     <td key={key} className="px-6 py-4" style={{ maxWidth: '250px' }}>
@@ -123,11 +128,6 @@ export default function PublicSongTable({ songs, visibleColumns, onRequestSort, 
                     <div dangerouslySetInnerHTML={{ 
                       __html: convertUrlsToLinks(song.memo) 
                     }} />
-                  </td>
-                )}
-                {extraAction && (
-                  <td className="px-6 py-4">
-                    {extraAction(song)}
                   </td>
                 )}
               </tr>
