@@ -68,9 +68,10 @@ export default function OtosapoAdBanner() {
                 <div className="bg-gray-50 p-2 border-t border-gray-100">
                     <div className="flex justify-between items-center px-4">
                         <div className="flex flex-col xs:flex-row xs:items-center">
-                            <span className="text-xs text-gray-500 mr-4">歌枠調整プラン: <span className="line-through">14,000円</span> → <span className="font-bold text-[#ea580c]">12,600円</span></span>
-                            <span className="text-xs text-gray-500 mt-1 xs:mt-0">※期間限定価格</span>
                             <span className="text-xs text-gray-400">プロモーションコードはお支払い画面にてご入力ください</span>
+                            <span className="text-xs text-gray-500 mr-4">＜おすすめ＞歌枠調整プラン: <span className="line-through">14,000円</span> → <span className="font-bold text-[#ea580c]">12,600円</span></span>
+                            <span className="text-xs text-gray-500 mt-1 xs:mt-0">■期間限定価格</span>
+                            <span className="text-xs text-gray-500 mt-1 xs:mt-0">■コードは全プランで利用可能です</span>
                         </div>
                         <div className="bottom-2 right-2 md:bottom-3 md:right-3 z-10">
                             <img
