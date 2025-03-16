@@ -567,11 +567,11 @@ export default function RequestUtawaku() {
                                                         const isConsumed = req.consumed;
                                                         return (
                                                             <tr key={req.id} className="hover:bg-gray-50 transition-colors">
-                                                                <td className="px-4 py-2 text-gray-700 truncate max-w-[300px]" title={req.songTitle}>
+                                                                <td className="px-4 py-2 text-gray-700 truncate max-w-[200px]" title={req.songTitle}>
                                                                     {req.youtubeUrl ? (
-                                                                        <Link href={req.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{req.songTitle}</Link>
+                                                                        <Link href={req.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate block" title={req.songTitle}>{req.songTitle}</Link>
                                                                     ) : (
-                                                                        req.songTitle
+                                                                        <span className="truncate block" title={req.songTitle}>{req.songTitle}</span>
                                                                     )}
                                                                 </td>
                                                                 <td className="px-4 py-2">
@@ -582,7 +582,9 @@ export default function RequestUtawaku() {
                                                                         <FontAwesomeIcon icon={faEye} />
                                                                     </button>
                                                                 </td>
-                                                                <td className="px-4 py-2 text-gray-700">{req.requesterName || '匿名'}</td>
+                                                                <td className="px-4 py-2 text-gray-700 truncate max-w-[130px]" title={req.requesterName || '匿名'}>
+                                                                    <span className="truncate block">{req.requesterName || '匿名'}</span>
+                                                                </td>
                                                                 <td className="px-4 py-2 text-gray-700">{req.isFirstTime ? '初見' : '常連'}</td>
                                                                 <td className="px-4 py-2 text-gray-700">{timeStr}</td>
                                                                 <td className="px-4 py-2">
