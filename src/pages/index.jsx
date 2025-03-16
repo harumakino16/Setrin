@@ -285,6 +285,8 @@ export default function Home() {
     <Layout>
       <div className="flex flex-col sm:flex-row w-full">
         <div className="flex-grow w-full p-0 sm:p-4">
+          {/* おとさぽ！バナー広告 - ページネーションの直下に配置 */}
+          {new Date() < new Date('2025-03-25T00:00:00') && <OtosapoAdBanner />}
           {/* <CtaComponent
             title="リクエスト歌枠ツールを使ってみよう"
             description="リクエスト歌枠ツールが実装されました。下のボタンをクリックするとリクエスト歌枠管理ページへ移動できます。リクエスト歌枠ツールでは、リスナーからのリクエストを受付・停止したり、届いたリクエストを確認・消化して管理することができます。"
@@ -408,8 +410,7 @@ export default function Home() {
           )}
         </div>
       </div>
-      {/* おとさぽ！バナー広告 - ページネーションの直下に配置 */}
-      {new Date() < new Date('2025-03-25T00:00:00') && <OtosapoAdBanner />}
+
     </Layout>
   );
 }
