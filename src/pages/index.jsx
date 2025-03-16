@@ -26,7 +26,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import BulkEditModal from '@/components/BulkEditModal';
 import { useRouter } from 'next/router';
 import CtaComponent from "@/components/CtaComponent";
-
+import OtosapoAdBanner from "@/components/OtosapoAdBanner";
 export default function Home() {
   const [modalState, setModalState] = useState({
     addSong: false,
@@ -408,6 +408,8 @@ export default function Home() {
           )}
         </div>
       </div>
+      {/* おとさぽ！バナー広告 - ページネーションの直下に配置 */}
+      {new Date() < new Date('2025-03-25T00:00:00') && <OtosapoAdBanner />}
     </Layout>
   );
 }
